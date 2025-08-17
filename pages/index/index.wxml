@@ -14,33 +14,37 @@
 				<icon type="location" size="22" color="#52c41a"/> 存放位置
 			</text>
 		</view>
-		<!-- 数据行 -->
+		<!-- 数据行，使用scroll-view包裹 -->
 		<block wx:if="{{products.length}}">
-			<block wx:for="{{products}}" wx:key="id">
-				<view class="swipe-row" data-show="{{swipeIndex==index}}">
-					<view class="swipe-actions">
-						<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDelete">删除</button>
-						<button class="swipe-btn update-btn" data-id="{{item.id}}" data-category="{{item.category}}" bindtap="onUpdate">更新</button>
+			<scroll-view scroll-y="true" class="table-scroll-view">
+				<block wx:for="{{products}}" wx:key="id">
+					<view class="swipe-row" data-show="{{swipeIndex==index}}">
+						<view class="swipe-actions">
+							<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDelete">删除</button>
+							<button class="swipe-btn update-btn" data-id="{{item.id}}" data-category="{{item.category}}" bindtap="onUpdate">更新</button>
+						</view>
+						<view class="table-row product-card swipe-content"
+						  catchtouchstart="onTouchStart"
+						  catchtouchmove="onTouchMove"
+						  catchtouchend="onTouchEnd"
+						  data-index="{{index}}">
+							<view class="table-cell name-cell">
+								<text class="product-name">{{item.name}} {{item.category === 'CatFood' ? '🐱' : item.category === 'Medicine' ? '💊' : item.category === 'Food' ? '🥖' : ''}}</text>
+							</view>
+							<view class="table-cell">
+								<text class="product-date date-normal">{{item.bestByFormatted}}</text>
+							</view>
+							<view class="table-cell">
+								<text class="location-tag">{{item.location.roomPlacement}}-{{item.location.site}}</text>
+							</view>
+						</view>
 					</view>
-					<view class="table-row product-card swipe-content"
-					  catchtouchstart="onTouchStart"
-					  catchtouchmove="onTouchMove"
-					  catchtouchend="onTouchEnd"
-					  data-index="{{index}}">
-						<view class="table-cell name-cell">
-							<text class="product-name">{{item.name}} {{item.category === 'CatFood' ? '🐱' : item.category === 'Medicine' ? '💊' : item.category === 'Food' ? '🥖' : ''}}</text>
-						</view>
-						<view class="table-cell">
-							<text class="product-date date-normal">{{item.bestByFormatted}}</text>
-						</view>
-						<view class="table-cell">
-							<text class="location-tag">{{item.location.roomPlacement}}-{{item.location.site}}</text>
-						</view>
-					</view>
-				</view>
-			</block>
+				</block>
+			</scroll-view>
 		</block>
-		<block wx:else="" />
+		<block wx:else="">
+			<view class="table-row"><text class="table-cell">暂无数据</text></view>
+		</block>
 	</view>
 	<!-- 添加新物品按钮 -->
 	<view class="add-btn-row">
