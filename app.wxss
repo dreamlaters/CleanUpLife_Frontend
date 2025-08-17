@@ -1,0 +1,245 @@
+/**app.wxss**/
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+} 
+
+/* ��ҳ������ʽ */
+.product-table {
+  width: 100%;
+  max-width: 700rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 16rpx #e0e0e0;
+  padding: 24rpx 0 0 0;
+  border: 1px solid #d9d9d9;
+}
+.table-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  min-height: 60rpx;
+}
+.table-row:last-child {
+  border-bottom: none;
+}
+.table-header {
+  background: #f6f8fa;
+  font-weight: bold;
+  color: #333;
+}
+.table-cell {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+  color: #444;
+  border-right: 1px solid #e0e0e0;
+}
+.table-cell:last-child {
+  border-right: none;
+}
+.product-status {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+}
+
+.add-btn-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50rpx 0 0 0;
+  width: 100%;
+  transform: rotate(45deg);
+}
+
+/* 表格美化和卡片样式 */
+.product-card {
+  background: #f9fafb;
+  border-radius: 16rpx;
+  margin: 16rpx 16rpx 0 16rpx;
+  box-shadow: 0 2rpx 8rpx #f0f1f2;
+  transition: box-shadow 0.2s;
+}
+.product-card:hover {
+  box-shadow: 0 4rpx 16rpx #e6f7ff;
+}
+.product-name {
+  font-weight: bold;
+  font-size: 30rpx;
+  color: #222;
+}
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.product-date {
+  font-size: 28rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+.date-normal {
+  background: #6adda9;
+  color: #000000;
+}
+.date-expired {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+.location-tag {
+  display: inline-block;
+  border-radius: 9rpx;
+  padding: 2rpx 10rpx;
+  font-size: 24rpx;
+  margin-right: 8rpx;
+  color: #222;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #bfbfbf;
+  font-size: 28rpx;
+  padding: 40rpx 0 60rpx 0;
+}
+
+/* 添加物品表单卡片样式 */
+.form-card {
+  width: 92%;
+  max-width: 700rpx;
+  background: #fff;
+  border-radius: 18rpx;
+  box-shadow: 0 4rpx 24rpx #e6f7ff;
+  padding: 48rpx 32rpx 32rpx 32rpx;
+  margin-top: 60rpx;
+  margin-bottom: 40rpx;
+}
+.form-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1890ff;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 36rpx;
+  justify-content: center;
+}
+.form-item {
+  margin-bottom: 32rpx;
+}
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  display: block;
+  font-weight: 500;
+}
+.form-input {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  background: #f9fafb;
+  margin-top: 8rpx;
+}
+.picker-view {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  background: #f9fafb;
+  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.location-selector {
+  display: flex;
+  gap: 18rpx;
+}
+.form-textarea {
+  width: 100%;
+  min-height: 80rpx;
+  border: 1px solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  background: #f9fafb;
+  margin-top: 8rpx;
+}
+.submit-button {
+  width: 100%;
+  background: linear-gradient(90deg, #1890ff 60%, #6adda9 100%);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: bold;
+  border: none;
+  border-radius: 12rpx;
+  padding: 22rpx 0;
+  margin-top: 18rpx;
+  box-shadow: 0 2rpx 8rpx #e6f7ff;
+}
+.submit-button:active {
+  background: #1890ff;
+}
+
+/* 左滑操作样式 */
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+}
+.swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  z-index: 2;
+  transition: right 0.2s;
+}
+.swipe-btn {
+  width: 120rpx;
+  height: 100%;
+  border: none;
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: bold;
+  outline: none;
+  border-radius: 0 16rpx 16rpx 0;
+}
+.delete-btn {
+  background: #ff4d4f;
+}
+.update-btn {
+  background: #1890ff;
+  border-radius: 0 0 16rpx 0;
+}
+.swipe-content {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  transition: transform 0.2s;
+}
+/* 控制滑动显示 */
+.swipe-row .swipe-actions {
+  right: -240rpx;
+}
+.swipe-row[data-show='true'] .swipe-actions {
+  right: 0;
+}
+.swipe-row .swipe-content {
+  transform: translateX(0);
+}
+.swipe-row[data-show='true'] .swipe-content {
+  transform: translateX(-240rpx);
+}

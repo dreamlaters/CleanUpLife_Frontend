@@ -1,0 +1,55 @@
+<!-- 首页展示物品列表和提醒功能 -->
+<view class="container">
+	<!-- 物品表格 -->
+	<view class="product-table">
+		<!-- 表头 -->
+		<view class="table-row table-header">
+			<text class="table-cell" bindtap="onSortByName">
+				<icon type="info" size="22" color="#1890ff"/> 名称
+			</text>
+			<text class="table-cell" bindtap="onSortByBestBy">
+				<icon type="time" size="22" color="#faad14"/> 保质期
+			</text>
+			<text class="table-cell">
+				<icon type="location" size="22" color="#52c41a"/> 存放位置
+			</text>
+		</view>
+		<!-- 数据行 -->
+		<block wx:if="{{products.length}}">
+			<block wx:for="{{products}}" wx:key="id">
+				<view class="swipe-row" data-show="{{swipeIndex==index}}">
+					<view class="swipe-actions">
+						<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDelete">删除</button>
+						<button class="swipe-btn update-btn" data-id="{{item.id}}" data-category="{{item.category}}" bindtap="onUpdate">更新</button>
+					</view>
+					<view class="table-row product-card swipe-content"
+					  catchtouchstart="onTouchStart"
+					  catchtouchmove="onTouchMove"
+					  catchtouchend="onTouchEnd"
+					  data-index="{{index}}">
+						<view class="table-cell name-cell">
+							<text class="product-name">{{item.name}} {{item.category === 'CatFood' ? '🐱' : item.category === 'Medicine' ? '💊' : item.category === 'Food' ? '🥖' : ''}}</text>
+						</view>
+						<view class="table-cell">
+							<text class="product-date date-normal">{{item.bestByFormatted}}</text>
+						</view>
+						<view class="table-cell">
+							<text class="location-tag">{{item.location.roomPlacement}}-{{item.location.site}}</text>
+						</view>
+					</view>
+				</view>
+			</block>
+		</block>
+		<block wx:else="" />
+	</view>
+	<!-- 添加新物品按钮 -->
+	<view class="add-btn-row">
+		<icon type="cancel" size="45" color="#1890ff" bindtap="goToTarget" />
+	</view>
+	<!-- 跳转到OpenID页面的链接 -->
+	<view style="margin-top: 40rpx; text-align: center;">
+		<navigator url="/pages/openid/openid" open-type="navigate">
+			<text style="color: #1890ff; font-size: 32rpx; text-decoration: underline;">推送消息</text>
+		</navigator>
+	</view>
+</view>

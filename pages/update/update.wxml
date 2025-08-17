@@ -1,0 +1,92 @@
+<!-- 更新物品页面 -->
+<view class="container">
+  <view class="form-card">
+    <view class="form-title">
+      <icon type="edit" size="28" color="#faad14" /> 更新物品
+    </view>
+    <!-- 物品名称输入 -->
+    <view class="form-item">
+      <text class="form-label">物品名称*</text>
+      <input class="form-input" placeholder="请输入物品名称" bindinput="onNameInput" value="{{formData.name}}"/>
+    </view>
+    <!-- 保质期到期日选择 -->
+    <view class="form-item">
+      <text class="form-label">保质期到期日*</text>
+      <picker mode="date" value="{{formData.bestBy}}" start="{{today}}" bindchange="onDateChange">
+        <view class="picker-view">
+          <icon type="time" size="20" color="#faad14" /> {{formData.bestBy || '请选择日期'}}
+        </view>
+      </picker>
+    </view>
+    <!-- 存放位置选择 -->
+    <view class="form-item">
+      <text class="form-label">存放位置*</text>
+      <view class="location-selector">
+        <picker bindchange="onLocationRoomChange" value="{{locationRoomIndex}}" range="{{locationRooms}}">
+          <view class="picker-view">
+            <icon type="location" size="20" color="#52c41a" /> {{locationRooms[locationRoomIndex] || '选择房间'}}
+          </view>
+        </picker>
+        <picker bindchange="onLocationSiteChange" value="{{locationSiteIndex}}" range="{{locationSites}}">
+          <view class="picker-view">
+            {{locationSites[locationSiteIndex] || '具体位置'}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <!-- 物品种类选择 -->
+    <view class="form-item">
+      <text class="form-label">物品种类*</text>
+      <picker bindchange="onCategoryChange" value="{{categoryIndex}}" range="{{categories}}">
+        <view class="picker-view">
+          {{categories[categoryIndex] || '请选择种类'}}
+        </view>
+      </picker>
+    </view>
+    <!-- 食物特有字段 -->
+    <view wx:if="{{categories[categoryIndex] === '食物'}}">
+      <view class="form-item">
+        <text class="form-label">存储条件*</text>
+        <picker bindchange="onStorageChange" value="{{storageIndex}}" range="{{storages}}">
+          <view class="picker-view">
+            {{storages[storageIndex] || '请选择存储条件'}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <!-- 猫粮特有字段 -->
+    <view wx:if="{{categories[categoryIndex] === '猫粮'}}">
+      <view class="form-item">
+        <text class="form-label">蛋白质百分比*</text>
+        <input class="form-input" placeholder="请输入蛋白质百分比" bindinput="onProteinInput" value="{{formData.proteinPercentage}}" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">重量*</text>
+        <input class="form-input" placeholder="请输入重量" bindinput="onWeightInput" value="{{formData.weight}}" />
+        <picker bindchange="onWeightUnitChange" value="{{weightUnitIndex}}" range="{{weightUnits}}">
+          <view class="picker-view">
+            {{weightUnits[weightUnitIndex] || '单位'}}
+          </view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">口味*</text>
+        <input class="form-input" placeholder="请输入口味" bindinput="onFlavorInput" value="{{formData.flavor}}" />
+      </view>
+    </view>
+    <!-- 药品特有字段 -->
+    <view wx:if="{{categories[categoryIndex] === '药品'}}">
+      <view class="form-item">
+        <text class="form-label">功效*</text>
+        <input class="form-input" placeholder="请输入功效" bindinput="onEffectInput" value="{{formData.effect}}" />
+      </view>
+    </view>
+    <!-- 物品描述输入 -->
+    <view class="form-item">
+      <text class="form-label">描述</text>
+      <textarea class="form-textarea" placeholder="可选描述" bindinput="onDescriptionInput" value="{{formData.description}}"></textarea>
+    </view>
+    <!-- 更新按钮 -->
+    <button class="submit-button" bindtap="updateForm" type="primary">更新物品</button>
+  </view>
+</view>

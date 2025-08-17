@@ -1,0 +1,10 @@
+<view class="container">
+  <view class="form-card">
+    <view class="form-title">当前用户 OpenID</view>
+    <view class="form-item">
+      <text class="form-label">OpenID：</text>
+      <text selectable="true">{{openid}}</text>
+    </view>
+    <button class="submit-button" style="margin-top: 32rpx;" open-type="requestSubscribeMessage" bindtap="onRequestSubscribe">允许消息推送</button>
+  </view>
+</view>

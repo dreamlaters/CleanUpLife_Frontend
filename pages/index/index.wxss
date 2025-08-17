@@ -1,0 +1,18 @@
+.table-cell {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+  color: #444;
+  border-right: 1px solid #e0e0e0;
+}
+/* 保质期列宽度设置为25% */
+.table-cell:nth-child(2) {
+  flex: none;
+  width: 28%;
+  min-width: 120rpx;
+  max-width: 220rpx;
+}
+.table-cell:last-child {
+  border-right: none;
+}
