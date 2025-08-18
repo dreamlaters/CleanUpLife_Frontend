@@ -3,10 +3,13 @@ Page({
     data: {
         products: [], // 存储物品列表
         touchStartX: 0,
+        touchStartY: 0, // 添加Y坐标记录
         touchMoveX: 0,
+        touchMoveY: 0, // 添加Y坐标记录
         swipeIndex: -1, // 当前左滑显示操作的行索引
         sortField: '', // 当前排序字段
-        sortOrder: 'asc' // 当前排序顺序
+        sortOrder: 'asc', // 当前排序顺序
+        isVerticalScroll: false // 标记是否为垂直滚动
     },
     // 页面加载时获取数据
     onLoad: function () {
@@ -65,12 +68,32 @@ Page({
     onTouchStart: function (e) {
         this.setData({
             touchStartX: e.touches[0].clientX,
+            touchStartY: e.touches[0].clientY, // 记录Y坐标
+            isVerticalScroll: false, // 重置垂直滚动标记
             swipeIndex: -1
         });
     },
     onTouchMove: function (e) {
         const moveX = e.touches[0].clientX;
+        const moveY = e.touches[0].clientY;
         const index = e.currentTarget.dataset.index;
+        
+        // 计算X和Y方向的移动距离
+        const deltaX = Math.abs(moveX - this.data.touchStartX);
+        const deltaY = Math.abs(moveY - this.data.touchStartY);
+        
+        // 如果Y方向的移动距离大于X方向，认为是垂直滚动
+        if (deltaY > deltaX && deltaY > 10) {
+            this.setData({ isVerticalScroll: true });
+            return; // 不处理左右滑动
+        }
+        
+        // 如果已经判定为垂直滚动，不处理左右滑动
+        if (this.data.isVerticalScroll) {
+            return;
+        }
+        
+        // 处理左右滑动
         if (this.data.touchStartX - moveX > 50) {
             this.setData({ swipeIndex: index });
         }
@@ -80,6 +103,8 @@ Page({
     },
     onTouchEnd: function (e) {
         // 保持当前swipeIndex
+        // 重置垂直滚动标记
+        this.setData({ isVerticalScroll: false });
     },
     // 删除功能
     onDelete: function (e) {
