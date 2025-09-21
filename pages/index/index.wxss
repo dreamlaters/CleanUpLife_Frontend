@@ -24,7 +24,7 @@
 }
 
 .table-scroll-view {
-  max-height: 700rpx; /* 9行，每行约78rpx，可根据实际行高调整 */
+  max-height: 450rpx; /* 9行，每行约78rpx，可根据实际行高调整 */
   min-height: 100rpx;
   overflow-y: auto;
 }
@@ -64,6 +64,29 @@
   background: #fff;
   z-index: 1;
   overflow: hidden;
+}
+
+.product-date {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  color: #fff;
+}
+
+/* 过期：红色 */
+.date-expired {
+  background: #ff4d4f;
+}
+/* 快过期：黄色 */
+.date-soon {
+  background: #faad14;
+  color: #000;
+}
+/* 正常：绿色 */
+.date-normal {
+  background: #6adda9;
+  color: #000;
 }
 
 .swipe-btn {

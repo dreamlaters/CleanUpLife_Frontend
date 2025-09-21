@@ -32,7 +32,8 @@
 								<text class="product-name">{{item.name}} {{item.category === 'CatFood' ? '🐱' : item.category === 'Medicine' ? '💊' : item.category === 'Food' ? '🥖' : ''}}</text>
 							</view>
 							<view class="table-cell">
-								<text class="product-date date-normal">{{item.bestByFormatted}}</text>
+								<!-- 根据后端计算的dateClass动态设置样式 -->
+								<text class="product-date {{item.dateClass}}">{{item.bestByFormatted}}</text>
 							</view>
 							<view class="table-cell">
 								<text class="location-tag">{{item.location.roomPlacement}}-{{item.location.site}}</text>

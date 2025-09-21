@@ -30,11 +30,29 @@ Page({
             method: 'GET',
             success: (res) => {
                 if (res.statusCode === 200) {
-                    // 对每个物品格式化日期
-                    const products = res.data.map(item => ({
-                        ...item,
-                        bestByFormatted: this.formatDate(item.bestBy)
-                    }));
+                    // 对每个物品格式化日期并计算状态样式
+                    const products = res.data.map(item => {
+                        const bestBy = item.bestBy ? new Date(item.bestBy) : null;
+                        const today = new Date();
+                        let dateClass = 'date-normal';
+                        if (bestBy) {
+                            // 清除时间部分，按天比较
+                            const b = new Date(bestBy.getFullYear(), bestBy.getMonth(), bestBy.getDate());
+                            const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                            const diffMs = b - t;
+                            const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                            if (diffDays < 0) {
+                                dateClass = 'date-expired';
+                            } else if (diffDays <= 30) {
+                                dateClass = 'date-soon';
+                            }
+                        }
+                        return {
+                            ...item,
+                            bestByFormatted: this.formatDate(item.bestBy),
+                            dateClass
+                        };
+                    });
                     // 成功获取数据后设置到页面数据中
                     this.setData({
                         products: products
