@@ -9,7 +9,6 @@
   box-sizing: border-box;
 } 
 
-/* ��ҳ������ʽ */
 .product-table {
   width: 100%;
   max-width: 700rpx;
