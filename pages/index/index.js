@@ -2,11 +2,13 @@
 Page({
     data: {
         products: [], // 存储物品列表
+        toBuyProducts: [], // 存储待购物品
         touchStartX: 0,
         touchStartY: 0, // 添加Y坐标记录
         touchMoveX: 0,
         touchMoveY: 0, // 添加Y坐标记录
         swipeIndex: -1, // 当前左滑显示操作的行索引
+        toBuySwipeIndex: -1, // 待购物品左滑索引
         sortField: '', // 当前排序字段
         sortOrder: 'asc', // 当前排序顺序
         isVerticalScroll: false // 标记是否为垂直滚动
@@ -14,10 +16,12 @@ Page({
     // 页面加载时获取数据
     onLoad: function () {
         this.fetchProducts();
+        this.fetchToBuyProducts();
     },
     // 页面显示时刷新数据
     onShow: function () {
         this.fetchProducts();
+        this.fetchToBuyProducts();
     },
     // 从API获取物品列表
     fetchProducts: function () {
@@ -77,12 +81,63 @@ Page({
             }
         });
     },
+    // 获取待购物品列表
+    fetchToBuyProducts: function() {
+        wx.request({
+            url: 'https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsites.net/ToBuy',
+            method: 'GET',
+            success: (res) => {
+                if (res.statusCode === 200) {
+                    const list = (res.data || []).map(item => ({
+                        ...item,
+                        // 兼容后端字段名：Priority / Name
+                        priority: item.priority ?? item.Priority ?? 0,
+                        name: item.name ?? item.Name ?? ''
+                    }));
+                    // 按优先级排序
+                    list.sort((a, b) => a.priority - b.priority);
+                    this.setData({ toBuyProducts: list });
+                }
+            }
+        });
+    },
     goToTarget: function () {
         wx.navigateTo({
             url: '/pages/add/add'
         });
     },
-    // 左滑交互
+    goToAddToBuy: function() {
+        wx.navigateTo({ url: '/pages/tobuy/add' });
+    },
+    // 删除待购物品
+    onDeleteToBuy: function(e) {
+        const id = e.currentTarget.dataset.id;
+        wx.showModal({
+            title: '确认删除',
+            content: '确定要删除该待购物品吗？',
+            success: (res) => {
+                if (res.confirm) {
+                    wx.request({
+                        url: `https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsites.net/ToBuy/${id}`,
+                        method: 'DELETE',
+                        success: () => {
+                            wx.showToast({ title: '删除成功', icon: 'success' });
+                            this.fetchToBuyProducts();
+                        },
+                        fail: () => {
+                            wx.showToast({ title: '删除失败', icon: 'error' });
+                        }
+                    });
+                }
+            }
+        });
+    },
+    // 更新待购物品
+    onUpdateToBuy: function(e) {
+        const id = e.currentTarget.dataset.id;
+        wx.navigateTo({ url: `/pages/tobuy/update?id=${id}` });
+    },
+    // 左滑交互 for main list
     onTouchStart: function (e) {
         this.setData({
             touchStartX: e.touches[0].clientX,
@@ -122,6 +177,36 @@ Page({
     onTouchEnd: function (e) {
         // 保持当前swipeIndex
         // 重置垂直滚动标记
+        this.setData({ isVerticalScroll: false });
+    },
+    // 左滑交互 for toBuy list
+    onTouchStartToBuy: function(e) {
+        this.setData({
+            toBuyTouchStartX: e.touches[0].clientX,
+            toBuyTouchStartY: e.touches[0].clientY,
+            isVerticalScroll: false,
+            toBuySwipeIndex: -1
+        });
+    },
+    onTouchMoveToBuy: function(e) {
+        const moveX = e.touches[0].clientX;
+        const moveY = e.touches[0].clientY;
+        const index = e.currentTarget.dataset.index;
+        const deltaX = Math.abs(moveX - this.data.toBuyTouchStartX);
+        const deltaY = Math.abs(moveY - this.data.toBuyTouchStartY);
+        if (deltaY > deltaX && deltaY > 10) {
+            this.setData({ isVerticalScroll: true });
+            return;
+        }
+        if (this.data.isVerticalScroll) return;
+        if (this.data.toBuyTouchStartX - moveX > 50) {
+            this.setData({ toBuySwipeIndex: index });
+        }
+        if (moveX - this.data.toBuyTouchStartX > 50) {
+            this.setData({ toBuySwipeIndex: -1 });
+        }
+    },
+    onTouchEndToBuy: function(e) {
         this.setData({ isVerticalScroll: false });
     },
     // 删除功能

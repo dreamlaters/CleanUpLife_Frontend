@@ -24,7 +24,7 @@
 }
 
 .table-scroll-view {
-  max-height: 450rpx; /* 9行，每行约78rpx，可根据实际行高调整 */
+  max-height: 410rpx; /* 9行，每行约78rpx，可根据实际行高调整 */
   min-height: 100rpx;
   overflow-y: auto;
 }

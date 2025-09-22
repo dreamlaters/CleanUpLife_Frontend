@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="form-card">
+    <view class="form-title">
+      <icon type="add" size="28" color="#1890ff" /> 新增待购物品
+    </view>
+    <view class="form-item">
+      <text class="form-label">物品名称*</text>
+      <input class="form-input" placeholder="请输入物品名称" bindinput="onNameInput" value="{{formData.name}}" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">优先级（数字，越小越优先）*</text>
+      <input class="form-input" type="number" placeholder="请输入优先级" bindinput="onPriorityInput" value="{{formData.priority}}" />
+    </view>
+    <view class="form-item">
+      <text class="form-label">描述</text>
+      <textarea class="form-textarea" placeholder="可选描述" bindinput="onDescriptionInput" value="{{formData.description}}"></textarea>
+    </view>
+    <button class="submit-button" bindtap="submitForm" type="primary">新增</button>
+  </view>
+</view>
