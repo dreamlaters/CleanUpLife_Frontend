@@ -316,7 +316,7 @@ Page({
                         let displayName = item.name || '';
                         if (item.type === 'Domestic' && item.domesticLocation) {
                             const loc = item.domesticLocation;
-                            displayName = [loc.province, loc.city, loc.district].filter(Boolean).join('-');
+                            displayName = [loc.province, loc.city].filter(Boolean).join('-');
                             if (item.name) displayName += `(${item.name})`;
                         } else if (item.type === 'International' && item.country) {
                             displayName = item.country;
@@ -385,9 +385,9 @@ Page({
         this.setData({ travelFormName: e.detail.value });
     },
 
-    // 优先级选择
+    // 优先级选择（slider）
     onTravelPriorityChange: function(e) {
-        this.setData({ travelFormPriority: parseInt(e.detail.value) + 1 });
+        this.setData({ travelFormPriority: e.detail.value });
     },
 
     // 提交新增出行目的地
@@ -402,11 +402,10 @@ Page({
         };
 
         if (travelFormTypeIndex === 0) {
-            // 国内 - 使用官方region picker的结果
+            // 国内 - 使用官方region picker的结果（只省市）
             destination.domesticLocation = {
                 province: travelRegion[0] || '',
-                city: travelRegion[1] || '',
-                district: travelRegion[2] || ''
+                city: travelRegion[1] || ''
             };
         } else {
             // 国外

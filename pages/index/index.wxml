@@ -117,12 +117,12 @@
 					<view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '国内' : '国外'}}</view>
 				</picker>
 			</view>
-			<!-- 国内选择省市区 - 使用微信官方region picker -->
+			<!-- 国内选择省市 - 使用微信官方region picker，level="sub-district"可选省市区，level="city"只选省市 -->
 			<block wx:if="{{travelFormTypeIndex === 0}}">
 				<view class="travel-form-row">
-					<text class="travel-form-label">省市区</text>
-					<picker mode="region" value="{{travelRegion}}" bindchange="onRegionChange">
-						<view class="travel-form-picker">{{travelRegion[0] ? travelRegion.join('-') : '请选择省市区'}}</view>
+					<text class="travel-form-label">省市</text>
+					<picker mode="region" level="city" value="{{travelRegion}}" bindchange="onRegionChange">
+						<view class="travel-form-picker">{{travelRegion[0] ? travelRegion.join('-') : '请选择省市'}}</view>
 					</picker>
 				</view>
 			</block>
@@ -139,11 +139,11 @@
 				<text class="travel-form-label">目的地名称</text>
 				<input class="travel-form-input" placeholder="请输入目的地名称/备注" value="{{travelFormName}}" bindinput="onTravelNameInput" />
 			</view>
-			<view class="travel-form-row">
+			<view class="travel-form-row travel-form-row-slider">
 				<text class="travel-form-label">优先级</text>
-				<picker mode="selector" range="{{[1,2,3,4,5]}}" value="{{travelFormPriority - 1}}" bindchange="onTravelPriorityChange">
-					<view class="travel-form-picker">{{travelFormPriority}}</view>
-				</picker>
+				<view class="travel-slider-wrap">
+					<slider min="1" max="30" value="{{travelFormPriority}}" show-value="true" activeColor="#1890ff" bindchange="onTravelPriorityChange" />
+				</view>
 			</view>
 			<view class="travel-form-btns">
 				<button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
