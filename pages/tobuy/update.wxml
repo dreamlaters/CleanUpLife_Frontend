@@ -7,9 +7,11 @@
       <text class="form-label">物品名称*</text>
       <input class="form-input" placeholder="请输入物品名称" bindinput="onNameInput" value="{{formData.name}}" />
     </view>
-    <view class="form-item">
-      <text class="form-label">优先级（数字，越小越优先）*</text>
-      <input class="form-input" type="number" placeholder="请输入优先级" bindinput="onPriorityInput" value="{{formData.priority}}" />
+    <view class="form-item form-item-slider">
+      <text class="form-label">优先级（越小越优先）*</text>
+      <view class="slider-wrap">
+        <slider min="1" max="100" value="{{formData.priority}}" show-value="true" activeColor="#1890ff" bindchange="onPriorityChange" />
+      </view>
     </view>
     <view class="form-item">
       <text class="form-label">描述</text>

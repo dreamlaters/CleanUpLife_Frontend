@@ -1,7 +1,7 @@
 Page({
   data: {
     id: null,
-    formData: { name: '', priority: 0, description: '' }
+    formData: { name: '', priority: 1, description: '' }
   },
   onLoad: function(options) {
     if (options.id) {
@@ -17,7 +17,7 @@ Page({
       success: (res) => {
         if (res.statusCode === 200) {
           const item = res.data;
-          this.setData({ formData: { name: item.name ?? item.Name ?? '', priority: item.priority ?? item.Priority ?? 0, description: item.description ?? item.Description ?? '' } });
+          this.setData({ formData: { name: item.name ?? item.Name ?? '', priority: item.priority ?? item.Priority ?? 1, description: item.description ?? item.Description ?? '' } });
         } else {
           wx.showToast({ title: '加载失败', icon: 'error' });
         }
@@ -27,7 +27,7 @@ Page({
     });
   },
   onNameInput: function(e) { this.setData({ 'formData.name': e.detail.value }); },
-  onPriorityInput: function(e) { this.setData({ 'formData.priority': Number(e.detail.value) }); },
+  onPriorityChange: function(e) { this.setData({ 'formData.priority': e.detail.value }); },
   onDescriptionInput: function(e) { this.setData({ 'formData.description': e.detail.value }); },
   submitForm: function() {
     if (!this.data.formData.name) { wx.showToast({ title: '物品名称不能为空', icon: 'error' }); return; }

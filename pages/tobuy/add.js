@@ -2,15 +2,15 @@ Page({
   data: {
     formData: {
       name: '',
-      priority: 0,
+      priority: 1,
       description: ''
     }
   },
   onNameInput: function (e) {
     this.setData({ 'formData.name': e.detail.value });
   },
-  onPriorityInput: function (e) {
-    this.setData({ 'formData.priority': Number(e.detail.value) });
+  onPriorityChange: function (e) {
+    this.setData({ 'formData.priority': e.detail.value });
   },
   onDescriptionInput: function (e) {
     this.setData({ 'formData.description': e.detail.value });

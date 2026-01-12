@@ -93,3 +93,13 @@
 .update-btn {
   background: linear-gradient(90deg, #1890ff 50%, #40a9ff 100%);
 }
+
+/* 滑块样式 */
+.form-item-slider {
+  padding-bottom: 10rpx;
+}
+
+.slider-wrap {
+  width: 100%;
+  padding: 16rpx 0;
+}
