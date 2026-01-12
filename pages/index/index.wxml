@@ -96,6 +96,119 @@
 			<icon type="cancel" size="45" color="#1890ff" bindtap="goToAddToBuy" />
 		</view>
 	</view>
+
+	<!-- 待出行模块 -->
+	<view class="travel-section" style="margin-top: 40rpx;max-width: 700rpx;width:100%;">
+		<!-- Tab切换 -->
+		<view class="travel-tabs">
+			<view class="travel-tab {{travelTab === 'pending' ? 'travel-tab-active' : ''}}" bindtap="switchTravelTab" data-tab="pending">
+				待出行
+			</view>
+			<view class="travel-tab {{travelTab === 'visited' ? 'travel-tab-active' : ''}}" bindtap="switchTravelTab" data-tab="visited">
+				已出行
+			</view>
+		</view>
+
+		<!-- 新增待出行目的地区域 -->
+		<view class="travel-add-form" wx:if="{{showTravelForm}}">
+			<view class="travel-form-row">
+				<text class="travel-form-label">目的地类型</text>
+				<picker mode="selector" range="{{['国内', '国外']}}" value="{{travelFormTypeIndex}}" bindchange="onTravelTypeChange">
+					<view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '国内' : '国外'}}</view>
+				</picker>
+			</view>
+			<!-- 国内选择省市区 -->
+			<block wx:if="{{travelFormTypeIndex === 0}}">
+				<view class="travel-form-row">
+					<text class="travel-form-label">省份</text>
+					<picker mode="selector" range="{{provinceList}}" value="{{travelProvinceIndex}}" bindchange="onProvinceChange">
+						<view class="travel-form-picker">{{provinceList[travelProvinceIndex] || '请选择省份'}}</view>
+					</picker>
+				</view>
+				<view class="travel-form-row">
+					<text class="travel-form-label">城市</text>
+					<picker mode="selector" range="{{cityList}}" value="{{travelCityIndex}}" bindchange="onCityChange">
+						<view class="travel-form-picker">{{cityList[travelCityIndex] || '请选择城市'}}</view>
+					</picker>
+				</view>
+				<view class="travel-form-row">
+					<text class="travel-form-label">区县</text>
+					<picker mode="selector" range="{{districtList}}" value="{{travelDistrictIndex}}" bindchange="onDistrictChange">
+						<view class="travel-form-picker">{{districtList[travelDistrictIndex] || '请选择区县'}}</view>
+					</picker>
+				</view>
+			</block>
+			<!-- 国外选择国家 -->
+			<block wx:if="{{travelFormTypeIndex === 1}}">
+				<view class="travel-form-row">
+					<text class="travel-form-label">国家</text>
+					<picker mode="selector" range="{{countryList}}" value="{{travelCountryIndex}}" bindchange="onCountryChange">
+						<view class="travel-form-picker">{{countryList[travelCountryIndex] || '请选择国家'}}</view>
+					</picker>
+				</view>
+			</block>
+			<view class="travel-form-row">
+				<text class="travel-form-label">目的地名称</text>
+				<input class="travel-form-input" placeholder="请输入目的地名称/备注" value="{{travelFormName}}" bindinput="onTravelNameInput" />
+			</view>
+			<view class="travel-form-row">
+				<text class="travel-form-label">优先级</text>
+				<picker mode="selector" range="{{[1,2,3,4,5]}}" value="{{travelFormPriority - 1}}" bindchange="onTravelPriorityChange">
+					<view class="travel-form-picker">{{travelFormPriority}}</view>
+				</picker>
+			</view>
+			<view class="travel-form-btns">
+				<button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
+				<button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">确定</button>
+			</view>
+		</view>
+
+		<!-- 目的地列表 -->
+		<view class="product-table">
+			<view class="table-row table-header">
+				<text class="table-cell" style="flex:none; width:50%;">目的地</text>
+				<text class="table-cell" style="flex:none; width:25%;">类型</text>
+				<text class="table-cell" style="flex:none; width:25%;">优先级</text>
+			</view>
+			<block wx:if="{{travelList.length}}">
+				<scroll-view scroll-y="true" class="table-scroll-view">
+					<block wx:for="{{travelList}}" wx:key="id">
+						<view class="swipe-row" data-show="{{travelSwipeIndex==index}}">
+							<view class="swipe-actions">
+								<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDeleteTravel">删除</button>
+								<button class="swipe-btn update-btn" data-id="{{item.id}}" bindtap="onMarkVisited" wx:if="{{travelTab === 'pending'}}">已出行</button>
+							</view>
+							<view class="table-row product-card swipe-content"
+							  bindtouchstart="onTouchStartTravel"
+							  bindtouchmove="onTouchMoveTravel"
+							  bindtouchend="onTouchEndTravel"
+							  data-index="{{index}}">
+								<view class="table-cell name-cell" style="flex:none; width:50%;">
+									<text class="product-name">{{item.displayName}}</text>
+								</view>
+								<view class="table-cell" style="flex:none; width:25%;">
+									<text>{{item.type === 'Domestic' ? '🇨🇳国内' : '🌍国外'}}</text>
+								</view>
+								<view class="table-cell" style="flex:none; width:25%;">
+									<text>{{item.priority}}</text>
+								</view>
+							</view>
+						</view>
+					</block>
+				</scroll-view>
+			</block>
+			<block wx:if="{{!travelList.length}}">
+				<view class="table-row">
+					<text class="table-cell">{{travelTab === 'pending' ? '暂无待出行目的地' : '暂无已出行记录'}}</text>
+				</view>
+			</block>
+		</view>
+		<!-- 新增待出行目的地按钮 -->
+		<view class="add-btn-row" style="margin-top:20rpx;" wx:if="{{travelTab === 'pending'}}">
+			<icon type="cancel" size="45" color="#1890ff" bindtap="showAddTravelForm" />
+		</view>
+	</view>
+
 	<!-- 跳转到OpenID页面的链接 -->
 	<view style="margin-top: 40rpx; text-align: center;">
 		<navigator url="/pages/openid/openid" open-type="navigate">

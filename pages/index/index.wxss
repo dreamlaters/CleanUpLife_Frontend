@@ -118,3 +118,112 @@
 .update-btn:active {
   background: #1765ad;
 }
+
+/* 出行模块样式 */
+.travel-section {
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  padding: 20rpx;
+}
+
+.travel-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.travel-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+}
+
+.travel-tab-active {
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.travel-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  width: 60%;
+  height: 4rpx;
+  background: #1890ff;
+  border-radius: 2rpx;
+}
+
+/* 新增表单样式 */
+.travel-add-form {
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.travel-form-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1px solid #eee;
+}
+
+.travel-form-row:last-child {
+  border-bottom: none;
+}
+
+.travel-form-label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.travel-form-picker {
+  flex: 1;
+  font-size: 28rpx;
+  color: #666;
+  padding: 8rpx 16rpx;
+  background: #fff;
+  border-radius: 8rpx;
+  border: 1px solid #ddd;
+}
+
+.travel-form-input {
+  flex: 1;
+  font-size: 28rpx;
+  padding: 8rpx 16rpx;
+  background: #fff;
+  border-radius: 8rpx;
+  border: 1px solid #ddd;
+}
+
+.travel-form-btns {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20rpx;
+  gap: 20rpx;
+}
+
+.travel-form-btn {
+  padding: 12rpx 40rpx;
+  font-size: 28rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.travel-form-cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.travel-form-submit {
+  background: linear-gradient(90deg, #1890ff 50%, #40a9ff 100%);
+  color: #fff;
+}
+
