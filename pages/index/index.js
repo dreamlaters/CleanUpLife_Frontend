@@ -20,8 +20,9 @@ Page({
         travelFormTypeIndex: 0, // 0: 国内, 1: 国外
         travelFormName: '', // 目的地名称
         travelFormPriority: 1, // 优先级
-        // 国内省市区 - 使用官方region picker
-        travelRegion: [], // [省, 市, 区]
+        // 国内省市 - 使用官方region picker
+        travelRegion: [], // [省, 市]
+        travelRegionDisplay: '', // 省市显示文本
         // 国外国家
         countryList: ['日本', '韩国', '美国', '英国', '法国', '德国', '意大利', '西班牙', '葡萄牙', '荷兰', '比利时', '瑞士', '奥地利', '澳大利亚', '新西兰', '加拿大', '墨西哥', '巴西', '阿根廷', '俄罗斯', '印度', '泰国', '越南', '新加坡', '马来西亚', '印度尼西亚', '菲律宾', '埃及', '南非', '土耳其', '希腊', '捷克', '波兰', '挪威', '瑞典', '丹麦', '芬兰', '冰岛', '其他'],
         travelCountryIndex: 0
@@ -352,6 +353,7 @@ Page({
             travelFormName: '',
             travelFormPriority: 1,
             travelRegion: [],
+            travelRegionDisplay: '',
             travelCountryIndex: 0
         });
     },
@@ -366,13 +368,18 @@ Page({
         this.setData({
             travelFormTypeIndex: parseInt(e.detail.value),
             travelRegion: [],
+            travelRegionDisplay: '',
             travelCountryIndex: 0
         });
     },
 
-    // 省市区选择（官方region picker）
+    // 省市选择（官方region picker）
     onRegionChange: function(e) {
-        this.setData({ travelRegion: e.detail.value });
+        const region = e.detail.value.filter(Boolean); // 过滤空值
+        this.setData({ 
+            travelRegion: region,
+            travelRegionDisplay: region.join('-')
+        });
     },
 
     // 国家选择
