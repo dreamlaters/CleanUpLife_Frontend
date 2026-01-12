@@ -20,13 +20,8 @@ Page({
         travelFormTypeIndex: 0, // 0: 国内, 1: 国外
         travelFormName: '', // 目的地名称
         travelFormPriority: 1, // 优先级
-        // 国内省市区
-        provinceList: ['北京', '上海', '天津', '重庆', '河北', '山西', '辽宁', '吉林', '黑龙江', '江苏', '浙江', '安徽', '福建', '江西', '山东', '河南', '湖北', '湖南', '广东', '海南', '四川', '贵州', '云南', '陕西', '甘肃', '青海', '台湾', '内蒙古', '广西', '西藏', '宁夏', '新疆', '香港', '澳门'],
-        cityList: [],
-        districtList: [],
-        travelProvinceIndex: 0,
-        travelCityIndex: 0,
-        travelDistrictIndex: 0,
+        // 国内省市区 - 使用官方region picker
+        travelRegion: [], // [省, 市, 区]
         // 国外国家
         countryList: ['日本', '韩国', '美国', '英国', '法国', '德国', '意大利', '西班牙', '葡萄牙', '荷兰', '比利时', '瑞士', '奥地利', '澳大利亚', '新西兰', '加拿大', '墨西哥', '巴西', '阿根廷', '俄罗斯', '印度', '泰国', '越南', '新加坡', '马来西亚', '印度尼西亚', '菲律宾', '埃及', '南非', '土耳其', '希腊', '捷克', '波兰', '挪威', '瑞典', '丹麦', '芬兰', '冰岛', '其他'],
         travelCountryIndex: 0
@@ -356,11 +351,7 @@ Page({
             travelFormTypeIndex: 0,
             travelFormName: '',
             travelFormPriority: 1,
-            travelProvinceIndex: 0,
-            travelCityIndex: 0,
-            travelDistrictIndex: 0,
-            cityList: [],
-            districtList: [],
+            travelRegion: [],
             travelCountryIndex: 0
         });
     },
@@ -374,80 +365,14 @@ Page({
     onTravelTypeChange: function(e) {
         this.setData({
             travelFormTypeIndex: parseInt(e.detail.value),
-            travelProvinceIndex: 0,
-            travelCityIndex: 0,
-            travelDistrictIndex: 0,
-            cityList: [],
-            districtList: [],
+            travelRegion: [],
             travelCountryIndex: 0
         });
     },
 
-    // 省份选择
-    onProvinceChange: function(e) {
-        const index = parseInt(e.detail.value);
-        // 这里简化处理，实际应根据省份加载对应城市
-        const citiesByProvince = {
-            '北京': ['北京市'],
-            '上海': ['上海市'],
-            '广东': ['广州', '深圳', '东莞', '佛山', '珠海', '中山', '惠州', '汕头', '湛江', '江门'],
-            '浙江': ['杭州', '宁波', '温州', '绍兴', '嘉兴', '金华', '台州', '湖州'],
-            '江苏': ['南京', '苏州', '无锡', '常州', '南通', '扬州', '镇江', '徐州'],
-            '四川': ['成都', '绵阳', '德阳', '宜宾', '泸州', '达州', '南充', '乐山'],
-            '湖北': ['武汉', '宜昌', '襄阳', '荆州', '黄冈', '十堰', '孝感'],
-            '湖南': ['长沙', '株洲', '湘潭', '衡阳', '岳阳', '常德', '郴州'],
-            '山东': ['济南', '青岛', '烟台', '威海', '潍坊', '淄博', '临沂', '济宁'],
-            '河南': ['郑州', '洛阳', '开封', '新乡', '安阳', '焦作', '许昌', '南阳'],
-            '福建': ['福州', '厦门', '泉州', '漳州', '莆田', '宁德', '龙岩'],
-            '陕西': ['西安', '咸阳', '宝鸡', '渭南', '延安', '汉中', '榆林'],
-            '云南': ['昆明', '大理', '丽江', '西双版纳', '曲靖', '玉溪', '红河'],
-            '海南': ['海口', '三亚', '儋州', '琼海', '万宁'],
-            '辽宁': ['沈阳', '大连', '鞍山', '抚顺', '锦州', '营口', '丹东'],
-            '吉林': ['长春', '吉林', '四平', '延边', '通化', '白城'],
-            '黑龙江': ['哈尔滨', '齐齐哈尔', '牡丹江', '佳木斯', '大庆', '绥化'],
-            '河北': ['石家庄', '唐山', '保定', '邯郸', '秦皇岛', '张家口', '廊坊'],
-            '山西': ['太原', '大同', '临汾', '运城', '晋城', '长治', '阳泉'],
-            '安徽': ['合肥', '芜湖', '蚌埠', '淮南', '马鞍山', '安庆', '黄山'],
-            '江西': ['南昌', '九江', '景德镇', '赣州', '吉安', '上饶', '宜春'],
-            '贵州': ['贵阳', '遵义', '六盘水', '安顺', '毕节', '铜仁'],
-            '甘肃': ['兰州', '天水', '白银', '酒泉', '嘉峪关', '张掖'],
-            '青海': ['西宁', '海东', '海北', '海南', '黄南', '果洛'],
-            '内蒙古': ['呼和浩特', '包头', '鄂尔多斯', '赤峰', '通辽', '呼伦贝尔'],
-            '广西': ['南宁', '桂林', '柳州', '北海', '玉林', '百色', '梧州'],
-            '西藏': ['拉萨', '日喀则', '昌都', '林芝', '山南', '那曲'],
-            '宁夏': ['银川', '石嘴山', '吴忠', '固原', '中卫'],
-            '新疆': ['乌鲁木齐', '喀什', '阿克苏', '伊犁', '克拉玛依', '吐鲁番'],
-            '天津': ['天津市'],
-            '重庆': ['重庆市'],
-            '香港': ['香港'],
-            '澳门': ['澳门'],
-            '台湾': ['台北', '高雄', '台中', '台南', '新北', '桃园']
-        };
-        const province = this.data.provinceList[index];
-        const cities = citiesByProvince[province] || ['其他'];
-        this.setData({
-            travelProvinceIndex: index,
-            cityList: cities,
-            travelCityIndex: 0,
-            districtList: [],
-            travelDistrictIndex: 0
-        });
-    },
-
-    // 城市选择
-    onCityChange: function(e) {
-        const index = parseInt(e.detail.value);
-        // 简化处理，实际应根据城市加载区县
-        this.setData({
-            travelCityIndex: index,
-            districtList: ['市区', '郊区', '其他'],
-            travelDistrictIndex: 0
-        });
-    },
-
-    // 区县选择
-    onDistrictChange: function(e) {
-        this.setData({ travelDistrictIndex: parseInt(e.detail.value) });
+    // 省市区选择（官方region picker）
+    onRegionChange: function(e) {
+        this.setData({ travelRegion: e.detail.value });
     },
 
     // 国家选择
@@ -467,7 +392,7 @@ Page({
 
     // 提交新增出行目的地
     submitTravelForm: function() {
-        const { travelFormTypeIndex, travelFormName, travelFormPriority, provinceList, cityList, districtList, travelProvinceIndex, travelCityIndex, travelDistrictIndex, countryList, travelCountryIndex } = this.data;
+        const { travelFormTypeIndex, travelFormName, travelFormPriority, travelRegion, countryList, travelCountryIndex } = this.data;
         
         let destination = {
             name: travelFormName,
@@ -477,11 +402,11 @@ Page({
         };
 
         if (travelFormTypeIndex === 0) {
-            // 国内
+            // 国内 - 使用官方region picker的结果
             destination.domesticLocation = {
-                province: provinceList[travelProvinceIndex] || '',
-                city: cityList[travelCityIndex] || '',
-                district: districtList[travelDistrictIndex] || ''
+                province: travelRegion[0] || '',
+                city: travelRegion[1] || '',
+                district: travelRegion[2] || ''
             };
         } else {
             // 国外

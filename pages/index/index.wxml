@@ -117,24 +117,12 @@
 					<view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '国内' : '国外'}}</view>
 				</picker>
 			</view>
-			<!-- 国内选择省市区 -->
+			<!-- 国内选择省市区 - 使用微信官方region picker -->
 			<block wx:if="{{travelFormTypeIndex === 0}}">
 				<view class="travel-form-row">
-					<text class="travel-form-label">省份</text>
-					<picker mode="selector" range="{{provinceList}}" value="{{travelProvinceIndex}}" bindchange="onProvinceChange">
-						<view class="travel-form-picker">{{provinceList[travelProvinceIndex] || '请选择省份'}}</view>
-					</picker>
-				</view>
-				<view class="travel-form-row">
-					<text class="travel-form-label">城市</text>
-					<picker mode="selector" range="{{cityList}}" value="{{travelCityIndex}}" bindchange="onCityChange">
-						<view class="travel-form-picker">{{cityList[travelCityIndex] || '请选择城市'}}</view>
-					</picker>
-				</view>
-				<view class="travel-form-row">
-					<text class="travel-form-label">区县</text>
-					<picker mode="selector" range="{{districtList}}" value="{{travelDistrictIndex}}" bindchange="onDistrictChange">
-						<view class="travel-form-picker">{{districtList[travelDistrictIndex] || '请选择区县'}}</view>
+					<text class="travel-form-label">省市区</text>
+					<picker mode="region" value="{{travelRegion}}" bindchange="onRegionChange">
+						<view class="travel-form-picker">{{travelRegion[0] ? travelRegion.join('-') : '请选择省市区'}}</view>
 					</picker>
 				</view>
 			</block>
