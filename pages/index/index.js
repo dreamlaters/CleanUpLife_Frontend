@@ -1,6 +1,7 @@
 /**
  * 首页逻辑处理
  * 管理物品列表、待购物品、出行目的地
+ * 现代化UI设计版本
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
@@ -10,10 +11,19 @@ Page({
   data: {
     // 物品列表
     products: [],
+    filteredProducts: [],
+    currentFilter: 'all',
     swipeIndex: -1,
+    
+    // 统计数据
+    expiringSoonCount: 0,
+    expiredCount: 0,
     
     // 待购物品
     toBuyProducts: [],
+    toBuyPending: [],      // 未完成的待购
+    toBuyCompleted: [],    // 已完成的待购
+    showCompletedToBuy: false, // 是否展开已完成列表
     toBuySwipeIndex: -1,
     
     // 出行模块
@@ -27,6 +37,13 @@ Page({
     travelRegion: [],
     travelRegionDisplay: '',
     travelCountryIndex: 0,
+    
+    // 操作菜单
+    showActionSheet: false,
+    actionSheetTitle: '',
+    actionSheetType: '',
+    actionSheetId: '',
+    actionSheetCategory: '',
     
     // 常量数据
     countryList: constants.COUNTRY_LIST,
@@ -61,22 +78,134 @@ Page({
   fetchProducts() {
     api.get('/Products', { loadingText: '加载中...' })
       .then(data => {
-        const products = (data || []).map(item => ({
-          ...item,
-          bestByFormatted: util.formatDate(item.bestBy),
-          dateClass: util.getDateClass(item.bestBy),
-          emoji: constants.CATEGORY_EMOJI[item.category] || ''
-        }));
-        this.setData({ products });
+        const now = new Date();
+        let expiringSoonCount = 0;
+        let expiredCount = 0;
+        
+        const products = (data || []).map(item => {
+          const bestByDate = new Date(item.bestBy);
+          const diffDays = Math.ceil((bestByDate - now) / (1000 * 60 * 60 * 24));
+          
+          let dateClass = 'date-normal';
+          if (diffDays < 0) {
+            dateClass = 'date-expired';
+            expiredCount++;
+          } else if (diffDays <= 7) {
+            dateClass = 'date-soon';
+            expiringSoonCount++;
+          }
+          
+          return {
+            ...item,
+            bestByFormatted: util.formatDate(item.bestBy),
+            dateClass: dateClass,
+            emoji: constants.CATEGORY_EMOJI[item.category] || '📦'
+          };
+        });
+        
+        this.setData({ 
+          products,
+          filteredProducts: products,
+          expiringSoonCount,
+          expiredCount
+        });
       })
       .catch(() => {
         util.showError('数据加载失败');
       });
   },
 
-  // 删除物品
-  onDelete(e) {
+  // 筛选切换
+  onFilterChange(e) {
+    const filter = e.currentTarget.dataset.filter;
+    const { products } = this.data;
+    
+    let filteredProducts = products;
+    if (filter !== 'all') {
+      filteredProducts = products.filter(item => item.category === filter);
+    }
+    
+    this.setData({ 
+      currentFilter: filter,
+      filteredProducts 
+    });
+  },
+
+  // 显示物品操作菜单
+  showItemActions(e) {
+    const { id, category } = e.currentTarget.dataset;
+    const item = this.data.products.find(p => p.id === id);
+    this.setData({
+      showActionSheet: true,
+      actionSheetTitle: item ? item.name : '操作',
+      actionSheetType: 'product',
+      actionSheetId: id,
+      actionSheetCategory: category || 'Product'
+    });
+  },
+
+  // 显示待购操作菜单
+  showToBuyActions(e) {
     const id = e.currentTarget.dataset.id;
+    const item = this.data.toBuyProducts.find(p => p.id === id);
+    this.setData({
+      showActionSheet: true,
+      actionSheetTitle: item ? item.name : '操作',
+      actionSheetType: 'tobuy',
+      actionSheetId: id
+    });
+  },
+
+  // 显示出行操作菜单
+  showTravelActions(e) {
+    const id = e.currentTarget.dataset.id;
+    const item = this.data.travelList.find(p => p.id === id);
+    this.setData({
+      showActionSheet: true,
+      actionSheetTitle: item ? item.displayName : '操作',
+      actionSheetType: 'travel',
+      actionSheetId: id
+    });
+  },
+
+  // 隐藏操作菜单
+  hideActionSheet() {
+    this.setData({ showActionSheet: false });
+  },
+
+  // 操作菜单 - 编辑
+  onActionEdit() {
+    const { actionSheetType, actionSheetId, actionSheetCategory } = this.data;
+    this.hideActionSheet();
+    
+    setTimeout(() => {
+      if (actionSheetType === 'product') {
+        wx.navigateTo({
+          url: `/pages/update/update?id=${actionSheetId}&category=${actionSheetCategory}`
+        });
+      } else if (actionSheetType === 'tobuy') {
+        wx.navigateTo({ url: `/pages/tobuy/update?id=${actionSheetId}` });
+      }
+    }, 200);
+  },
+
+  // 操作菜单 - 删除
+  onActionDelete() {
+    const { actionSheetType, actionSheetId } = this.data;
+    this.hideActionSheet();
+    
+    setTimeout(() => {
+      if (actionSheetType === 'product') {
+        this._deleteProduct(actionSheetId);
+      } else if (actionSheetType === 'tobuy') {
+        this._deleteToBuy(actionSheetId);
+      } else if (actionSheetType === 'travel') {
+        this._deleteTravel(actionSheetId);
+      }
+    }, 200);
+  },
+
+  _deleteProduct(id) {
     util.showConfirm('确认删除', '确定要删除该物品吗？')
       .then(confirmed => {
         if (confirmed) {
@@ -88,6 +217,11 @@ Page({
             .catch(() => util.showError('删除失败'));
         }
       });
+  },
+
+  // 删除物品 (兼容旧调用)
+  onDelete(e) {
+    this._deleteProduct(e.currentTarget.dataset.id);
   },
 
   // 更新物品
@@ -113,10 +247,10 @@ Page({
   },
 
   _sortProducts(field) {
-    const { sortField, sortOrder, products } = this.data;
+    const { sortField, sortOrder, filteredProducts } = this.data;
     const newOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
     
-    const sortedProducts = [...products].sort((a, b) => {
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
       if (field === 'name') {
         return newOrder === 'asc' 
           ? a.name.localeCompare(b.name, 'zh')
@@ -128,7 +262,7 @@ Page({
     });
 
     this.setData({
-      products: sortedProducts,
+      filteredProducts: sortedProducts,
       sortField: field,
       sortOrder: newOrder
     });
@@ -142,10 +276,43 @@ Page({
           .map(item => ({
             ...item,
             priority: item.priority ?? item.Priority ?? 0,
-            name: item.name ?? item.Name ?? ''
+            name: item.name ?? item.Name ?? '',
+            completed: item.completed ?? item.Completed ?? false
           }))
           .sort((a, b) => a.priority - b.priority);
-        this.setData({ toBuyProducts: list });
+        
+        // 分组：未完成和已完成
+        const toBuyPending = list.filter(item => !item.completed);
+        const toBuyCompleted = list.filter(item => item.completed);
+        
+        this.setData({ 
+          toBuyProducts: list,
+          toBuyPending,
+          toBuyCompleted
+        });
+      });
+  },
+
+  // 切换已完成列表展开/折叠
+  toggleCompletedToBuyList() {
+    this.setData({ showCompletedToBuy: !this.data.showCompletedToBuy });
+  },
+
+  // 清除所有已完成的待购
+  clearCompletedToBuy() {
+    if (!this.data.toBuyCompleted.length) return;
+    
+    util.showConfirm('清除已完成', `确定要清除 ${this.data.toBuyCompleted.length} 个已完成的待购物品吗？`)
+      .then(confirmed => {
+        if (confirmed) {
+          api.del('/ToBuy/completed', { loadingText: '清除中...' })
+            .then(() => {
+              util.showSuccess('清除成功');
+              this.setData({ showCompletedToBuy: false });
+              this.fetchToBuyProducts();
+            })
+            .catch(() => util.showError('清除失败'));
+        }
       });
   },
 
@@ -153,8 +320,7 @@ Page({
     wx.navigateTo({ url: '/pages/tobuy/add' });
   },
 
-  onDeleteToBuy(e) {
-    const id = e.currentTarget.dataset.id;
+  _deleteToBuy(id) {
     util.showConfirm('确认删除', '确定要删除该待购物品吗？')
       .then(confirmed => {
         if (confirmed) {
@@ -168,9 +334,50 @@ Page({
       });
   },
 
+  onDeleteToBuy(e) {
+    this._deleteToBuy(e.currentTarget.dataset.id);
+  },
+
   onUpdateToBuy(e) {
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/tobuy/update?id=${id}` });
+  },
+
+  // 切换待购完成状态
+  toggleToBuyComplete(e) {
+    const id = e.currentTarget.dataset.id;
+    const item = this.data.toBuyProducts.find(p => p.id === id);
+    if (!item) return;
+    
+    // 先乐观更新UI
+    const newList = this.data.toBuyProducts.map(p => {
+      if (p.id === id) {
+        return { ...p, completed: !p.completed };
+      }
+      return p;
+    });
+    const toBuyPending = newList.filter(item => !item.completed);
+    const toBuyCompleted = newList.filter(item => item.completed);
+    this.setData({ toBuyProducts: newList, toBuyPending, toBuyCompleted });
+    
+    // 调用API持久化状态
+    api.request({
+      url: `/ToBuy/${id}/toggle-completed`,
+      method: 'PATCH',
+      showLoading: false
+    }).catch(() => {
+      // 如果API调用失败，恢复原状态
+      const revertList = this.data.toBuyProducts.map(p => {
+        if (p.id === id) {
+          return { ...p, completed: !p.completed };
+        }
+        return p;
+      });
+      const revertPending = revertList.filter(item => !item.completed);
+      const revertCompleted = revertList.filter(item => item.completed);
+      this.setData({ toBuyProducts: revertList, toBuyPending: revertPending, toBuyCompleted: revertCompleted });
+      wx.showToast({ title: '操作失败', icon: 'error' });
+    });
   },
 
   // ==================== 出行模块 ====================
@@ -290,8 +497,7 @@ Page({
       .catch(() => util.showError('添加失败'));
   },
 
-  onDeleteTravel(e) {
-    const id = e.currentTarget.dataset.id;
+  _deleteTravel(id) {
     util.showConfirm('确认删除', '确定要删除该目的地吗？')
       .then(confirmed => {
         if (confirmed) {
@@ -303,6 +509,10 @@ Page({
             .catch(() => util.showError('删除失败'));
         }
       });
+  },
+
+  onDeleteTravel(e) {
+    this._deleteTravel(e.currentTarget.dataset.id);
   },
 
   onMarkVisited(e) {

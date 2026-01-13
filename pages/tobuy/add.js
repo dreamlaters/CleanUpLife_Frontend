@@ -1,5 +1,5 @@
 /**
- * 新增待购物品页面逻辑
+ * 新增待购物品页面逻辑 - 现代化UI
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
@@ -8,7 +8,7 @@ Page({
   data: {
     formData: {
       name: '',
-      priority: 1,
+      priority: 5,
       description: ''
     }
   },
@@ -42,11 +42,11 @@ Page({
 
     api.post('/ToBuy', data, { loadingText: '提交中...' })
       .then(() => {
-        util.showSuccess('新增成功');
+        util.showSuccess('添加成功');
         setTimeout(() => wx.navigateBack(), 1000);
       })
       .catch(() => {
-        util.showError('新增失败');
+        util.showError('添加失败');
       });
   }
 });

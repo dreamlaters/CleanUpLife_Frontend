@@ -3,13 +3,14 @@
  */
 
 // 物品种类
-const CATEGORIES = ['食物', '猫粮', '药品'];
+const CATEGORIES = ['食物', '猫粮', '药品', '其他'];
 
 // 种类映射 (中文 -> 英文)
 const CATEGORY_MAP = {
   '食物': 'Food',
   '猫粮': 'CatFood',
-  '药品': 'Medicine'
+  '药品': 'Medicine',
+  '其他': 'Product'
 };
 
 // 种类映射 (英文 -> 中文)

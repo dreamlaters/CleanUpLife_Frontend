@@ -1,36 +1,172 @@
 /**
- * 添加物品页面样式
+ * 添加物品页面样式 - 现代化设计
  */
 
-/* 标题图标 */
-.title-icon {
-  font-size: 40rpx;
-  margin-right: var(--spacing-xs);
+/* ==================== 表单头部 ==================== */
+.form-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1rpx solid var(--border-light);
 }
 
-/* 必填标识 */
+.form-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.title-icon {
+  font-size: 48rpx;
+  -webkit-text-fill-color: initial;
+}
+
+.form-subtitle {
+  font-size: 26rpx;
+  color: var(--text-hint);
+  margin-top: var(--spacing-xs);
+  display: block;
+}
+
+/* ==================== 输入框包装 ==================== */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-suffix {
+  position: absolute;
+  right: 24rpx;
+  color: var(--text-hint);
+  font-size: 28rpx;
+}
+
+.input-placeholder {
+  color: var(--text-hint);
+}
+
+/* ==================== Picker样式 ==================== */
+.picker-view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 2rpx solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24rpx;
+  font-size: 28rpx;
+  background: var(--bg-hover);
+  box-sizing: border-box;
+  transition: all var(--transition-fast);
+  color: var(--text-hint);
+}
+
+.picker-view:active {
+  border-color: var(--primary-color);
+  background: var(--bg-card);
+}
+
+.picker-selected {
+  color: var(--text-primary) !important;
+  border-color: var(--primary-color);
+  background: var(--bg-card);
+}
+
+.picker-icon {
+  margin-right: var(--spacing-sm);
+  font-size: 28rpx;
+}
+
+.picker-text {
+  flex: 1;
+}
+
+.picker-arrow {
+  font-size: 20rpx;
+  color: var(--text-hint);
+  margin-left: var(--spacing-sm);
+}
+
+/* ==================== 位置选择器 ==================== */
+.location-selector {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.location-selector .picker-view {
+  flex: 1;
+}
+
+.location-picker {
+  min-width: 0;
+}
+
+.location-picker .picker-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==================== 必填/可选标识 ==================== */
 .label-required {
   color: var(--danger-color);
   margin-right: 4rpx;
 }
 
-/* Picker 选中状态 */
-.picker-selected {
-  color: var(--text-primary) !important;
+.label-optional {
+  font-size: 24rpx;
+  color: var(--text-hint);
+  font-weight: 400;
 }
 
-.picker-icon {
-  margin-right: var(--spacing-xs);
-}
-
-/* 特有字段区域 */
+/* ==================== 特有字段区域 ==================== */
 .category-fields {
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-md);
-  border-top: 1rpx dashed var(--border-light);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  animation: fadeIn 0.3s ease;
 }
 
-/* 重量行 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-divider {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.category-divider::before,
+.category-divider::after {
+  content: '';
+  flex: 1;
+  height: 1rpx;
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+}
+
+.divider-text {
+  padding: 0 var(--spacing-md);
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ==================== 重量行 ==================== */
 .weight-row {
   display: flex;
   gap: var(--spacing-md);
@@ -45,5 +181,35 @@
 }
 
 .unit-picker {
-  min-width: 120rpx;
+  min-width: 140rpx;
+  justify-content: center;
+}
+
+/* ==================== 提交按钮 ==================== */
+.submit-button {
+  width: 100%;
+  background: var(--primary-gradient);
+  color: var(--text-white);
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 28rpx 0;
+  margin-top: var(--spacing-2xl);
+  box-shadow: var(--shadow-colored);
+  transition: all var(--transition-bounce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.submit-button:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-icon {
+  font-size: 36rpx;
 }

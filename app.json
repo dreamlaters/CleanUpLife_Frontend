@@ -8,11 +8,13 @@
     "pages/tobuy/update"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#667eea",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "CleanUpLife",
-    "backgroundColor": "#eeeeee",
-    "backgroundTextStyle": "light"
+    "backgroundColor": "#f8fafc",
+    "backgroundTextStyle": "dark",
+    "backgroundColorTop": "#f8fafc",
+    "backgroundColorBottom": "#e2e8f0"
   },
   "renderer": "webview",
   "sitemapLocation": "sitemap.json"

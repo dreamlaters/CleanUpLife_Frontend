@@ -1,15 +1,138 @@
 /**
- * 待购物品页面公共样式
+ * 待购物品页面样式 - 现代化设计
  */
 
-/* 标题图标 */
-.title-icon {
-  font-size: 40rpx;
-  margin-right: var(--spacing-xs);
+/* ==================== 表单头部 ==================== */
+.form-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1rpx solid var(--border-light);
 }
 
-/* 必填标识 */
+.form-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.title-icon {
+  font-size: 48rpx;
+  -webkit-text-fill-color: initial;
+}
+
+.form-subtitle {
+  font-size: 26rpx;
+  color: var(--text-hint);
+  margin-top: var(--spacing-xs);
+  display: block;
+}
+
+/* ==================== 输入框样式 ==================== */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-placeholder {
+  color: var(--text-hint);
+}
+
+/* ==================== 必填/可选标识 ==================== */
 .label-required {
   color: var(--danger-color);
   margin-right: 4rpx;
+}
+
+.label-optional {
+  font-size: 24rpx;
+  color: var(--text-hint);
+  font-weight: 400;
+}
+
+/* ==================== 优先级样式 ==================== */
+.priority-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.priority-value-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-full);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.priority-high {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(248, 113, 113, 0.15) 100%);
+  color: var(--danger-color);
+}
+
+.priority-medium {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+  color: var(--warning-color);
+}
+
+.priority-low {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.15) 100%);
+  color: var(--success-color);
+}
+
+.priority-desc {
+  font-size: 22rpx;
+  opacity: 0.8;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.slider-labels text {
+  font-size: 22rpx;
+  color: var(--text-hint);
+}
+
+/* ==================== 提交按钮 ==================== */
+.submit-button {
+  width: 100%;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: var(--text-white);
+  font-size: 32rpx;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 28rpx 0;
+  margin-top: var(--spacing-2xl);
+  box-shadow: 0 8rpx 24rpx rgba(16, 185, 129, 0.3);
+  transition: all var(--transition-bounce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.submit-button:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-icon {
+  font-size: 36rpx;
 }

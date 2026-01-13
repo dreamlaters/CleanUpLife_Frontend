@@ -1,61 +1,189 @@
 /**
- * OpenID 页面样式
+ * OpenID 页面样式 - 现代化设计
  */
 
-/* 卡片位置调整 */
+/* ==================== 卡片布局 ==================== */
 .openid-card {
-  margin-top: 80rpx;
+  margin-top: var(--spacing-xl);
 }
 
-/* 标题图标 */
-.title-icon {
+/* ==================== 标题区域 ==================== */
+.form-header {
+  text-align: center;
+  padding-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1rpx solid var(--border-light);
+}
+
+.notification-icon-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 0 auto var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+  border-radius: var(--radius-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-icon {
+  font-size: 56rpx;
+}
+
+.form-title {
   font-size: 40rpx;
-  margin-right: var(--spacing-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
 }
 
-/* OpenID 显示区域 */
-.openid-item {
+.form-subtitle {
+  font-size: 26rpx;
+  color: var(--text-hint);
+  display: block;
+}
+
+/* ==================== OpenID 区域 ==================== */
+.openid-section {
+  background: var(--bg-hover);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
 }
 
+.openid-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-md);
+}
+
+.openid-label-icon {
+  font-size: 28rpx;
+}
+
 .openid-box {
-  background: var(--bg-hover);
-  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
-  word-break: break-all;
+  border: 1rpx solid var(--border-color);
 }
 
 .openid-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   color: var(--text-hint);
   font-size: 26rpx;
+}
+
+.loading-spinner-small {
+  width: 32rpx;
+  height: 32rpx;
+  border: 3rpx solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .openid-text {
   font-size: 24rpx;
   color: var(--text-secondary);
-  font-family: monospace;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
   line-height: 1.6;
+  word-break: break-all;
 }
 
-/* 说明文字 */
-.info-box {
-  background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md) var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+/* ==================== 功能说明 ==================== */
+.features-section {
+  margin-bottom: var(--spacing-2xl);
 }
 
-.info-text {
-  font-size: 26rpx;
-  color: var(--primary-color);
-  line-height: 1.6;
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1rpx solid var(--border-light);
 }
 
-/* 订阅按钮 */
+.feature-item:last-child {
+  border-bottom: none;
+}
+
+.feature-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.feature-icon-warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+}
+
+.feature-icon-info {
+  background: var(--primary-soft);
+}
+
+.feature-icon-success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.15) 100%);
+}
+
+.feature-content {
+  flex: 1;
+  margin-left: var(--spacing-md);
+}
+
+.feature-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: var(--text-hint);
+  margin-top: 4rpx;
+  display: block;
+}
+
+/* ==================== 订阅按钮 ==================== */
 .subscribe-btn {
-  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  background: var(--success-gradient) !important;
+  box-shadow: 0 8rpx 24rpx rgba(16, 185, 129, 0.3) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.subscribe-btn-icon {
+  font-size: 32rpx;
 }
 
 .subscribe-btn:active {
   opacity: 0.9;
+  transform: scale(0.98);
+}
+
+.subscribe-tip {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+}
+
+.subscribe-tip text {
+  font-size: 24rpx;
+  color: var(--text-hint);
 }

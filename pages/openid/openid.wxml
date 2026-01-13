@@ -1,29 +1,63 @@
-<!-- OpenID 页面 -->
+<!-- OpenID 页面 - 现代化设计 -->
 <view class="container">
   <view class="form-card openid-card">
     <!-- 标题 -->
-    <view class="form-title">
-      <text class="title-icon">🔔</text>
-      <text>消息推送设置</text>
+    <view class="form-header">
+      <view class="notification-icon-wrap">
+        <text class="notification-icon">🔔</text>
+      </view>
+      <view class="form-title">消息推送设置</view>
+      <text class="form-subtitle">订阅过期提醒，不再错过任何物品</text>
     </view>
 
     <!-- OpenID 显示 -->
-    <view class="form-item openid-item">
-      <text class="form-label">当前用户 OpenID</text>
+    <view class="openid-section">
+      <view class="openid-label">
+        <text class="openid-label-icon">👤</text>
+        <text>当前用户标识</text>
+      </view>
       <view class="openid-box">
-        <text class="openid-loading" wx:if="{{loading}}">加载中...</text>
-        <text class="openid-text" selectable="true" wx:else>{{openid}}</text>
+        <view class="openid-loading" wx:if="{{loading}}">
+          <view class="loading-spinner-small"></view>
+          <text>加载中...</text>
+        </view>
+        <text class="openid-text" selectable="true" wx:else>{{openid || '未获取'}}</text>
       </view>
     </view>
 
-    <!-- 说明文字 -->
-    <view class="info-box">
-      <text class="info-text">📌 授权后，您将在物品即将过期时收到微信消息提醒</text>
+    <!-- 功能说明 -->
+    <view class="features-section">
+      <view class="feature-item">
+        <view class="feature-icon feature-icon-warning">⏰</view>
+        <view class="feature-content">
+          <text class="feature-title">过期提醒</text>
+          <text class="feature-desc">物品即将过期时收到通知</text>
+        </view>
+      </view>
+      <view class="feature-item">
+        <view class="feature-icon feature-icon-info">📱</view>
+        <view class="feature-content">
+          <text class="feature-title">微信推送</text>
+          <text class="feature-desc">消息直达微信服务通知</text>
+        </view>
+      </view>
+      <view class="feature-item">
+        <view class="feature-icon feature-icon-success">🔒</view>
+        <view class="feature-content">
+          <text class="feature-title">隐私安全</text>
+          <text class="feature-desc">仅用于发送过期提醒</text>
+        </view>
+      </view>
     </view>
 
     <!-- 订阅按钮 -->
     <button class="submit-button subscribe-btn" bindtap="onRequestSubscribe">
-      <text>🔔 允许消息推送</text>
+      <text class="subscribe-btn-icon">🔔</text>
+      <text>开启消息推送</text>
     </button>
+    
+    <view class="subscribe-tip">
+      <text>点击后请在弹窗中选择"允许"</text>
+    </view>
   </view>
 </view>

@@ -1,10 +1,13 @@
-<!-- 新增待购物品页面 -->
+<!-- 新增待购物品页面 - 现代化设计 -->
 <view class="container">
   <view class="form-card">
     <!-- 标题 -->
-    <view class="form-title">
-      <text class="title-icon">🛒</text>
-      <text>新增待购物品</text>
+    <view class="form-header">
+      <view class="form-title">
+        <text class="title-icon">🛒</text>
+        <text>新增待购物品</text>
+      </view>
+      <text class="form-subtitle">添加需要购买的物品到清单</text>
     </view>
 
     <!-- 物品名称 -->
@@ -12,26 +15,41 @@
       <text class="form-label">
         <text class="label-required">*</text> 物品名称
       </text>
-      <input 
-        class="form-input" 
-        placeholder="请输入物品名称" 
-        bindinput="onNameInput" 
-        value="{{formData.name}}" 
-      />
+      <view class="input-wrapper">
+        <input 
+          class="form-input" 
+          placeholder="请输入物品名称" 
+          bindinput="onNameInput" 
+          value="{{formData.name}}"
+          placeholder-class="input-placeholder"
+        />
+      </view>
     </view>
 
     <!-- 优先级 -->
     <view class="form-item form-item-slider">
-      <text class="form-label">
-        <text class="label-required">*</text> 优先级（越小越优先）
-      </text>
+      <view class="priority-header">
+        <text class="form-label">
+          <text class="label-required">*</text> 优先级
+        </text>
+        <view class="priority-value-badge priority-{{formData.priority <= 3 ? 'high' : formData.priority <= 7 ? 'medium' : 'low'}}">
+          <text>P{{formData.priority}}</text>
+          <text class="priority-desc">{{formData.priority <= 3 ? '紧急' : formData.priority <= 7 ? '一般' : '不急'}}</text>
+        </view>
+      </view>
       <view class="slider-wrap">
+        <view class="slider-labels">
+          <text>紧急</text>
+          <text>一般</text>
+          <text>不急</text>
+        </view>
         <slider 
           min="1" 
-          max="100" 
+          max="10" 
           value="{{formData.priority}}" 
-          show-value="true" 
-          activeColor="#1890ff" 
+          show-value="false" 
+          activeColor="#667eea"
+          block-color="#667eea"
           bindchange="onPriorityChange" 
         />
       </view>
@@ -39,18 +57,20 @@
 
     <!-- 描述 -->
     <view class="form-item">
-      <text class="form-label">描述 (可选)</text>
+      <text class="form-label">📝 描述 <text class="label-optional">(可选)</text></text>
       <textarea 
         class="form-textarea" 
         placeholder="添加一些备注信息..." 
         bindinput="onDescriptionInput" 
         value="{{formData.description}}"
+        placeholder-class="input-placeholder"
       ></textarea>
     </view>
 
     <!-- 提交按钮 -->
     <button class="submit-button" bindtap="submitForm">
-      <text>✓ 新增</text>
+      <text class="submit-icon">✓</text>
+      <text>添加到购物清单</text>
     </button>
   </view>
 </view>
