@@ -1,3 +1,9 @@
+/**
+ * 新增待购物品页面逻辑
+ */
+const api = require('../../utils/api');
+const util = require('../../utils/util');
+
 Page({
   data: {
     formData: {
@@ -6,42 +12,41 @@ Page({
       description: ''
     }
   },
-  onNameInput: function (e) {
+
+  // ==================== 表单输入处理 ====================
+  onNameInput(e) {
     this.setData({ 'formData.name': e.detail.value });
   },
-  onPriorityChange: function (e) {
+
+  onPriorityChange(e) {
     this.setData({ 'formData.priority': e.detail.value });
   },
-  onDescriptionInput: function (e) {
+
+  onDescriptionInput(e) {
     this.setData({ 'formData.description': e.detail.value });
   },
-  submitForm: function () {
+
+  // ==================== 表单提交 ====================
+  submitForm() {
     if (!this.data.formData.name) {
-      wx.showToast({ title: '物品名称不能为空', icon: 'error' });
+      util.showError('物品名称不能为空');
       return;
     }
+
     const data = {
       id: undefined,
       Name: this.data.formData.name,
       Priority: this.data.formData.priority,
       Description: this.data.formData.description || ''
     };
-    wx.showLoading({ title: '提交中...' });
-    wx.request({
-      url: 'https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsites.net/ToBuy',
-      method: 'POST',
-      data: data,
-      header: { 'content-type': 'application/json' },
-      success: (res) => {
-        if (res.statusCode === 201 || res.statusCode === 200) {
-          wx.showToast({ title: '新增成功', icon: 'success' });
-          setTimeout(() => { wx.navigateBack(); }, 1000);
-        } else {
-          wx.showToast({ title: '新增失败', icon: 'error' });
-        }
-      },
-      fail: () => { wx.showToast({ title: '网络错误', icon: 'error' }); },
-      complete: () => { wx.hideLoading(); }
-    });
+
+    api.post('/ToBuy', data, { loadingText: '提交中...' })
+      .then(() => {
+        util.showSuccess('新增成功');
+        setTimeout(() => wx.navigateBack(), 1000);
+      })
+      .catch(() => {
+        util.showError('新增失败');
+      });
   }
 });

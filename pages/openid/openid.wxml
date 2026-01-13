@@ -1,10 +1,29 @@
+<!-- OpenID 页面 -->
 <view class="container">
-  <view class="form-card">
-    <view class="form-title">当前用户 OpenID</view>
-    <view class="form-item">
-      <text class="form-label">OpenID：</text>
-      <text selectable="true">{{openid}}</text>
+  <view class="form-card openid-card">
+    <!-- 标题 -->
+    <view class="form-title">
+      <text class="title-icon">🔔</text>
+      <text>消息推送设置</text>
     </view>
-    <button class="submit-button" style="margin-top: 32rpx;" open-type="requestSubscribeMessage" bindtap="onRequestSubscribe">允许消息推送</button>
+
+    <!-- OpenID 显示 -->
+    <view class="form-item openid-item">
+      <text class="form-label">当前用户 OpenID</text>
+      <view class="openid-box">
+        <text class="openid-loading" wx:if="{{loading}}">加载中...</text>
+        <text class="openid-text" selectable="true" wx:else>{{openid}}</text>
+      </view>
+    </view>
+
+    <!-- 说明文字 -->
+    <view class="info-box">
+      <text class="info-text">📌 授权后，您将在物品即将过期时收到微信消息提醒</text>
+    </view>
+
+    <!-- 订阅按钮 -->
+    <button class="submit-button subscribe-btn" bindtap="onRequestSubscribe">
+      <text>🔔 允许消息推送</text>
+    </button>
   </view>
 </view>

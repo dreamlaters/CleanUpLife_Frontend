@@ -1,105 +1,15 @@
-/* Styles for tobuy add/update pages and tobuy list to match existing style */
-.form-card {
-  background: #fff;
-  padding: 24rpx;
-  margin: 20rpx;
-  border-radius: 16rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
-}
-.form-title {
-  font-size: 30rpx;
-  color: #333;
-  margin-bottom: 20rpx;
-  display: flex;
-  align-items: center;
-}
-.form-item {
-  margin-bottom: 18rpx;
-}
-.form-label {
-  display: block;
-  font-size: 26rpx;
-  color: #666;
-  margin-bottom: 8rpx;
-}
-.form-input, .form-textarea {
-  width: 100%;
-  min-height: 64rpx;
-  padding: 12rpx;
-  font-size: 28rpx;
-  border: 1rpx solid #e8e8e8;
-  border-radius: 8rpx;
-  background: #fafafa;
-}
-.submit-button {
-  display: block;
-  width: 90%;
-  margin: 20rpx auto 0;
-  height: 64rpx;
-  line-height: 64rpx;
-  text-align: center;
-  background: linear-gradient(90deg,#1890ff,#40a9ff);
-  color: #fff;
-  border-radius: 12rpx;
-  font-size: 30rpx;
-}
-/* reuse swipe styles from index.wxss context */
-.swipe-row {
-  position: relative;
-  width: 100%;
-}
-.swipe-actions {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.8s;
-  z-index: 2;
-}
-.swipe-row[data-show="true"] .swipe-actions {
-  opacity: 1;
-  pointer-events: auto;
-}
-.swipe-content {
-  background: #fff;
-  z-index: 1;
-  overflow: hidden;
-}
-.swipe-btn {
-  border: none;
-  top: 5rpx;
-  outline: none;
-  width: 85rpx;
-  right: 38rpx;
-  padding: 0 1rpx;
-  min-width: 32rpx;
-  height: 45rpx;
-  line-height: 45rpx;
-  font-size: 24rpx;
-  border-radius: 16rpx;
-  margin-left: 4rpx;
-  color: #fff;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
-  transition: background 0.8s;
-}
-.delete-btn {
-  background: linear-gradient(90deg, #ff4d4f 50%, #ff7875 100%);
-}
-.update-btn {
-  background: linear-gradient(90deg, #1890ff 50%, #40a9ff 100%);
+/**
+ * 待购物品页面公共样式
+ */
+
+/* 标题图标 */
+.title-icon {
+  font-size: 40rpx;
+  margin-right: var(--spacing-xs);
 }
 
-/* 滑块样式 */
-.form-item-slider {
-  padding-bottom: 10rpx;
-}
-
-.slider-wrap {
-  width: 100%;
-  padding: 16rpx 0;
+/* 必填标识 */
+.label-required {
+  color: var(--danger-color);
+  margin-right: 4rpx;
 }

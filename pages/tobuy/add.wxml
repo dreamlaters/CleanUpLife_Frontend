@@ -1,22 +1,56 @@
+<!-- 新增待购物品页面 -->
 <view class="container">
   <view class="form-card">
+    <!-- 标题 -->
     <view class="form-title">
-      <icon type="add" size="28" color="#1890ff" /> 新增待购物品
+      <text class="title-icon">🛒</text>
+      <text>新增待购物品</text>
     </view>
+
+    <!-- 物品名称 -->
     <view class="form-item">
-      <text class="form-label">物品名称*</text>
-      <input class="form-input" placeholder="请输入物品名称" bindinput="onNameInput" value="{{formData.name}}" />
+      <text class="form-label">
+        <text class="label-required">*</text> 物品名称
+      </text>
+      <input 
+        class="form-input" 
+        placeholder="请输入物品名称" 
+        bindinput="onNameInput" 
+        value="{{formData.name}}" 
+      />
     </view>
+
+    <!-- 优先级 -->
     <view class="form-item form-item-slider">
-      <text class="form-label">优先级（越小越优先）*</text>
+      <text class="form-label">
+        <text class="label-required">*</text> 优先级（越小越优先）
+      </text>
       <view class="slider-wrap">
-        <slider min="1" max="100" value="{{formData.priority}}" show-value="true" activeColor="#1890ff" bindchange="onPriorityChange" />
+        <slider 
+          min="1" 
+          max="100" 
+          value="{{formData.priority}}" 
+          show-value="true" 
+          activeColor="#1890ff" 
+          bindchange="onPriorityChange" 
+        />
       </view>
     </view>
+
+    <!-- 描述 -->
     <view class="form-item">
-      <text class="form-label">描述</text>
-      <textarea class="form-textarea" placeholder="可选描述" bindinput="onDescriptionInput" value="{{formData.description}}"></textarea>
+      <text class="form-label">描述 (可选)</text>
+      <textarea 
+        class="form-textarea" 
+        placeholder="添加一些备注信息..." 
+        bindinput="onDescriptionInput" 
+        value="{{formData.description}}"
+      ></textarea>
     </view>
-    <button class="submit-button" bindtap="submitForm" type="primary">新增</button>
+
+    <!-- 提交按钮 -->
+    <button class="submit-button" bindtap="submitForm">
+      <text>✓ 新增</text>
+    </button>
   </view>
 </view>

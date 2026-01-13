@@ -1,1 +1,4 @@
-/* pages/update/update.wxss */
+/**
+ * 更新物品页面样式
+ */
+@import "../add/add.wxss";

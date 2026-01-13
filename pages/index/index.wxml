@@ -1,206 +1,251 @@
 <!-- 首页展示物品列表和提醒功能 -->
-<view class="container" xmlns:wx="http://www.w3.org/1999/xhtml">
-	<!-- 物品表格 -->
-	<view class="product-table">
-		<!-- 表头 -->
-		<view class="table-row table-header">
-			<text class="table-cell" bindtap="onSortByName">
-				<icon type="info" size="22" color="#1890ff"/> 物品名称
-			</text>
-			<text class="table-cell" bindtap="onSortByBestBy">
-				<icon type="time" size="22" color="#faad14"/> 保质期
-			</text>
-			<text class="table-cell">
-				<icon type="location" size="22" color="#52c41a"/> 存放位置
-			</text>
-		</view>
-		<!-- 数据行，使用scroll-view包裹 -->
-		<block wx:if="{{products.length}}">
-			<scroll-view scroll-y="true" class="table-scroll-view">
-				<block wx:for="{{products}}" wx:key="id">
-					<view class="swipe-row" data-show="{{swipeIndex==index}}">
-						<view class="swipe-actions">
-							<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDelete">删除</button>
-							<button class="swipe-btn update-btn" data-id="{{item.id}}" data-category="{{item.category}}" bindtap="onUpdate">更新</button>
-						</view>
-						<view class="table-row product-card swipe-content"
-						  bindtouchstart="onTouchStart"
-						  bindtouchmove="onTouchMove"
-						  bindtouchend="onTouchEnd"
-						  data-index="{{index}}">
-							<view class="table-cell name-cell">
-								<text class="product-name">{{item.name}} {{item.category === 'CatFood' ? '🐱' : item.category === 'Medicine' ? '💊' : item.category === 'Food' ? '🥖' : ''}}</text>
-							</view>
-							<view class="table-cell">
-								<!-- 根据后端计算的dateClass动态设置样式 -->
-								<text class="product-date {{item.dateClass}}">{{item.bestByFormatted}}</text>
-							</view>
-							<view class="table-cell">
-								<text class="location-tag">{{item.location.roomPlacement}}-{{item.location.site}}</text>
-							</view>
-						</view>
-					</view>
-				</block>
-			</scroll-view>
-		</block>
-		<block wx:if="{{!products.length}}">
-			<view class="table-row"><text class="table-cell">暂无数据</text></view>
-		</block>
-	</view>
+<view class="container">
+  <!-- 物品管理区域 -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">📦 我的物品</text>
+    </view>
+    
+    <!-- 物品表格 -->
+    <view class="product-table">
+      <!-- 表头 -->
+      <view class="table-row table-header">
+        <view class="table-cell" bindtap="onSortByName">
+          <text>物品名称</text>
+          <text class="sort-icon">↕</text>
+        </view>
+        <view class="table-cell col-date" bindtap="onSortByBestBy">
+          <text>保质期</text>
+          <text class="sort-icon">↕</text>
+        </view>
+        <view class="table-cell col-location">
+          <text>存放位置</text>
+        </view>
+      </view>
+      
+      <!-- 数据行 -->
+      <scroll-view scroll-y="true" class="table-scroll-view" wx:if="{{products.length}}">
+        <view 
+          wx:for="{{products}}" 
+          wx:key="id" 
+          class="swipe-row" 
+          data-show="{{swipeIndex == index}}"
+        >
+          <view class="swipe-actions">
+            <button class="swipe-btn delete-btn" data-id="{{item.id}}" catchtap="onDelete">删除</button>
+            <button class="swipe-btn update-btn" data-id="{{item.id}}" data-category="{{item.category}}" catchtap="onUpdate">编辑</button>
+          </view>
+          <view 
+            class="table-row product-card swipe-content"
+            bindtouchstart="onTouchStart"
+            bindtouchmove="onTouchMove"
+            bindtouchend="onTouchEnd"
+            data-index="{{index}}"
+          >
+            <view class="table-cell name-cell">
+              <text class="product-name">{{item.name}} {{item.emoji}}</text>
+            </view>
+            <view class="table-cell col-date">
+              <text class="product-date {{item.dateClass}}">{{item.bestByFormatted}}</text>
+            </view>
+            <view class="table-cell col-location">
+              <text class="location-tag">{{item.location.roomPlacement}}-{{item.location.site}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{!products.length}}">
+        <text class="empty-icon">📭</text>
+        <text>暂无物品，点击下方按钮添加</text>
+      </view>
+    </view>
+    
+    <!-- 添加按钮 -->
+    <view class="add-btn-row">
+      <view class="fab-btn" bindtap="goToTarget">
+        <text class="fab-btn-icon">+</text>
+      </view>
+    </view>
+  </view>
 
-<!-- 添加新物品按钮 -->
-	<view class="add-btn-row">
-		<icon type="cancel" size="45" color="#1890ff" bindtap="goToTarget" />
-	</view>
+  <!-- 待购物品区域 -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">🛒 待购清单</text>
+    </view>
+    
+    <view class="product-table">
+      <view class="table-row table-header">
+        <view class="table-cell" style="flex: 2;">物品名称</view>
+        <view class="table-cell" style="flex: 1;">优先级</view>
+      </view>
+      
+      <scroll-view scroll-y="true" class="table-scroll-view" wx:if="{{toBuyProducts.length}}">
+        <view 
+          wx:for="{{toBuyProducts}}" 
+          wx:key="id" 
+          class="swipe-row" 
+          data-show="{{toBuySwipeIndex == index}}"
+        >
+          <view class="swipe-actions">
+            <button class="swipe-btn delete-btn" data-id="{{item.id}}" catchtap="onDeleteToBuy">删除</button>
+            <button class="swipe-btn update-btn" data-id="{{item.id}}" catchtap="onUpdateToBuy">编辑</button>
+          </view>
+          <view 
+            class="table-row product-card swipe-content"
+            bindtouchstart="onTouchStartToBuy"
+            bindtouchmove="onTouchMoveToBuy"
+            bindtouchend="onTouchEndToBuy"
+            data-index="{{index}}"
+          >
+            <view class="table-cell name-cell" style="flex: 2;">
+              <text class="product-name">{{item.name}}</text>
+            </view>
+            <view class="table-cell" style="flex: 1;">
+              <text class="priority-badge">{{item.priority}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <view class="empty-state" wx:if="{{!toBuyProducts.length}}">
+        <text class="empty-icon">🛒</text>
+        <text>暂无待购物品</text>
+      </view>
+    </view>
+    
+    <view class="add-btn-row">
+      <view class="fab-btn" bindtap="goToAddToBuy">
+        <text class="fab-btn-icon">+</text>
+      </view>
+    </view>
+  </view>
 
-	<!-- 新增的待购物品表格 -->
-	<view class="toBuy-section" style="margin-top: 40rpx;max-width: 700rpx;width:100%;">
-		<view class="product-table">
-			<!-- 表头：名称 + 优先级 -->
-			<view class="table-row table-header">
-				<text class="table-cell" style="flex:none; width:70%;">待购物品名称</text>
-				<text class="table-cell" style="flex:none; width:30%;">优先级</text>
-			</view>
-			<block wx:if="{{toBuyProducts.length}}">
-				<scroll-view scroll-y="true" class="table-scroll-view">
-					<block wx:for="{{toBuyProducts}}" wx:key="id">
-						<view class="swipe-row" data-show="{{toBuySwipeIndex==index}}">
-							<view class="swipe-actions">
-								<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDeleteToBuy">删除</button>
-								<button class="swipe-btn update-btn" data-id="{{item.id}}" bindtap="onUpdateToBuy">更新</button>
-							</view>
-							<view class="table-row product-card swipe-content"
-							  bindtouchstart="onTouchStartToBuy"
-							  bindtouchmove="onTouchMoveToBuy"
-							  bindtouchend="onTouchEndToBuy"
-							  data-index="{{index}}">
-								<view class="table-cell name-cell">
-									<text class="product-name">{{item.name}}</text>
-								</view>
-								<view class="table-cell" style="flex:none; width:30%; min-width:120rpx;">
-									<text>{{item.priority}}</text>
-								</view>
-							</view>
-						</view>
-					</block>
-				</scroll-view>
-			</block>
-			<block wx:if="{{!toBuyProducts.length}}">
-				<view class="table-row">
-					<text class="table-cell">暂无待购物品</text>
-				</view>
-			</block>
-		</view>
-		<!-- 新增待购物品按钮 -->
-		<view class="add-btn-row" style="margin-top:20rpx;">
-			<icon type="cancel" size="45" color="#1890ff" bindtap="goToAddToBuy" />
-		</view>
-	</view>
+  <!-- 出行目的地区域 -->
+  <view class="section-card">
+    <view class="section-header">
+      <text class="section-title">✈️ 出行计划</text>
+    </view>
+    
+    <!-- Tab切换 -->
+    <view class="travel-tabs">
+      <view 
+        class="travel-tab {{travelTab === 'pending' ? 'travel-tab-active' : ''}}" 
+        bindtap="switchTravelTab" 
+        data-tab="pending"
+      >
+        待出行
+      </view>
+      <view 
+        class="travel-tab {{travelTab === 'visited' ? 'travel-tab-active' : ''}}" 
+        bindtap="switchTravelTab" 
+        data-tab="visited"
+      >
+        已出行
+      </view>
+    </view>
 
-	<!-- 待出行模块 -->
-	<view class="travel-section" style="margin-top: 40rpx;max-width: 700rpx;width:100%;">
-		<!-- Tab切换 -->
-		<view class="travel-tabs">
-			<view class="travel-tab {{travelTab === 'pending' ? 'travel-tab-active' : ''}}" bindtap="switchTravelTab" data-tab="pending">
-				待出行
-			</view>
-			<view class="travel-tab {{travelTab === 'visited' ? 'travel-tab-active' : ''}}" bindtap="switchTravelTab" data-tab="visited">
-				已出行
-			</view>
-		</view>
+    <!-- 新增表单 -->
+    <view class="travel-add-form" wx:if="{{showTravelForm}}">
+      <view class="travel-form-row">
+        <text class="travel-form-label">目的地类型</text>
+        <picker mode="selector" range="{{['国内', '国外']}}" value="{{travelFormTypeIndex}}" bindchange="onTravelTypeChange">
+          <view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '🇨🇳 国内' : '🌍 国外'}}</view>
+        </picker>
+      </view>
+      
+      <!-- 国内选择省市 -->
+      <view class="travel-form-row" wx:if="{{travelFormTypeIndex === 0}}">
+        <text class="travel-form-label">省市</text>
+        <picker mode="region" level="city" value="{{travelRegion}}" bindchange="onRegionChange">
+          <view class="travel-form-picker">{{travelRegionDisplay || '请选择省市'}}</view>
+        </picker>
+      </view>
+      
+      <!-- 国外选择国家 -->
+      <view class="travel-form-row" wx:if="{{travelFormTypeIndex === 1}}">
+        <text class="travel-form-label">国家</text>
+        <picker mode="selector" range="{{countryList}}" value="{{travelCountryIndex}}" bindchange="onCountryChange">
+          <view class="travel-form-picker">{{countryList[travelCountryIndex] || '请选择国家'}}</view>
+        </picker>
+      </view>
+      
+      <view class="travel-form-row">
+        <text class="travel-form-label">目的地名称</text>
+        <input class="travel-form-input" placeholder="请输入目的地名称/备注" value="{{travelFormName}}" bindinput="onTravelNameInput" />
+      </view>
+      
+      <view class="travel-form-row travel-form-row-slider">
+        <text class="travel-form-label">优先级 (1-30)</text>
+        <view class="travel-slider-wrap">
+          <slider min="1" max="30" value="{{travelFormPriority}}" show-value="true" activeColor="#1890ff" bindchange="onTravelPriorityChange" />
+        </view>
+      </view>
+      
+      <view class="travel-form-btns">
+        <button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
+        <button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">确定</button>
+      </view>
+    </view>
 
-		<!-- 新增待出行目的地区域 -->
-		<view class="travel-add-form" wx:if="{{showTravelForm}}">
-			<view class="travel-form-row">
-				<text class="travel-form-label">目的地类型</text>
-				<picker mode="selector" range="{{['国内', '国外']}}" value="{{travelFormTypeIndex}}" bindchange="onTravelTypeChange">
-					<view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '国内' : '国外'}}</view>
-				</picker>
-			</view>
-			<!-- 国内选择省市 - 使用微信官方region picker，level="city"只选省市 -->
-			<block wx:if="{{travelFormTypeIndex === 0}}">
-				<view class="travel-form-row">
-					<text class="travel-form-label">省市</text>
-					<picker mode="region" level="city" value="{{travelRegion}}" bindchange="onRegionChange">
-						<view class="travel-form-picker">{{travelRegionDisplay || '请选择省市'}}</view>
-					</picker>
-				</view>
-			</block>
-			<!-- 国外选择国家 -->
-			<block wx:if="{{travelFormTypeIndex === 1}}">
-				<view class="travel-form-row">
-					<text class="travel-form-label">国家</text>
-					<picker mode="selector" range="{{countryList}}" value="{{travelCountryIndex}}" bindchange="onCountryChange">
-						<view class="travel-form-picker">{{countryList[travelCountryIndex] || '请选择国家'}}</view>
-					</picker>
-				</view>
-			</block>
-			<view class="travel-form-row">
-				<text class="travel-form-label">目的地名称</text>
-				<input class="travel-form-input" placeholder="请输入目的地名称/备注" value="{{travelFormName}}" bindinput="onTravelNameInput" />
-			</view>
-			<view class="travel-form-row travel-form-row-slider">
-				<text class="travel-form-label">优先级</text>
-				<view class="travel-slider-wrap">
-					<slider min="1" max="30" value="{{travelFormPriority}}" show-value="true" activeColor="#1890ff" bindchange="onTravelPriorityChange" />
-				</view>
-			</view>
-			<view class="travel-form-btns">
-				<button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
-				<button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">确定</button>
-			</view>
-		</view>
+    <!-- 目的地列表 -->
+    <view class="product-table">
+      <view class="table-row table-header">
+        <view class="table-cell" style="flex: 2;">目的地</view>
+        <view class="table-cell" style="flex: 1;">类型</view>
+        <view class="table-cell" style="flex: 1;">优先级</view>
+      </view>
+      
+      <scroll-view scroll-y="true" class="table-scroll-view" wx:if="{{travelList.length}}">
+        <view 
+          wx:for="{{travelList}}" 
+          wx:key="id" 
+          class="swipe-row" 
+          data-show="{{travelSwipeIndex == index}}"
+        >
+          <view class="swipe-actions">
+            <button class="swipe-btn delete-btn" data-id="{{item.id}}" catchtap="onDeleteTravel">删除</button>
+            <button class="swipe-btn update-btn" data-id="{{item.id}}" catchtap="onMarkVisited" wx:if="{{travelTab === 'pending'}}">✓ 已去</button>
+          </view>
+          <view 
+            class="table-row product-card swipe-content"
+            bindtouchstart="onTouchStartTravel"
+            bindtouchmove="onTouchMoveTravel"
+            bindtouchend="onTouchEndTravel"
+            data-index="{{index}}"
+          >
+            <view class="table-cell name-cell" style="flex: 2;">
+              <text class="product-name">{{item.displayName}}</text>
+            </view>
+            <view class="table-cell type-cell" style="flex: 1;">
+              <text class="type-tag {{item.type === 'Domestic' ? 'type-domestic' : 'type-international'}}">{{item.type === 'Domestic' ? '🇨🇳' : '🌍'}}</text>
+            </view>
+            <view class="table-cell" style="flex: 1;">
+              <text class="priority-badge">{{item.priority}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <view class="empty-state" wx:if="{{!travelList.length}}">
+        <text class="empty-icon">{{travelTab === 'pending' ? '✈️' : '🎉'}}</text>
+        <text>{{travelTab === 'pending' ? '暂无待出行目的地' : '暂无出行记录'}}</text>
+      </view>
+    </view>
+    
+    <view class="add-btn-row" wx:if="{{travelTab === 'pending'}}">
+      <view class="fab-btn" bindtap="showAddTravelForm">
+        <text class="fab-btn-icon">+</text>
+      </view>
+    </view>
+  </view>
 
-		<!-- 目的地列表 -->
-		<view class="product-table">
-			<view class="table-row table-header">
-				<text class="table-cell" style="flex:none; width:50%;">目的地</text>
-				<text class="table-cell" style="flex:none; width:25%;">类型</text>
-				<text class="table-cell" style="flex:none; width:25%;">优先级</text>
-			</view>
-			<block wx:if="{{travelList.length}}">
-				<scroll-view scroll-y="true" class="table-scroll-view">
-					<block wx:for="{{travelList}}" wx:key="id">
-						<view class="swipe-row" data-show="{{travelSwipeIndex==index}}">
-							<view class="swipe-actions">
-								<button class="swipe-btn delete-btn" data-id="{{item.id}}" bindtap="onDeleteTravel">删除</button>
-								<button class="swipe-btn update-btn" data-id="{{item.id}}" bindtap="onMarkVisited" wx:if="{{travelTab === 'pending'}}">已出行</button>
-							</view>
-							<view class="table-row product-card swipe-content"
-							  bindtouchstart="onTouchStartTravel"
-							  bindtouchmove="onTouchMoveTravel"
-							  bindtouchend="onTouchEndTravel"
-							  data-index="{{index}}">
-								<view class="table-cell name-cell" style="flex:none; width:50%;">
-									<text class="product-name">{{item.displayName}}</text>
-								</view>
-								<view class="table-cell" style="flex:none; width:25%;">
-									<text>{{item.type === 'Domestic' ? '🇨🇳国内' : '🌍国外'}}</text>
-								</view>
-								<view class="table-cell" style="flex:none; width:25%;">
-									<text>{{item.priority}}</text>
-								</view>
-							</view>
-						</view>
-					</block>
-				</scroll-view>
-			</block>
-			<block wx:if="{{!travelList.length}}">
-				<view class="table-row">
-					<text class="table-cell">{{travelTab === 'pending' ? '暂无待出行目的地' : '暂无已出行记录'}}</text>
-				</view>
-			</block>
-		</view>
-		<!-- 新增待出行目的地按钮 -->
-		<view class="add-btn-row" style="margin-top:20rpx;" wx:if="{{travelTab === 'pending'}}">
-			<icon type="cancel" size="45" color="#1890ff" bindtap="showAddTravelForm" />
-		</view>
-	</view>
-
-	<!-- 跳转到OpenID页面的链接 -->
-	<view style="margin-top: 40rpx; text-align: center;">
-		<navigator url="/pages/openid/openid" open-type="navigate">
-			<text style="color: #1890ff; font-size: 32rpx; text-decoration: underline;">推送消息</text>
-		</navigator>
-	</view>
+  <!-- 推送消息入口 -->
+  <view class="push-link">
+    <navigator url="/pages/openid/openid" open-type="navigate" class="push-navigator">
+      <text class="push-text">🔔 消息推送设置</text>
+    </navigator>
+  </view>
 </view>

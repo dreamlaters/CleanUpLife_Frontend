@@ -1,242 +1,273 @@
-// 更新物品页面逻辑
+/**
+ * 更新物品页面逻辑
+ */
+const api = require('../../utils/api');
+const util = require('../../utils/util');
+const constants = require('../../utils/constants');
+
 Page({
-    data: {
-        formData: {
-            name: '',
-            description: '',
-            bestBy: '',
-            location: {
-                site: '',
-                roomPlacement: ''
-            },
-            // 新增特有字段
-            storeOption: '', // 食物
-            proteinPercentage: '', // 猫粮
-            weight: '', // 猫粮
-            weightUnit: '', // 猫粮
-            flavor: '', // 猫粮
-            effect: '' // 药品
-        },
-        today: '',
-        locationRooms: ['厨房', '客厅', '厕所', '卧室', '杂物间'],
-        locationSiteIndex: null,
-        locationSites: ['冰箱冷藏室', '冰箱冷冻室', '柜子', '桌面', '其他'],
-        locationRoomIndex: null,
-        id: null,
-        // 新增种类相关字段
-        categories: ['食物', '猫粮', '药品'],
-        categoryIndex: null,
-        storages: ['冷藏', '冷冻', '常温'],
-        storageIndex: null,
-        weightUnits: ['kg', 'pound'],
-        weightUnitIndex: null
+  data: {
+    id: null,
+    category: 'Product',
+    formData: {
+      name: '',
+      description: '',
+      bestBy: '',
+      location: {
+        site: '',
+        roomPlacement: ''
+      },
+      // 特有字段
+      storeOption: '',
+      proteinPercentage: '',
+      weight: '',
+      weightUnit: '',
+      flavor: '',
+      effect: ''
     },
-    onLoad: function (options) {
-        // 设置当前日期为默认最小可选日期
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const dateString = `${year}-${month}-${day}`;
-        this.setData({ today: dateString });
-        if (options.id) {
-            this.setData({ id: options.id });
-            // 处理category参数
-            let category = options.category;
-            if (!category) {
-                category = 'Product';
-            }
-            this.setData({ category: category });
-            this.fetchProduct(options.id, category);
-        }
-    },
-    fetchProduct: function (id, category) {
-        // 添加英文到中文的映射
-        const categoryMapping = {
-            'Food': '食物',
-            'CatFood': '猫粮',
-            'Medicine': '药品',
-            'Product': '其他'
-        };
-        wx.showLoading({ title: '加载中...' });
-        wx.request({
-            url: `https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsites.net/${category === 'Product' ? 'Products' : category}/${id}`,
-            method: 'GET',
-            success: (res) => {
-                if (res.statusCode === 200) {
-                    const item = res.data;
-                    const locationRoomIndex = this.data.locationRooms.indexOf(item.location.roomPlacement);
-                    const locationSiteIndex = this.data.locationSites.indexOf(item.location.site);
-                    // 回填种类和特有字段索引
-                    const categoryIndex = this.data.categories.indexOf(categoryMapping[item.category]);
-                    let storageIndex = null, weightUnitIndex = null;
-                    if (item.category === 'Food') {
-                        storageIndex = this.data.storages.indexOf(item.storeOption);
-                    }
-                    if (item.category === 'CatFood') {
-                        weightUnitIndex = this.data.weightUnits.indexOf(item.weightUnit);
-                    }
-                    this.setData({
-                        formData: {
-                            id: id,
-                            name: item.name,
-                            description: item.description,
-                            bestBy: item.bestBy ? item.bestBy.split('T')[0] : '',
-                            location: {
-                                site: item.location.site,
-                                roomPlacement: item.location.roomPlacement
-                            },
-                            storeOption: item.storeOption || '',
-                            proteinPercentage: item.proteinPercentage || '',
-                            weight: item.weight || '',
-                            weightUnit: item.weightUnit || '',
-                            flavor: item.flavor || '',
-                            effect: item.effect || ''
-                        },
-                        locationRoomIndex: locationRoomIndex === -1 ? null : locationRoomIndex,
-                        locationSiteIndex: locationSiteIndex === -1 ? null : locationSiteIndex,
-                        categoryIndex: categoryIndex === -1 ? null : categoryIndex,
-                        storageIndex: storageIndex === -1 ? null : storageIndex,
-                        weightUnitIndex: weightUnitIndex === -1 ? null : weightUnitIndex
-                    });
-                } else {
-                    wx.showToast({ title: '加载失败', icon: 'error' });
-                }
-            },
-            fail: () => {
-                wx.showToast({ title: '网络错误', icon: 'error' });
-            },
-            complete: () => {
-                wx.hideLoading();
-            }
-        });
-    },
-    onNameInput: function (e) {
-        this.setData({ 'formData.name': e.detail.value });
-    },
-    onDescriptionInput: function (e) {
-        this.setData({ 'formData.description': e.detail.value });
-    },
-    onDateChange: function (e) {
-        this.setData({ 'formData.bestBy': e.detail.value });
-    },
-    onLocationSiteChange: function (e) {
-        const index = e.detail.value;
-        this.setData({
-            locationSiteIndex: index,
-            'formData.location.site': this.data.locationSites[index]
-        });
-    },
-    onLocationRoomChange: function (e) {
-        const index = e.detail.value;
-        this.setData({
-            locationRoomIndex: index,
-            'formData.location.roomPlacement': this.data.locationRooms[index]
-        });
-    },
-    onCategoryChange: function (e) {
-        const index = e.detail.value;
-        this.setData({ categoryIndex: index });
-    },
-    onStorageChange: function (e) {
-        const index = e.detail.value;
-        this.setData({
-            storageIndex: index,
-            'formData.storeOption': this.data.storages[index]
-        });
-    },
-    onProteinInput: function (e) {
-        this.setData({ 'formData.proteinPercentage': e.detail.value });
-    },
-    onWeightInput: function (e) {
-        this.setData({ 'formData.weight': e.detail.value });
-    },
-    onWeightUnitChange: function (e) {
-        const index = e.detail.value;
-        this.setData({
-            weightUnitIndex: index,
-            'formData.weightUnit': this.data.weightUnits[index]
-        });
-    },
-    onFlavorInput: function (e) {
-        this.setData({ 'formData.flavor': e.detail.value });
-    },
-    onEffectInput: function (e) {
-        this.setData({ 'formData.effect': e.detail.value });
-    },
-    updateForm: function () {
-        if (!this.data.formData.name) {
-            wx.showToast({ title: '物品名称不能为空', icon: 'error' });
-            return;
-        }
-        if (!this.data.formData.bestBy) {
-            wx.showToast({ title: '请选择保质期到期日', icon: 'error' });
-            return;
-        }
-        if (!this.data.formData.location.site) {
-            wx.showToast({ title: '请选择存放位置', icon: 'error' });
-            return;
-        }
-        // 新增种类校验
-        if (this.data.categoryIndex === null) {
-            wx.showToast({ title: '请选择物品种类', icon: 'error' });
-            return;
-        }
-        const category = this.data.categories[this.data.categoryIndex];
-        // 特有字段校验
-        if (category === '食物' && this.data.storageIndex === null) {
-            wx.showToast({ title: '请选择存储条件', icon: 'error' });
-            return;
-        }
-        if (category === '猫粮' && (!this.data.formData.proteinPercentage || !this.data.formData.weight || this.data.weightUnitIndex === null || !this.data.formData.flavor)) {
-            wx.showToast({ title: '请填写猫粮所有特有字段', icon: 'error' });
-            return;
-        }
-        if (category === '药品' && !this.data.formData.effect) {
-            wx.showToast({ title: '请填写药品功效', icon: 'error' });
-            return;
-        }
-        const productData = {
-            id: this.data.id,
-            name: this.data.formData.name,
-            description: this.data.formData.description || '',
-            bestBy: this.data.formData.bestBy + 'T00:00:00Z',
-            location: {
-                site: this.data.formData.location.site,
-                roomPlacement: this.data.formData.location.roomPlacement || ''
-            },
-            category: category === '食物' ? "Food" : category === '猫粮' ? 'CatFood' : category === '药品' ? 'Medicine' : 'Product',
-        };
-        if (category === '食物') {
-            productData.storeOption = this.data.formData.storeOption;
-        } else if (category === '猫粮') {
-            productData.proteinPercentage = this.data.formData.proteinPercentage;
-            productData.weight = this.data.formData.weight;
-            productData.weightUnit = this.data.formData.weightUnit;
-            productData.flavor = this.data.formData.flavor;
-        } else if (category === '药品') {
-            productData.effect = this.data.formData.effect;
-        }
-        wx.showLoading({ title: '更新中...' });
-        wx.request({
-            url: `https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsites.net/${productData.category}/${this.data.id}`,
-            method: 'PUT',
-            data: productData,
-            header: { 'content-type': 'application/json' },
-            success: (res) => {
-                if (res.statusCode === 200) {
-                    wx.showToast({ title: '更新成功', icon: 'success' });
-                    setTimeout(() => { wx.navigateBack(); }, 1500);
-                } else {
-                    wx.showToast({ title: '更新失败', icon: 'error' });
-                }
-            },
-            fail: () => {
-                wx.showToast({ title: '网络错误', icon: 'error' });
-            },
-            complete: () => {
-                wx.hideLoading();
-            }
-        });
+    today: '',
+    
+    // 选项数据
+    locationRooms: constants.LOCATION_ROOMS,
+    locationSites: constants.LOCATION_SITES,
+    categories: constants.CATEGORIES,
+    storages: constants.STORAGES,
+    weightUnits: constants.WEIGHT_UNITS,
+    
+    // 选中索引
+    locationRoomIndex: null,
+    locationSiteIndex: null,
+    categoryIndex: null,
+    storageIndex: null,
+    weightUnitIndex: null
+  },
+
+  onLoad(options) {
+    this.setData({ today: util.getTodayString() });
+    
+    if (options.id) {
+      const category = options.category || 'Product';
+      this.setData({ id: options.id, category });
+      this._fetchProduct(options.id, category);
     }
+  },
+
+  // ==================== 数据获取 ====================
+  _fetchProduct(id, category) {
+    const endpoint = category === 'Product' ? 'Products' : category;
+    
+    api.get(`/${endpoint}/${id}`, { loadingText: '加载中...' })
+      .then(item => {
+        this._fillFormData(item);
+      })
+      .catch(() => {
+        util.showError('加载失败');
+      });
+  },
+
+  _fillFormData(item) {
+    const { locationRooms, locationSites, categories, storages, weightUnits } = this.data;
+    
+    // 获取索引
+    const locationRoomIndex = locationRooms.indexOf(item.location?.roomPlacement);
+    const locationSiteIndex = locationSites.indexOf(item.location?.site);
+    const categoryIndex = categories.indexOf(constants.CATEGORY_MAP_REVERSE[item.category]);
+    
+    let storageIndex = null;
+    let weightUnitIndex = null;
+    
+    if (item.category === 'Food') {
+      storageIndex = storages.indexOf(item.storeOption);
+    }
+    if (item.category === 'CatFood') {
+      weightUnitIndex = weightUnits.indexOf(item.weightUnit);
+    }
+
+    this.setData({
+      formData: {
+        id: item.id,
+        name: item.name || '',
+        description: item.description || '',
+        bestBy: item.bestBy ? item.bestBy.split('T')[0] : '',
+        location: {
+          site: item.location?.site || '',
+          roomPlacement: item.location?.roomPlacement || ''
+        },
+        storeOption: item.storeOption || '',
+        proteinPercentage: item.proteinPercentage || '',
+        weight: item.weight || '',
+        weightUnit: item.weightUnit || '',
+        flavor: item.flavor || '',
+        effect: item.effect || ''
+      },
+      locationRoomIndex: locationRoomIndex === -1 ? null : locationRoomIndex,
+      locationSiteIndex: locationSiteIndex === -1 ? null : locationSiteIndex,
+      categoryIndex: categoryIndex === -1 ? null : categoryIndex,
+      storageIndex: storageIndex === -1 ? null : storageIndex,
+      weightUnitIndex: weightUnitIndex === -1 ? null : weightUnitIndex
+    });
+  },
+
+  // ==================== 表单输入处理 ====================
+  onNameInput(e) {
+    this.setData({ 'formData.name': e.detail.value });
+  },
+
+  onDescriptionInput(e) {
+    this.setData({ 'formData.description': e.detail.value });
+  },
+
+  onDateChange(e) {
+    this.setData({ 'formData.bestBy': e.detail.value });
+  },
+
+  onLocationRoomChange(e) {
+    const index = parseInt(e.detail.value);
+    this.setData({
+      locationRoomIndex: index,
+      'formData.location.roomPlacement': this.data.locationRooms[index]
+    });
+  },
+
+  onLocationSiteChange(e) {
+    const index = parseInt(e.detail.value);
+    this.setData({
+      locationSiteIndex: index,
+      'formData.location.site': this.data.locationSites[index]
+    });
+  },
+
+  onCategoryChange(e) {
+    const index = parseInt(e.detail.value);
+    this.setData({ categoryIndex: index });
+  },
+
+  onStorageChange(e) {
+    const index = parseInt(e.detail.value);
+    this.setData({
+      storageIndex: index,
+      'formData.storeOption': this.data.storages[index]
+    });
+  },
+
+  onProteinInput(e) {
+    this.setData({ 'formData.proteinPercentage': e.detail.value });
+  },
+
+  onWeightInput(e) {
+    this.setData({ 'formData.weight': e.detail.value });
+  },
+
+  onWeightUnitChange(e) {
+    const index = parseInt(e.detail.value);
+    this.setData({
+      weightUnitIndex: index,
+      'formData.weightUnit': this.data.weightUnits[index]
+    });
+  },
+
+  onFlavorInput(e) {
+    this.setData({ 'formData.flavor': e.detail.value });
+  },
+
+  onEffectInput(e) {
+    this.setData({ 'formData.effect': e.detail.value });
+  },
+
+  // ==================== 表单提交 ====================
+  updateForm() {
+    // 表单验证
+    if (!this._validateForm()) return;
+
+    const category = this.data.categories[this.data.categoryIndex];
+    const categoryKey = constants.CATEGORY_MAP[category] || 'Product';
+
+    // 构建提交数据
+    const productData = {
+      id: this.data.id,
+      name: this.data.formData.name,
+      description: this.data.formData.description || '',
+      bestBy: this.data.formData.bestBy + 'T00:00:00Z',
+      location: {
+        site: this.data.formData.location.site,
+        roomPlacement: this.data.formData.location.roomPlacement || ''
+      },
+      category: categoryKey
+    };
+
+    // 添加特有字段
+    this._addCategorySpecificFields(productData, category);
+
+    // 提交数据
+    api.put(`/${categoryKey}/${this.data.id}`, productData, { loadingText: '更新中...' })
+      .then(() => {
+        util.showSuccess('更新成功');
+        setTimeout(() => wx.navigateBack(), 1500);
+      })
+      .catch(() => {
+        util.showError('更新失败');
+      });
+  },
+
+  // ==================== 私有方法 ====================
+  _validateForm() {
+    const { formData, categoryIndex, storageIndex, weightUnitIndex, categories } = this.data;
+
+    if (!formData.name) {
+      util.showError('物品名称不能为空');
+      return false;
+    }
+
+    if (!formData.bestBy) {
+      util.showError('请选择保质期到期日');
+      return false;
+    }
+
+    if (!formData.location.site) {
+      util.showError('请选择存放位置');
+      return false;
+    }
+
+    if (categoryIndex === null) {
+      util.showError('请选择物品种类');
+      return false;
+    }
+
+    const category = categories[categoryIndex];
+
+    if (category === '食物' && storageIndex === null) {
+      util.showError('请选择存储条件');
+      return false;
+    }
+
+    if (category === '猫粮') {
+      if (!formData.proteinPercentage || !formData.weight || 
+          weightUnitIndex === null || !formData.flavor) {
+        util.showError('请填写猫粮所有特有字段');
+        return false;
+      }
+    }
+
+    if (category === '药品' && !formData.effect) {
+      util.showError('请填写药品功效');
+      return false;
+    }
+
+    return true;
+  },
+
+  _addCategorySpecificFields(data, category) {
+    const { formData } = this.data;
+    
+    if (category === '食物') {
+      data.storeOption = formData.storeOption;
+    } else if (category === '猫粮') {
+      data.proteinPercentage = formData.proteinPercentage;
+      data.weight = formData.weight;
+      data.weightUnit = formData.weightUnit;
+      data.flavor = formData.flavor;
+    } else if (category === '药品') {
+      data.effect = formData.effect;
+    }
+  }
 });

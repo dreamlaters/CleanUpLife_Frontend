@@ -1,1 +1,61 @@
-.form-card { margin-top: 60rpx; }
+/**
+ * OpenID 页面样式
+ */
+
+/* 卡片位置调整 */
+.openid-card {
+  margin-top: 80rpx;
+}
+
+/* 标题图标 */
+.title-icon {
+  font-size: 40rpx;
+  margin-right: var(--spacing-xs);
+}
+
+/* OpenID 显示区域 */
+.openid-item {
+  margin-bottom: var(--spacing-xl);
+}
+
+.openid-box {
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  word-break: break-all;
+}
+
+.openid-loading {
+  color: var(--text-hint);
+  font-size: 26rpx;
+}
+
+.openid-text {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  font-family: monospace;
+  line-height: 1.6;
+}
+
+/* 说明文字 */
+.info-box {
+  background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.info-text {
+  font-size: 26rpx;
+  color: var(--primary-color);
+  line-height: 1.6;
+}
+
+/* 订阅按钮 */
+.subscribe-btn {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+}
+
+.subscribe-btn:active {
+  opacity: 0.9;
+}
