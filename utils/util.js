@@ -18,6 +18,20 @@ const formatDate = (dateInput) => {
 };
 
 /**
+ * 格式化日期为 YYYY-MM 格式（年月）
+ * @param {string|Date} dateInput 日期字符串或 Date 对象
+ * @returns {string} 格式化后的年月字符串
+ */
+const formatYearMonth = (dateInput) => {
+  if (!dateInput) return '';
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
+/**
  * 获取今天的日期字符串
  * @returns {string} 今天的日期 YYYY-MM-DD
  */
@@ -111,6 +125,7 @@ const showError = (title) => {
 
 module.exports = {
   formatDate,
+  formatYearMonth,
   getTodayString,
   getDaysDiff,
   getDateClass,

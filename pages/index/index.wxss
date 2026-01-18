@@ -460,6 +460,15 @@
   color: var(--info-color);
 }
 
+.visited-date-tag {
+  font-size: 20rpx;
+  font-weight: 500;
+  padding: 4rpx 10rpx;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(74, 222, 128, 0.1) 100%);
+  color: var(--success-color);
+}
+
 .travel-action-btn {
   background: var(--success-gradient);
   color: var(--text-white);

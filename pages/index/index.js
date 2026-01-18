@@ -31,12 +31,18 @@ Page({
     travelList: [],
     travelSwipeIndex: -1,
     showTravelForm: false,
+    editingTravelId: null,  // 编辑模式下的目的地ID
     travelFormTypeIndex: 0,
     travelFormName: '',
     travelFormPriority: 1,
     travelRegion: [],
     travelRegionDisplay: '',
     travelCountryIndex: 0,
+    // visited编辑表单
+    showVisitedForm: false,
+    editingVisitedId: null,
+    visitedFormDate: '',
+    visitedFormIsVisited: true,
     
     // 操作菜单
     showActionSheet: false,
@@ -185,6 +191,8 @@ Page({
         });
       } else if (actionSheetType === 'tobuy') {
         wx.navigateTo({ url: `/pages/tobuy/update?id=${actionSheetId}` });
+      } else if (actionSheetType === 'travel') {
+        this.showEditTravelForm(actionSheetId);
       }
     }, 200);
   },
@@ -391,9 +399,10 @@ Page({
         const list = (data || [])
           .map(item => ({
             ...item,
-            displayName: this._formatTravelDisplayName(item)
-          }))
-          .sort((a, b) => a.priority - b.priority);
+            displayName: this._formatTravelDisplayName(item),
+            visitedDateFormatted: item.visitedDate ? util.formatYearMonth(item.visitedDate) : ''
+          }));
+        // visited列表已由后端按visitedDate倒序排序，pending列表由后端按priority排序
         this.setData({ travelList: list });
       });
   },
@@ -424,6 +433,7 @@ Page({
   showAddTravelForm() {
     this.setData({
       showTravelForm: true,
+      editingTravelId: null,
       travelFormTypeIndex: 0,
       travelFormName: '',
       travelFormPriority: 1,
@@ -433,8 +443,132 @@ Page({
     });
   },
 
+  // 显示编辑出行表单
+  showEditTravelForm(id) {
+    const { travelTab, travelList } = this.data;
+    const item = travelList.find(p => p.id === id);
+    
+    // 如果是visited列表，使用专用编辑表单
+    if (travelTab === 'visited') {
+      if (!item) {
+        api.get(`/Travel/${id}`, { loadingText: '加载中...' })
+          .then(data => {
+            this._populateVisitedForm(data);
+          })
+          .catch(() => util.showError('获取数据失败'));
+        return;
+      }
+      this._populateVisitedForm(item);
+      return;
+    }
+    
+    // pending列表使用原有表单
+    if (!item) {
+      api.get(`/Travel/${id}`, { loadingText: '加载中...' })
+        .then(data => {
+          this._populateTravelForm(data);
+        })
+        .catch(() => util.showError('获取数据失败'));
+      return;
+    }
+    this._populateTravelForm(item);
+  },
+
+  // 填充visited编辑表单数据
+  _populateVisitedForm(item) {
+    let visitedDate = '';
+    if (item.visitedDate) {
+      // 只取年月
+      visitedDate = util.formatYearMonth(item.visitedDate);
+    }
+    
+    this.setData({
+      showVisitedForm: true,
+      editingVisitedId: item.id,
+      visitedFormDate: visitedDate,
+      visitedFormIsVisited: item.status === 'Visited'
+    });
+  },
+
+  // visited表单状态改变
+  onVisitedStatusChange(e) {
+    this.setData({ visitedFormIsVisited: e.detail.value });
+  },
+
+  // visited表单日期改变
+  onVisitedDateChange(e) {
+    this.setData({ visitedFormDate: e.detail.value });
+  },
+
+  // 取消visited表单
+  cancelVisitedForm() {
+    this.setData({ showVisitedForm: false, editingVisitedId: null });
+  },
+
+  // 提交visited表单
+  submitVisitedForm() {
+    const { editingVisitedId, visitedFormDate, visitedFormIsVisited, travelList } = this.data;
+    const item = travelList.find(p => p.id === editingVisitedId);
+    
+    if (!item) {
+      util.showError('数据错误');
+      return;
+    }
+
+    // 构建更新数据，保留原有字段
+    const destination = {
+      id: editingVisitedId,
+      name: item.name,
+      type: item.type,
+      priority: item.priority,
+      status: visitedFormIsVisited ? 'Visited' : 'Pending',
+      domesticLocation: item.domesticLocation,
+      country: item.country,
+      // 年月格式默认为1号
+      visitedDate: visitedFormIsVisited && visitedFormDate ? new Date(`${visitedFormDate}-01`).toISOString() : null
+    };
+
+    api.put(`/Travel/${editingVisitedId}`, destination, { loadingText: '更新中...' })
+      .then(() => {
+        util.showSuccess('更新成功');
+        this.setData({ showVisitedForm: false, editingVisitedId: null });
+        this.fetchTravelList();
+      })
+      .catch(() => util.showError('更新失败'));
+  },
+
+  // 填充出行表单数据
+  _populateTravelForm(item) {
+    const { countryList } = this.data;
+    const isDomestic = item.type === 'Domestic';
+    const typeIndex = isDomestic ? 0 : 1;
+    
+    let region = [];
+    let regionDisplay = '';
+    let countryIndex = 0;
+    
+    if (isDomestic && item.domesticLocation) {
+      region = [item.domesticLocation.province || '', item.domesticLocation.city || ''];
+      regionDisplay = region.filter(Boolean).join('-');
+    } else if (!isDomestic && item.country) {
+      countryIndex = countryList.indexOf(item.country);
+      if (countryIndex < 0) countryIndex = 0;
+    }
+    
+    this.setData({
+      showTravelForm: true,
+      editingTravelId: item.id,
+      travelFormTypeIndex: typeIndex,
+      travelFormName: item.name || '',
+      travelFormPriority: item.priority || 1,
+      travelRegion: region,
+      travelRegionDisplay: regionDisplay,
+      travelCountryIndex: countryIndex
+    });
+  },
+
   cancelTravelForm() {
-    this.setData({ showTravelForm: false });
+    this.setData({ showTravelForm: false, editingTravelId: null });
   },
 
   onTravelTypeChange(e) {
@@ -469,7 +603,7 @@ Page({
   submitTravelForm() {
     const { 
       travelFormTypeIndex, travelFormName, travelFormPriority, 
-      travelRegion, countryList, travelCountryIndex 
+      travelRegion, countryList, travelCountryIndex, editingTravelId 
     } = this.data;
 
     const destination = {
@@ -488,6 +622,73 @@ Page({
       destination.country = countryList[travelCountryIndex] || '';
     }
 
+    // 判断是新增还是编辑
+    if (editingTravelId) {
+      // 编辑模式 - 需要在body中包含id
+      destination.id = editingTravelId;
+      api.put(`/Travel/${editingTravelId}`, destination, { loadingText: '更新中...' })
+        .then(() => {
+          util.showSuccess('更新成功');
+          this.setData({ showTravelForm: false, editingTravelId: null });
+          this.fetchTravelList();
+        })
+        .catch(() => util.showError('更新失败'));
+    } else {
+      // 新增模式 - 先检查重复
+      this._checkDuplicateAndSubmit(destination);
+    }
+  },
+
+  // 检查重复并提交
+  _checkDuplicateAndSubmit(destination) {
+    // 获取所有travel记录来检查重复
+    api.get('/Travel', { showLoading: false })
+      .then(allList => {
+        const duplicate = this._findDuplicate(destination, allList || []);
+        if (duplicate) {
+          const statusText = duplicate.status === 'Visited' ? '已去过' : '想去的';
+          const locationName = this._formatTravelDisplayName(duplicate);
+          util.showConfirm(
+            '发现相似记录',
+            `「${locationName}」已在${statusText}列表中，是否仍要添加？`
+          ).then(confirmed => {
+            if (confirmed) {
+              this._doSubmitTravel(destination);
+            }
+          });
+        } else {
+          this._doSubmitTravel(destination);
+        }
+      })
+      .catch(() => {
+        // 获取列表失败时直接提交
+        this._doSubmitTravel(destination);
+      });
+  },
+
+  // 查找重复记录
+  _findDuplicate(newDest, existingList) {
+    return existingList.find(item => {
+      // 跳过已删除的记录
+      if (item.isDeleted) return false;
+      
+      // 类型不同不算重复
+      if (item.type !== newDest.type) return false;
+      
+      if (newDest.type === 'Domestic') {
+        // 国内：省+市 相同视为重复
+        const newLoc = newDest.domesticLocation || {};
+        const existLoc = item.domesticLocation || {};
+        return newLoc.province === existLoc.province && newLoc.city === existLoc.city;
+      } else {
+        // 国外：国家+备注 相同视为重复
+        return item.country === newDest.country && (item.name || '') === (newDest.name || '');
+      }
+    });
+  },
+
+  // 执行提交
+  _doSubmitTravel(destination) {
     api.post('/Travel', destination, { loadingText: '添加中...' })
       .then(() => {
         util.showSuccess('添加成功');

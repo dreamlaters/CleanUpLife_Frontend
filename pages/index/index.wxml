@@ -219,10 +219,10 @@
       </view>
     </view>
 
-    <!-- 新增表单 -->
+    <!-- 新增/编辑表单 -->
     <view class="travel-add-form {{showTravelForm ? 'travel-form-show' : ''}}" wx:if="{{showTravelForm}}">
       <view class="travel-form-header">
-        <text class="travel-form-title">✨ 添加目的地</text>
+        <text class="travel-form-title">{{editingTravelId ? '✨ 编辑目的地' : '✨ 添加目的地'}}</text>
       </view>
       
       <view class="travel-form-row">
@@ -262,7 +262,31 @@
       
       <view class="travel-form-btns">
         <button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
-        <button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">确定添加</button>
+        <button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">{{editingTravelId ? '确定修改' : '确定添加'}}</button>
+      </view>
+    </view>
+
+    <!-- 已出行编辑表单 -->
+    <view class="travel-add-form {{showVisitedForm ? 'travel-form-show' : ''}}" wx:if="{{showVisitedForm}}">
+      <view class="travel-form-header">
+        <text class="travel-form-title">✨ 编辑出行记录</text>
+      </view>
+      
+      <view class="travel-form-row">
+        <text class="travel-form-label">是否去过</text>
+        <switch checked="{{visitedFormIsVisited}}" bindchange="onVisitedStatusChange" color="#667eea" />
+      </view>
+      
+      <view class="travel-form-row" wx:if="{{visitedFormIsVisited}}">
+        <text class="travel-form-label">首次到达时间</text>
+        <picker mode="date" fields="month" value="{{visitedFormDate}}" bindchange="onVisitedDateChange">
+          <view class="travel-form-picker">{{visitedFormDate || '请选择年月'}} <text class="picker-arrow">▼</text></view>
+        </picker>
+      </view>
+      
+      <view class="travel-form-btns">
+        <button class="travel-form-btn travel-form-cancel" bindtap="cancelVisitedForm">取消</button>
+        <button class="travel-form-btn travel-form-submit" bindtap="submitVisitedForm">确定修改</button>
       </view>
     </view>
 
@@ -287,6 +311,9 @@
               </view>
               <view class="priority-indicator priority-travel" wx:if="{{travelTab !== 'visited'}}">
                 <text>想去 {{item.priority}}</text>
+              </view>
+              <view class="visited-date-tag" wx:if="{{travelTab === 'visited'}}">
+                <text>📅 {{item.visitedDateFormatted || '未记录日期'}}</text>
               </view>
             </view>
           </view>
