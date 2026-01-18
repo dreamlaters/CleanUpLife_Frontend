@@ -101,12 +101,11 @@ Page({
             expiringSoonCount++;
           }
           
-          return {
-            ...item,
+          return Object.assign({}, item, {
             bestByFormatted: util.formatDate(item.bestBy),
             dateClass: dateClass,
             emoji: constants.CATEGORY_EMOJI[item.category] || '📦'
-          };
+          });
         });
         
         this.setData({ 
@@ -258,7 +257,7 @@ Page({
     const { sortField, sortOrder, filteredProducts } = this.data;
     const newOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
     
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const sortedProducts = filteredProducts.slice().sort((a, b) => {
       if (field === 'name') {
         return newOrder === 'asc' 
           ? a.name.localeCompare(b.name, 'zh')
@@ -281,8 +280,7 @@ Page({
     api.get('/ToBuy', { showLoading: false })
       .then(data => {
         const list = (data || [])
-          .map(item => ({
-            ...item,
+          .map(item => Object.assign({}, item, {
             priority: item.priority ?? item.Priority ?? 0,
             name: item.name ?? item.Name ?? '',
             completed: item.completed ?? item.Completed ?? false
@@ -360,7 +358,7 @@ Page({
     // 先乐观更新UI
     const newList = this.data.toBuyProducts.map(p => {
       if (p.id === id) {
-        return { ...p, completed: !p.completed };
+        return Object.assign({}, p, { completed: !p.completed });
       }
       return p;
     });
@@ -377,7 +375,7 @@ Page({
       // 如果API调用失败，恢复原状态
       const revertList = this.data.toBuyProducts.map(p => {
         if (p.id === id) {
-          return { ...p, completed: !p.completed };
+          return Object.assign({}, p, { completed: !p.completed });
         }
         return p;
       });
@@ -397,8 +395,7 @@ Page({
     api.get(`/Travel/status/${status}`, { showLoading: false })
       .then(data => {
         const list = (data || [])
-          .map(item => ({
-            ...item,
+          .map(item => Object.assign({}, item, {
             displayName: this._formatTravelDisplayName(item),
             visitedDateFormatted: item.visitedDate ? util.formatYearMonth(item.visitedDate) : ''
           }));
