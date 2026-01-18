@@ -278,7 +278,7 @@
       </view>
       
       <view class="travel-form-row" wx:if="{{visitedFormIsVisited}}">
-        <text class="travel-form-label">首次到达时间</text>
+        <text class="travel-form-label">访问时间</text>
         <picker mode="date" fields="month" value="{{visitedFormDate}}" bindchange="onVisitedDateChange">
           <view class="travel-form-picker">{{visitedFormDate || '请选择年月'}} <text class="picker-arrow">▼</text></view>
         </picker>
