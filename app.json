@@ -16,6 +16,7 @@
     "backgroundColorTop": "#f8fafc",
     "backgroundColorBottom": "#e2e8f0"
   },
+  "lazyCodeLoading": "requiredComponents",
   "renderer": "webview",
   "sitemapLocation": "sitemap.json"
 }
