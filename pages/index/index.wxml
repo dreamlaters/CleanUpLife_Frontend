@@ -92,6 +92,156 @@
     </view>
   </view>
 
+  <!-- 出行目的地区域 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon section-icon-travel">✈️</view>
+        <text class="section-title">出行计划</text>
+      </view>
+      <view class="section-badge" wx:if="{{travelList.length}}">{{travelList.length}}个</view>
+    </view>
+    
+    <!-- Tab切换 -->
+    <view class="travel-tabs">
+      <view 
+        class="travel-tab {{travelTab === 'pending' ? 'travel-tab-active' : ''}}" 
+        bindtap="switchTravelTab" 
+        data-tab="pending"
+      >
+        <text class="travel-tab-icon">🗺️</text>
+        <text>想去的</text>
+      </view>
+      <view 
+        class="travel-tab {{travelTab === 'visited' ? 'travel-tab-active' : ''}}" 
+        bindtap="switchTravelTab" 
+        data-tab="visited"
+      >
+        <text class="travel-tab-icon">✅</text>
+        <text>去过的</text>
+      </view>
+    </view>
+
+    <!-- 新增/编辑表单 -->
+    <view class="travel-add-form {{showTravelForm ? 'travel-form-show' : ''}}" wx:if="{{showTravelForm}}">
+      <view class="travel-form-header">
+        <text class="travel-form-title">{{editingTravelId ? '✨ 编辑目的地' : '✨ 添加目的地'}}</text>
+      </view>
+      
+      <view class="travel-form-row">
+        <text class="travel-form-label">目的地类型</text>
+        <picker mode="selector" range="{{['🇨🇳 国内', '🌍 国外']}}" value="{{travelFormTypeIndex}}" bindchange="onTravelTypeChange">
+          <view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '🇨🇳 国内' : '🌍 国外'}} <text class="picker-arrow">▼</text></view>
+        </picker>
+      </view>
+      
+      <!-- 国内选择省市 -->
+      <view class="travel-form-row" wx:if="{{travelFormTypeIndex === 0}}">
+        <text class="travel-form-label">省市</text>
+        <picker mode="region" level="city" value="{{travelRegion}}" bindchange="onRegionChange">
+          <view class="travel-form-picker">{{travelRegionDisplay || '请选择省市'}} <text class="picker-arrow">▼</text></view>
+        </picker>
+      </view>
+      
+      <!-- 国外选择国家 -->
+      <view class="travel-form-row" wx:if="{{travelFormTypeIndex === 1}}">
+        <text class="travel-form-label">国家</text>
+        <picker mode="selector" range="{{countryList}}" value="{{travelCountryIndex}}" bindchange="onCountryChange">
+          <view class="travel-form-picker">{{countryList[travelCountryIndex] || '请选择国家'}} <text class="picker-arrow">▼</text></view>
+        </picker>
+      </view>
+      
+      <view class="travel-form-row">
+        <text class="travel-form-label">目的地名称</text>
+        <input class="travel-form-input" placeholder="请输入目的地名称/备注" value="{{travelFormName}}" bindinput="onTravelNameInput" />
+      </view>
+      
+      <view class="travel-form-row travel-form-row-slider">
+        <text class="travel-form-label">想去程度 1-30</text>
+        <view class="travel-slider-wrap">
+          <slider min="1" max="30" value="{{travelFormPriority}}" show-value="true" activeColor="#667eea" block-color="#667eea" bindchange="onTravelPriorityChange" />
+        </view>
+      </view>
+      
+      <view class="travel-form-btns">
+        <button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
+        <button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">{{editingTravelId ? '确定修改' : '确定添加'}}</button>
+      </view>
+    </view>
+
+    <!-- 已出行编辑表单 -->
+    <view class="travel-add-form {{showVisitedForm ? 'travel-form-show' : ''}}" wx:if="{{showVisitedForm}}">
+      <view class="travel-form-header">
+        <text class="travel-form-title">✨ 编辑出行记录</text>
+      </view>
+      
+      <view class="travel-form-row">
+        <text class="travel-form-label">是否去过</text>
+        <switch checked="{{visitedFormIsVisited}}" bindchange="onVisitedStatusChange" color="#667eea" />
+      </view>
+      
+      <view class="travel-form-row" wx:if="{{visitedFormIsVisited}}">
+        <text class="travel-form-label">首次到达时间</text>
+        <picker mode="date" fields="month" value="{{visitedFormDate}}" bindchange="onVisitedDateChange">
+          <view class="travel-form-picker">{{visitedFormDate || '请选择年月'}} <text class="picker-arrow">▼</text></view>
+        </picker>
+      </view>
+      
+      <view class="travel-form-btns">
+        <button class="travel-form-btn travel-form-cancel" bindtap="cancelVisitedForm">取消</button>
+        <button class="travel-form-btn travel-form-submit" bindtap="submitVisitedForm">确定修改</button>
+      </view>
+    </view>
+
+    <!-- 目的地列表 -->
+    <view class="item-list" wx:if="{{travelList.length}}">
+      <view 
+        class="item-card-wrapper"
+        wx:for="{{travelList}}" 
+        wx:key="id"
+      >
+        <view 
+          class="item-card travel-item"
+          data-id="{{item.id}}"
+          bindlongpress="showTravelActions"
+        >
+          <view class="item-emoji travel-emoji">{{item.type === 'Domestic' ? '🇨🇳' : '🌍'}}</view>
+          <view class="item-content">
+            <text class="item-name">{{item.displayName}}</text>
+            <view class="item-info">
+              <view class="travel-type-tag {{item.type === 'Domestic' ? 'travel-domestic' : 'travel-international'}}">
+                {{item.type === 'Domestic' ? '国内' : '国际'}}
+              </view>
+              <view class="priority-indicator priority-travel" wx:if="{{travelTab !== 'visited'}}">
+                <text>想去 {{item.priority}}</text>
+              </view>
+              <view class="visited-date-tag" wx:if="{{travelTab === 'visited'}}">
+                <text>📅 {{item.visitedDateFormatted || '未记录日期'}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="travel-action-btn" catchtap="onMarkVisited" data-id="{{item.id}}" wx:if="{{travelTab === 'pending'}}">
+            <text>✓ 去过了</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!travelList.length}}">
+      <text class="empty-icon">{{travelTab === 'pending' ? '✈️' : '🎉'}}</text>
+      <text class="empty-title">{{travelTab === 'pending' ? '还没有想去的地方' : '还没有出行记录'}}</text>
+      <text class="empty-text">{{travelTab === 'pending' ? '添加你梦想中的目的地' : '把想去的地方标记为已去过'}}</text>
+      <view class="empty-btn" bindtap="showAddTravelForm" wx:if="{{travelTab === 'pending'}}">+ 添加目的地</view>
+    </view>
+    
+    <view class="add-btn-row" wx:if="{{travelTab === 'pending' && !showTravelForm && travelList.length}}">
+      <view class="fab-btn fab-btn-info" bindtap="showAddTravelForm">
+        <text class="fab-btn-icon">+</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 待购物品区域 -->
   <view class="section-card">
     <view class="section-header">
@@ -184,156 +334,6 @@
 
     <view class="add-btn-row" wx:if="{{toBuyProducts.length}}">
       <view class="fab-btn fab-btn-success" bindtap="goToAddToBuy">
-        <text class="fab-btn-icon">+</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 出行目的地区域 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title-wrap">
-        <view class="section-icon section-icon-travel">✈️</view>
-        <text class="section-title">出行计划</text>
-      </view>
-      <view class="section-badge" wx:if="{{travelList.length}}">{{travelList.length}}个</view>
-    </view>
-    
-    <!-- Tab切换 -->
-    <view class="travel-tabs">
-      <view 
-        class="travel-tab {{travelTab === 'pending' ? 'travel-tab-active' : ''}}" 
-        bindtap="switchTravelTab" 
-        data-tab="pending"
-      >
-        <text class="travel-tab-icon">🗺️</text>
-        <text>想去的</text>
-      </view>
-      <view 
-        class="travel-tab {{travelTab === 'visited' ? 'travel-tab-active' : ''}}" 
-        bindtap="switchTravelTab" 
-        data-tab="visited"
-      >
-        <text class="travel-tab-icon">✅</text>
-        <text>去过的</text>
-      </view>
-    </view>
-
-    <!-- 新增/编辑表单 -->
-    <view class="travel-add-form {{showTravelForm ? 'travel-form-show' : ''}}" wx:if="{{showTravelForm}}">
-      <view class="travel-form-header">
-        <text class="travel-form-title">{{editingTravelId ? '✨ 编辑目的地' : '✨ 添加目的地'}}</text>
-      </view>
-      
-      <view class="travel-form-row">
-        <text class="travel-form-label">目的地类型</text>
-        <picker mode="selector" range="{{['🇨🇳 国内', '🌍 国外']}}" value="{{travelFormTypeIndex}}" bindchange="onTravelTypeChange">
-          <view class="travel-form-picker">{{travelFormTypeIndex === 0 ? '🇨🇳 国内' : '🌍 国外'}} <text class="picker-arrow">▼</text></view>
-        </picker>
-      </view>
-      
-      <!-- 国内选择省市 -->
-      <view class="travel-form-row" wx:if="{{travelFormTypeIndex === 0}}">
-        <text class="travel-form-label">省市</text>
-        <picker mode="region" level="city" value="{{travelRegion}}" bindchange="onRegionChange">
-          <view class="travel-form-picker">{{travelRegionDisplay || '请选择省市'}} <text class="picker-arrow">▼</text></view>
-        </picker>
-      </view>
-      
-      <!-- 国外选择国家 -->
-      <view class="travel-form-row" wx:if="{{travelFormTypeIndex === 1}}">
-        <text class="travel-form-label">国家</text>
-        <picker mode="selector" range="{{countryList}}" value="{{travelCountryIndex}}" bindchange="onCountryChange">
-          <view class="travel-form-picker">{{countryList[travelCountryIndex] || '请选择国家'}} <text class="picker-arrow">▼</text></view>
-        </picker>
-      </view>
-      
-      <view class="travel-form-row">
-        <text class="travel-form-label">目的地名称</text>
-        <input class="travel-form-input" placeholder="请输入目的地名称/备注" value="{{travelFormName}}" bindinput="onTravelNameInput" />
-      </view>
-      
-      <view class="travel-form-row travel-form-row-slider">
-        <text class="travel-form-label">想去程度 1-30</text>
-        <view class="travel-slider-wrap">
-          <slider min="1" max="30" value="{{travelFormPriority}}" show-value="true" activeColor="#667eea" block-color="#667eea" bindchange="onTravelPriorityChange" />
-        </view>
-      </view>
-      
-      <view class="travel-form-btns">
-        <button class="travel-form-btn travel-form-cancel" bindtap="cancelTravelForm">取消</button>
-        <button class="travel-form-btn travel-form-submit" bindtap="submitTravelForm">{{editingTravelId ? '确定修改' : '确定添加'}}</button>
-      </view>
-    </view>
-
-    <!-- 已出行编辑表单 -->
-    <view class="travel-add-form {{showVisitedForm ? 'travel-form-show' : ''}}" wx:if="{{showVisitedForm}}">
-      <view class="travel-form-header">
-        <text class="travel-form-title">✨ 编辑出行记录</text>
-      </view>
-      
-      <view class="travel-form-row">
-        <text class="travel-form-label">是否去过</text>
-        <switch checked="{{visitedFormIsVisited}}" bindchange="onVisitedStatusChange" color="#667eea" />
-      </view>
-      
-      <view class="travel-form-row" wx:if="{{visitedFormIsVisited}}">
-        <text class="travel-form-label">访问时间</text>
-        <picker mode="date" fields="month" value="{{visitedFormDate}}" bindchange="onVisitedDateChange">
-          <view class="travel-form-picker">{{visitedFormDate || '请选择年月'}} <text class="picker-arrow">▼</text></view>
-        </picker>
-      </view>
-      
-      <view class="travel-form-btns">
-        <button class="travel-form-btn travel-form-cancel" bindtap="cancelVisitedForm">取消</button>
-        <button class="travel-form-btn travel-form-submit" bindtap="submitVisitedForm">确定修改</button>
-      </view>
-    </view>
-
-    <!-- 目的地列表 -->
-    <view class="item-list" wx:if="{{travelList.length}}">
-      <view 
-        class="item-card-wrapper"
-        wx:for="{{travelList}}" 
-        wx:key="id"
-      >
-        <view 
-          class="item-card travel-item"
-          data-id="{{item.id}}"
-          bindlongpress="showTravelActions"
-        >
-          <view class="item-emoji travel-emoji">{{item.type === 'Domestic' ? '🇨🇳' : '🌍'}}</view>
-          <view class="item-content">
-            <text class="item-name">{{item.displayName}}</text>
-            <view class="item-info">
-              <view class="travel-type-tag {{item.type === 'Domestic' ? 'travel-domestic' : 'travel-international'}}">
-                {{item.type === 'Domestic' ? '国内' : '国际'}}
-              </view>
-              <view class="priority-indicator priority-travel" wx:if="{{travelTab !== 'visited'}}">
-                <text>想去 {{item.priority}}</text>
-              </view>
-              <view class="visited-date-tag" wx:if="{{travelTab === 'visited'}}">
-                <text>📅 {{item.visitedDateFormatted || '未记录日期'}}</text>
-              </view>
-            </view>
-          </view>
-          <view class="travel-action-btn" catchtap="onMarkVisited" data-id="{{item.id}}" wx:if="{{travelTab === 'pending'}}">
-            <text>✓ 去过了</text>
-          </view>
-        </view>
-      </view>
-    </view>
-    
-    <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{!travelList.length}}">
-      <text class="empty-icon">{{travelTab === 'pending' ? '✈️' : '🎉'}}</text>
-      <text class="empty-title">{{travelTab === 'pending' ? '还没有想去的地方' : '还没有出行记录'}}</text>
-      <text class="empty-text">{{travelTab === 'pending' ? '添加你梦想中的目的地' : '把想去的地方标记为已去过'}}</text>
-      <view class="empty-btn" bindtap="showAddTravelForm" wx:if="{{travelTab === 'pending'}}">+ 添加目的地</view>
-    </view>
-    
-    <view class="add-btn-row" wx:if="{{travelTab === 'pending' && !showTravelForm && travelList.length}}">
-      <view class="fab-btn fab-btn-info" bindtap="showAddTravelForm">
         <text class="fab-btn-icon">+</text>
       </view>
     </view>

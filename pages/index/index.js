@@ -652,7 +652,9 @@ Page({
         if (err.statusCode === 409 && err.data?.duplicate) {
           // 后端返回重复记录，提示用户
           const duplicate = err.data.duplicate;
-          const statusText = duplicate.status === 1 ? '已去过' : '想去的';
+          // 兼容数字(1)和字符串('Visited')两种格式
+          const isVisited = duplicate.status === 1 || duplicate.status === 'Visited';
+          const statusText = isVisited ? '已去过' : '想去的';
           const locationName = this._formatTravelDisplayName(duplicate);
           util.showConfirm(
             '发现相似记录',
