@@ -39,6 +39,12 @@ const request = (options) => {
       success: (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
+        } else if (res.statusCode === 409) {
+          // 冲突响应，返回完整信息供调用方处理
+          const error = new Error(res.data?.message || '发现重复记录');
+          error.statusCode = 409;
+          error.data = res.data;
+          reject(error);
         } else {
           const errorMsg = res.data?.message || '请求失败';
           wx.showToast({ title: errorMsg, icon: 'error' });

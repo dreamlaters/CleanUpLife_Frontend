@@ -634,68 +634,38 @@ Page({
         })
         .catch(() => util.showError('更新失败'));
     } else {
-      // 新增模式 - 先检查重复
-      this._checkDuplicateAndSubmit(destination);
+      // 新增模式 - 后端会检查重复
+      this._submitTravel(destination);
     }
   },
 
-  // 检查重复并提交
-  _checkDuplicateAndSubmit(destination) {
-    // 获取所有travel记录来检查重复
-    api.get('/Travel', { showLoading: false })
-      .then(allList => {
-        const duplicate = this._findDuplicate(destination, allList || []);
-        if (duplicate) {
-          const statusText = duplicate.status === 'Visited' ? '已去过' : '想去的';
+  // 提交新增出行目的地
+  _submitTravel(destination, force = false) {
+    const url = force ? '/Travel?force=true' : '/Travel';
+    api.post(url, destination, { loadingText: '添加中...' })
+      .then(() => {
+        util.showSuccess('添加成功');
+        this.setData({ showTravelForm: false });
+        this.fetchTravelList();
+      })
+      .catch((err) => {
+        if (err.statusCode === 409 && err.data?.duplicate) {
+          // 后端返回重复记录，提示用户
+          const duplicate = err.data.duplicate;
+          const statusText = duplicate.status === 1 ? '已去过' : '想去的';
           const locationName = this._formatTravelDisplayName(duplicate);
           util.showConfirm(
             '发现相似记录',
             `「${locationName}」已在${statusText}列表中，是否仍要添加？`
           ).then(confirmed => {
             if (confirmed) {
-              this._doSubmitTravel(destination);
+              this._submitTravel(destination, true);
             }
           });
         } else {
-          this._doSubmitTravel(destination);
+          util.showError('添加失败');
         }
-      })
-      .catch(() => {
-        // 获取列表失败时直接提交
-        this._doSubmitTravel(destination);
       });
-  },
-
-  // 查找重复记录
-  _findDuplicate(newDest, existingList) {
-    return existingList.find(item => {
-      // 跳过已删除的记录
-      if (item.isDeleted) return false;
-      
-      // 类型不同不算重复
-      if (item.type !== newDest.type) return false;
-      
-      if (newDest.type === 'Domestic') {
-        // 国内：省+市 相同视为重复
-        const newLoc = newDest.domesticLocation || {};
-        const existLoc = item.domesticLocation || {};
-        return newLoc.province === existLoc.province && newLoc.city === existLoc.city;
-      } else {
-        // 国外：国家+备注 相同视为重复
-        return item.country === newDest.country && (item.name || '') === (newDest.name || '');
-      }
-    });
-  },
-
-  // 执行提交
-  _doSubmitTravel(destination) {
-    api.post('/Travel', destination, { loadingText: '添加中...' })
-      .then(() => {
-        util.showSuccess('添加成功');
-        this.setData({ showTravelForm: false });
-        this.fetchTravelList();
-      })
-      .catch(() => util.showError('添加失败'));
   },
 
   _deleteTravel(id) {
