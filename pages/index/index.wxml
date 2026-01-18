@@ -285,7 +285,7 @@
               <view class="travel-type-tag {{item.type === 'Domestic' ? 'travel-domestic' : 'travel-international'}}">
                 {{item.type === 'Domestic' ? '国内' : '国际'}}
               </view>
-              <view class="priority-indicator priority-travel">
+              <view class="priority-indicator priority-travel" wx:if="{{travelTab !== 'visited'}}">
                 <text>想去 {{item.priority}}</text>
               </view>
             </view>
