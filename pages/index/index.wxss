@@ -2,6 +2,37 @@
  * 首页样式 - 现代化设计
  */
 
+/* ==================== Loading效果 ==================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) 0;
+  min-height: 200rpx;
+}
+
+.loading-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid var(--border-light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: var(--spacing-md);
+  font-size: 26rpx;
+  color: var(--text-hint);
+}
+
 /* ==================== 页面头部 ==================== */
 .page-header {
   width: 100%;

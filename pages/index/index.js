@@ -54,6 +54,11 @@ Page({
     // 常量数据
     countryList: constants.COUNTRY_LIST,
     
+    // 加载状态
+    loadingProducts: false,
+    loadingToBuy: false,
+    loadingTravel: false,
+    
     // 触摸状态
     touchStartX: 0,
     touchStartY: 0,
@@ -82,7 +87,8 @@ Page({
 
   // ==================== 物品列表 ====================
   fetchProducts() {
-    api.get('/Products', { loadingText: '加载中...' })
+    this.setData({ loadingProducts: true });
+    api.get('/Products', { showLoading: false })
       .then(data => {
         const now = new Date();
         let expiringSoonCount = 0;
@@ -112,10 +118,12 @@ Page({
           products,
           filteredProducts: products,
           expiringSoonCount,
-          expiredCount
+          expiredCount,
+          loadingProducts: false
         });
       })
       .catch(() => {
+        this.setData({ loadingProducts: false });
         util.showError('数据加载失败');
       });
   },
@@ -277,6 +285,7 @@ Page({
 
   // ==================== 待购物品 ====================
   fetchToBuyProducts() {
+    this.setData({ loadingToBuy: true });
     api.get('/ToBuy', { showLoading: false })
       .then(data => {
         const list = (data || [])
@@ -294,8 +303,12 @@ Page({
         this.setData({ 
           toBuyProducts: list,
           toBuyPending,
-          toBuyCompleted
+          toBuyCompleted,
+          loadingToBuy: false
         });
+      })
+      .catch(() => {
+        this.setData({ loadingToBuy: false });
       });
   },
 
@@ -388,6 +401,7 @@ Page({
 
   // ==================== 出行模块 ====================
   fetchTravelList() {
+    this.setData({ loadingTravel: true });
     const status = this.data.travelTab === 'pending' 
       ? constants.TRAVEL_STATUS.PENDING 
       : constants.TRAVEL_STATUS.VISITED;
@@ -400,7 +414,10 @@ Page({
             visitedDateFormatted: item.visitedDate ? util.formatYearMonth(item.visitedDate) : ''
           }));
         // visited列表已由后端按visitedDate倒序排序，pending列表由后端按priority排序
-        this.setData({ travelList: list });
+        this.setData({ travelList: list, loadingTravel: false });
+      })
+      .catch(() => {
+        this.setData({ loadingTravel: false });
       });
   },
 

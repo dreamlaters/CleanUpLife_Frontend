@@ -50,7 +50,11 @@
     </scroll-view>
 
     <!-- 物品列表 - 卡片式布局 -->
-    <view class="item-list" wx:if="{{filteredProducts.length}}">
+    <view class="loading-container" wx:if="{{loadingProducts}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    <view class="item-list" wx:elif="{{filteredProducts.length}}">
       <view 
         class="item-card-wrapper"
         wx:for="{{filteredProducts}}" 
@@ -77,7 +81,7 @@
     </view>
 
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{!products.length}}">
+    <view class="empty-state" wx:if="{{!loadingProducts && !products.length}}">
       <text class="empty-icon">📭</text>
       <text class="empty-title">还没有添加物品</text>
       <text class="empty-text">点击下方按钮，开始记录你的物品</text>
@@ -194,7 +198,11 @@
     </view>
 
     <!-- 目的地列表 -->
-    <view class="item-list" wx:if="{{travelList.length}}">
+    <view class="loading-container" wx:if="{{loadingTravel}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    <view class="item-list" wx:elif="{{travelList.length}}">
       <view 
         class="item-card-wrapper"
         wx:for="{{travelList}}" 
@@ -228,7 +236,7 @@
     </view>
     
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{!travelList.length}}">
+    <view class="empty-state" wx:if="{{!loadingTravel && !travelList.length}}">
       <text class="empty-icon">{{travelTab === 'pending' ? '✈️' : '🎉'}}</text>
       <text class="empty-title">{{travelTab === 'pending' ? '还没有想去的地方' : '还没有出行记录'}}</text>
       <text class="empty-text">{{travelTab === 'pending' ? '添加你梦想中的目的地' : '把想去的地方标记为已去过'}}</text>
@@ -253,7 +261,11 @@
     </view>
     
     <!-- 未完成的待购物品 -->
-    <view class="item-list" wx:if="{{toBuyPending.length}}">
+    <view class="loading-container" wx:if="{{loadingToBuy}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    <view class="item-list" wx:elif="{{toBuyPending.length}}">
       <view 
         class="item-card-wrapper"
         wx:for="{{toBuyPending}}" 
@@ -325,7 +337,7 @@
     </view>
     
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{!toBuyProducts.length}}">
+    <view class="empty-state" wx:if="{{!loadingToBuy && !toBuyProducts.length}}">
       <text class="empty-icon">🛒</text>
       <text class="empty-title">购物清单是空的</text>
       <text class="empty-text">记录需要购买的物品</text>
