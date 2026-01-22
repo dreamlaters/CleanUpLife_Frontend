@@ -250,107 +250,6 @@
     </view>
   </view>
 
-  <!-- 待购物品区域 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title-wrap">
-        <view class="section-icon section-icon-tobuy">🛒</view>
-        <text class="section-title">待购清单</text>
-      </view>
-      <view class="section-badge" wx:if="{{toBuyProducts.length}}">{{toBuyProducts.length}}件</view>
-    </view>
-    
-    <!-- 未完成的待购物品 -->
-    <view class="loading-container" wx:if="{{loadingToBuy}}">
-      <view class="loading-spinner"></view>
-      <text class="loading-text">加载中...</text>
-    </view>
-    <view class="item-list" wx:elif="{{toBuyPending.length}}">
-      <view 
-        class="item-card-wrapper"
-        wx:for="{{toBuyPending}}" 
-        wx:key="id"
-      >
-        <view 
-          class="item-card tobuy-item"
-          data-id="{{item.id}}"
-          bindtap="onUpdateToBuy"
-          bindlongpress="showToBuyActions"
-        >
-          <view class="tobuy-checkbox {{item.completed ? 'tobuy-checkbox-checked' : ''}}" 
-                catchtap="toggleToBuyComplete" data-id="{{item.id}}">
-            <text wx:if="{{item.completed}}">✓</text>
-          </view>
-          <view class="item-content {{item.completed ? 'item-completed' : ''}}">
-            <text class="item-name">{{item.name}}</text>
-            <view class="item-info">
-              <view class="priority-indicator priority-{{item.priority <= 3 ? 'high' : item.priority <= 7 ? 'medium' : 'low'}}">
-                <text>P{{item.priority}}</text>
-              </view>
-            </view>
-          </view>
-          <text class="item-arrow">›</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 已完成的待购物品（可折叠） -->
-    <view class="completed-section" wx:if="{{toBuyCompleted.length}}">
-      <view class="completed-header" bindtap="toggleCompletedToBuyList">
-        <view class="completed-title-wrap">
-          <text class="completed-icon">✅</text>
-          <text class="completed-title">已完成 ({{toBuyCompleted.length}})</text>
-        </view>
-        <view class="completed-actions">
-          <view class="clear-btn" catchtap="clearCompletedToBuy">清除</view>
-          <text class="expand-icon {{showCompletedToBuy ? 'expand-icon-up' : ''}}">›</text>
-        </view>
-      </view>
-      <view class="completed-list {{showCompletedToBuy ? 'completed-list-show' : ''}}">
-        <view 
-          class="item-card-wrapper"
-          wx:for="{{toBuyCompleted}}" 
-          wx:key="id"
-        >
-          <view 
-            class="item-card tobuy-item item-card-completed"
-            data-id="{{item.id}}"
-            bindtap="onUpdateToBuy"
-            bindlongpress="showToBuyActions"
-          >
-            <view class="tobuy-checkbox tobuy-checkbox-checked" 
-                  catchtap="toggleToBuyComplete" data-id="{{item.id}}">
-              <text>✓</text>
-            </view>
-            <view class="item-content item-completed">
-              <text class="item-name">{{item.name}}</text>
-              <view class="item-info">
-                <view class="priority-indicator priority-{{item.priority <= 3 ? 'high' : item.priority <= 7 ? 'medium' : 'low'}}">
-                  <text>P{{item.priority}}</text>
-                </view>
-              </view>
-            </view>
-            <text class="item-arrow">›</text>
-          </view>
-        </view>
-      </view>
-    </view>
-    
-    <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{!loadingToBuy && !toBuyProducts.length}}">
-      <text class="empty-icon">🛒</text>
-      <text class="empty-title">购物清单是空的</text>
-      <text class="empty-text">记录需要购买的物品</text>
-      <view class="empty-btn" bindtap="goToAddToBuy">+ 添加待购</view>
-    </view>
-
-    <view class="add-btn-row" wx:if="{{toBuyProducts.length}}">
-      <view class="fab-btn fab-btn-success" bindtap="goToAddToBuy">
-        <text class="fab-btn-icon">+</text>
-      </view>
-    </view>
-  </view>
-
   <!-- 年度目标区域 -->
   <view class="section-card yearly-goal-section">
     <view class="section-header">
@@ -471,25 +370,141 @@
     </view>
   </view>
 
-  <!-- 新增目标弹窗 -->
+  <!-- 待购物品区域 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon section-icon-tobuy">🛒</view>
+        <text class="section-title">待购清单</text>
+      </view>
+      <view class="section-badge" wx:if="{{toBuyProducts.length}}">{{toBuyProducts.length}}件</view>
+    </view>
+    
+    <!-- 未完成的待购物品 -->
+    <view class="loading-container" wx:if="{{loadingToBuy}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    <view class="item-list" wx:elif="{{toBuyPending.length}}">
+      <view 
+        class="item-card-wrapper"
+        wx:for="{{toBuyPending}}" 
+        wx:key="id"
+      >
+        <view 
+          class="item-card tobuy-item"
+          data-id="{{item.id}}"
+          bindtap="onUpdateToBuy"
+          bindlongpress="showToBuyActions"
+        >
+          <view class="tobuy-checkbox {{item.completed ? 'tobuy-checkbox-checked' : ''}}" 
+                catchtap="toggleToBuyComplete" data-id="{{item.id}}">
+            <text wx:if="{{item.completed}}">✓</text>
+          </view>
+          <view class="item-content {{item.completed ? 'item-completed' : ''}}">
+            <text class="item-name">{{item.name}}</text>
+            <view class="item-info">
+              <view class="priority-indicator priority-{{item.priority <= 3 ? 'high' : item.priority <= 7 ? 'medium' : 'low'}}">
+                <text>P{{item.priority}}</text>
+              </view>
+            </view>
+          </view>
+          <text class="item-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 已完成的待购物品（可折叠） -->
+    <view class="completed-section" wx:if="{{toBuyCompleted.length}}">
+      <view class="completed-header" bindtap="toggleCompletedToBuyList">
+        <view class="completed-title-wrap">
+          <text class="completed-icon">✅</text>
+          <text class="completed-title">已完成 ({{toBuyCompleted.length}})</text>
+        </view>
+        <view class="completed-actions">
+          <view class="clear-btn" catchtap="clearCompletedToBuy">清除</view>
+          <text class="expand-icon {{showCompletedToBuy ? 'expand-icon-up' : ''}}">›</text>
+        </view>
+      </view>
+      <view class="completed-list {{showCompletedToBuy ? 'completed-list-show' : ''}}">
+        <view 
+          class="item-card-wrapper"
+          wx:for="{{toBuyCompleted}}" 
+          wx:key="id"
+        >
+          <view 
+            class="item-card tobuy-item item-card-completed"
+            data-id="{{item.id}}"
+            bindtap="onUpdateToBuy"
+            bindlongpress="showToBuyActions"
+          >
+            <view class="tobuy-checkbox tobuy-checkbox-checked" 
+                  catchtap="toggleToBuyComplete" data-id="{{item.id}}">
+              <text>✓</text>
+            </view>
+            <view class="item-content item-completed">
+              <text class="item-name">{{item.name}}</text>
+              <view class="item-info">
+                <view class="priority-indicator priority-{{item.priority <= 3 ? 'high' : item.priority <= 7 ? 'medium' : 'low'}}">
+                  <text>P{{item.priority}}</text>
+                </view>
+              </view>
+            </view>
+            <text class="item-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loadingToBuy && !toBuyProducts.length}}">
+      <text class="empty-icon">🛒</text>
+      <text class="empty-title">购物清单是空的</text>
+      <text class="empty-text">记录需要购买的物品</text>
+      <view class="empty-btn" bindtap="goToAddToBuy">+ 添加待购</view>
+    </view>
+
+    <view class="add-btn-row" wx:if="{{toBuyProducts.length}}">
+      <view class="fab-btn fab-btn-success" bindtap="goToAddToBuy">
+        <text class="fab-btn-icon">+</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增/编辑目标弹窗 -->
   <view class="goal-modal-mask {{showGoalForm ? 'show' : ''}}" bindtap="hideGoalForm"></view>
   <view class="goal-modal {{showGoalForm ? 'show' : ''}}">
     <view class="goal-modal-header">
-      <text class="goal-modal-title">{{goalFormOwner === 'Pig' ? '🐷 猪的新目标' : '🫏 驴的新目标'}}</text>
+      <text class="goal-modal-title">{{editingGoalId ? (goalFormOwner === 'Pig' ? '🐷 编辑猪的目标' : '🫏 编辑驴的目标') : (goalFormOwner === 'Pig' ? '🐷 猪的新目标' : '🫏 驴的新目标')}}</text>
       <view class="goal-modal-close" bindtap="hideGoalForm">✕</view>
     </view>
     <view class="goal-modal-body">
-      <input 
-        class="goal-input" 
-        placeholder="输入你的年度目标..." 
-        value="{{goalFormTitle}}"
-        bindinput="onGoalTitleInput"
-        focus="{{showGoalForm}}"
-      />
+      <!-- 年份选择 -->
+      <view class="goal-form-row">
+        <text class="goal-form-label">📅 目标年份</text>
+        <picker mode="selector" range="{{goalFormYearList}}" value="{{goalFormYearIndex}}" bindchange="onGoalFormYearChange">
+          <view class="goal-form-picker">
+            <text>{{goalFormYear}}年</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      <!-- 目标内容 -->
+      <view class="goal-form-row goal-form-row-input">
+        <text class="goal-form-label">🎯 目标内容</text>
+        <input 
+          class="goal-input" 
+          placeholder="输入你的年度目标..." 
+          value="{{goalFormTitle}}"
+          bindinput="onGoalTitleInput"
+          focus="{{showGoalForm}}"
+          adjust-position="{{true}}"
+        />
+      </view>
     </view>
     <view class="goal-modal-footer">
       <button class="goal-modal-btn goal-modal-cancel" bindtap="hideGoalForm">取消</button>
-      <button class="goal-modal-btn goal-modal-confirm" bindtap="submitGoalForm">确定添加</button>
+      <button class="goal-modal-btn goal-modal-confirm" bindtap="submitGoalForm">{{editingGoalId ? '确定修改' : '确定添加'}}</button>
     </view>
   </view>
 

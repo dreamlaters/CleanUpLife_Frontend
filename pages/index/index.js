@@ -56,6 +56,10 @@ Page({
     showGoalForm: false,
     goalFormOwner: 'Pig',
     goalFormTitle: '',
+    goalFormYear: new Date().getFullYear(),
+    goalFormYearList: [],
+    goalFormYearIndex: 0,
+    editingGoalId: null,
     
     // 操作菜单
     showActionSheet: false,
@@ -214,6 +218,8 @@ Page({
         wx.navigateTo({ url: `/pages/tobuy/update?id=${actionSheetId}` });
       } else if (actionSheetType === 'travel') {
         this.showEditTravelForm(actionSheetId);
+      } else if (actionSheetType === 'goal') {
+        this.showEditGoalForm(actionSheetId);
       }
     }, 200);
   },
@@ -884,16 +890,60 @@ Page({
   // 显示新增目标表单
   showAddGoalForm(e) {
     const owner = e.currentTarget.dataset.owner;
+    const currentYear = new Date().getFullYear();
+    // 生成年份列表：从2020年到当前年份+2年
+    const yearList = [];
+    for (let y = 2020; y <= currentYear + 2; y++) {
+      yearList.push(y);
+    }
+    
     this.setData({
       showGoalForm: true,
       goalFormOwner: owner,
-      goalFormTitle: ''
+      goalFormTitle: '',
+      goalFormYear: currentYear,
+      goalFormYearList: yearList,
+      goalFormYearIndex: yearList.indexOf(currentYear),
+      editingGoalId: null
+    });
+  },
+
+  // 显示编辑目标表单
+  showEditGoalForm(id) {
+    const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
+    const item = allGoals.find(g => g.id === id);
+    
+    if (!item) {
+      util.showError('目标不存在');
+      return;
+    }
+    
+    const currentYear = new Date().getFullYear();
+    // 生成年份列表：从2020年到当前年份+2年
+    const yearList = [];
+    for (let y = 2020; y <= currentYear + 2; y++) {
+      yearList.push(y);
+    }
+    // 如果目标年份不在列表中，添加进去
+    if (!yearList.includes(item.year)) {
+      yearList.push(item.year);
+      yearList.sort((a, b) => a - b);
+    }
+    
+    this.setData({
+      showGoalForm: true,
+      goalFormOwner: item.owner,
+      goalFormTitle: item.title,
+      goalFormYear: item.year,
+      goalFormYearList: yearList,
+      goalFormYearIndex: yearList.indexOf(item.year),
+      editingGoalId: id
     });
   },
 
   // 隐藏目标表单
   hideGoalForm() {
-    this.setData({ showGoalForm: false });
+    this.setData({ showGoalForm: false, editingGoalId: null });
   },
 
   // 目标标题输入
@@ -901,9 +951,18 @@ Page({
     this.setData({ goalFormTitle: e.detail.value });
   },
 
-  // 提交新增目标
+  // 目标年份选择
+  onGoalFormYearChange(e) {
+    const index = parseInt(e.detail.value);
+    this.setData({
+      goalFormYearIndex: index,
+      goalFormYear: this.data.goalFormYearList[index]
+    });
+  },
+
+  // 提交目标表单（新增或编辑）
   submitGoalForm() {
-    const { goalFormTitle, goalFormOwner, goalCurrentYear } = this.data;
+    const { goalFormTitle, goalFormOwner, goalFormYear, editingGoalId } = this.data;
     
     if (!goalFormTitle.trim()) {
       util.showError('请输入目标内容');
@@ -913,19 +972,48 @@ Page({
     const goal = {
       title: goalFormTitle.trim(),
       owner: goalFormOwner,
-      year: goalCurrentYear,
+      year: goalFormYear,
       priority: 10
     };
     
-    api.post('/YearlyGoal', goal, { loadingText: '添加中...' })
-      .then(() => {
-        util.showSuccess('添加成功');
-        this.setData({ showGoalForm: false, goalFormTitle: '' });
-        this.fetchYearlyGoals();
-      })
-      .catch(() => {
-        util.showError('添加失败');
-      });
+    if (editingGoalId) {
+      // 编辑模式
+      goal.id = editingGoalId;
+      api.put(`/YearlyGoal/${editingGoalId}`, goal, { loadingText: '更新中...' })
+        .then(() => {
+          util.showSuccess('更新成功');
+          this.setData({ showGoalForm: false, goalFormTitle: '', editingGoalId: null });
+          // 如果年份变了，切换到新年份
+          if (goalFormYear !== this.data.goalCurrentYear) {
+            this.setData({ goalCurrentYear: goalFormYear }, () => {
+              this.fetchYearlyGoals();
+            });
+          } else {
+            this.fetchYearlyGoals();
+          }
+        })
+        .catch(() => {
+          util.showError('更新失败');
+        });
+    } else {
+      // 新增模式
+      api.post('/YearlyGoal', goal, { loadingText: '添加中...' })
+        .then(() => {
+          util.showSuccess('添加成功');
+          this.setData({ showGoalForm: false, goalFormTitle: '' });
+          // 如果添加到其他年份，切换到那个年份
+          if (goalFormYear !== this.data.goalCurrentYear) {
+            this.setData({ goalCurrentYear: goalFormYear }, () => {
+              this.fetchYearlyGoals();
+            });
+          } else {
+            this.fetchYearlyGoals();
+          }
+        })
+        .catch(() => {
+          util.showError('添加失败');
+        });
+    }
   },
 
   // 切换目标完成状态
