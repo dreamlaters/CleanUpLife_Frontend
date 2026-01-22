@@ -809,3 +809,370 @@
   color: var(--text-white);
   transform: scale(0.98);
 }
+
+/* ==================== 年度目标模块 ==================== */
+.yearly-goal-section {
+  overflow: visible;
+}
+
+.section-icon-goal {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+}
+
+.year-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 10rpx 20rpx;
+  background: var(--bg-hover);
+  border-radius: var(--radius-full);
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.year-picker .picker-arrow {
+  font-size: 18rpx;
+  color: var(--text-hint);
+}
+
+/* 双栏布局 */
+.goal-columns {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+}
+
+.goal-column {
+  flex: 1;
+  background: var(--bg-hover);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 猪的目标 - 粉色系 */
+.goal-column-pig {
+  border: 2rpx solid rgba(255, 107, 157, 0.2);
+}
+
+.goal-header-pig {
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(255, 182, 193, 0.15) 100%);
+  border-bottom: 2rpx solid rgba(255, 107, 157, 0.2);
+}
+
+/* 驴的目标 - 蓝色系 */
+.goal-column-donkey {
+  border: 2rpx solid rgba(91, 141, 239, 0.2);
+}
+
+.goal-header-donkey {
+  background: linear-gradient(135deg, rgba(91, 141, 239, 0.15) 0%, rgba(147, 197, 253, 0.15) 100%);
+  border-bottom: 2rpx solid rgba(91, 141, 239, 0.2);
+}
+
+.goal-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+}
+
+.goal-owner-emoji {
+  font-size: 36rpx;
+}
+
+.goal-owner-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* 目标列表 */
+.goal-list {
+  flex: 1;
+  padding: var(--spacing-sm);
+  min-height: 150rpx;
+}
+
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-sm);
+  transition: all var(--transition-fast);
+}
+
+.goal-item:active {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+.goal-item-completed {
+  opacity: 0.6;
+  background: var(--bg-tertiary);
+}
+
+.goal-checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 3rpx solid var(--border-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  font-size: 24rpx;
+  color: var(--text-white);
+}
+
+.goal-checkbox-checked {
+  background: var(--success-gradient);
+  border-color: var(--success-color);
+}
+
+.goal-title {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.goal-title-completed {
+  text-decoration: line-through;
+  color: var(--text-hint);
+}
+
+.goal-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100rpx;
+}
+
+.goal-empty-text {
+  font-size: 24rpx;
+  color: var(--text-disabled);
+}
+
+/* 添加目标按钮 */
+.goal-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm);
+  background: var(--bg-card);
+  border: 2rpx dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  font-size: 24rpx;
+  color: var(--text-hint);
+  transition: all var(--transition-fast);
+}
+
+.goal-add-btn:active {
+  background: var(--primary-soft);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.goal-add-icon {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+/* 往年归档 */
+.goal-archive-section {
+  border-top: 1rpx solid var(--border-light);
+  margin: 0 var(--spacing-lg) var(--spacing-lg);
+  padding-top: var(--spacing-md);
+}
+
+.goal-archive-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: var(--radius-lg);
+}
+
+.goal-archive-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.goal-archive-icon {
+  font-size: 28rpx;
+}
+
+.goal-archive-title {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.goal-archive-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-normal);
+}
+
+.goal-archive-list-show {
+  max-height: 500rpx;
+}
+
+.goal-archive-year-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1rpx solid var(--border-light);
+}
+
+.goal-archive-year-item:last-child {
+  border-bottom: none;
+}
+
+.goal-archive-year-item:active {
+  background: var(--bg-hover);
+}
+
+.archive-year-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.archive-year-arrow {
+  font-size: 28rpx;
+  color: var(--text-disabled);
+}
+
+/* 新增目标弹窗 */
+.goal-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  z-index: 1000;
+}
+
+.goal-modal-mask.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.goal-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 85%;
+  max-width: 600rpx;
+  background: var(--bg-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.goal-modal.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.goal-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-xl);
+  background: var(--primary-soft);
+  border-bottom: 1rpx solid var(--border-light);
+}
+
+.goal-modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.goal-modal-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: var(--text-hint);
+  border-radius: var(--radius-full);
+  background: var(--bg-hover);
+}
+
+.goal-modal-body {
+  padding: var(--spacing-xl);
+}
+
+.goal-input {
+  width: 100%;
+  padding: var(--spacing-lg);
+  font-size: 28rpx;
+  background: var(--bg-hover);
+  border: 2rpx solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+}
+
+.goal-input:focus {
+  border-color: var(--primary-color);
+  background: var(--bg-card);
+}
+
+.goal-modal-footer {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl);
+}
+
+.goal-modal-btn {
+  flex: 1;
+  padding: var(--spacing-lg) 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.goal-modal-cancel {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.goal-modal-confirm {
+  background: var(--primary-gradient);
+  color: var(--text-white);
+  box-shadow: var(--shadow-colored);
+}
+
+.goal-modal-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}

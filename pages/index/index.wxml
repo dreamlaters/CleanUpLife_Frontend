@@ -351,6 +351,148 @@
     </view>
   </view>
 
+  <!-- 年度目标区域 -->
+  <view class="section-card yearly-goal-section">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon section-icon-goal">🎯</view>
+        <text class="section-title">年度目标</text>
+      </view>
+      <picker mode="selector" range="{{goalYearList}}" value="{{goalYearIndex}}" bindchange="onGoalYearChange">
+        <view class="year-picker">
+          <text>{{goalCurrentYear}}年</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 双栏布局：猪 & 驴 -->
+    <view class="goal-columns">
+      <!-- 左栏：猪的目标 -->
+      <view class="goal-column goal-column-pig">
+        <view class="goal-column-header goal-header-pig">
+          <text class="goal-owner-emoji">🐷</text>
+          <text class="goal-owner-name">猪的目标</text>
+        </view>
+        
+        <view class="goal-list">
+          <!-- 未完成目标 -->
+          <view 
+            class="goal-item {{item.completed ? 'goal-item-completed' : ''}}"
+            wx:for="{{goalsPig}}" 
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindlongpress="showGoalActions"
+          >
+            <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
+                  catchtap="toggleGoalComplete" data-id="{{item.id}}">
+              <text wx:if="{{item.completed}}">✓</text>
+            </view>
+            <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+          </view>
+          
+          <!-- 空状态 -->
+          <view class="goal-empty" wx:if="{{!goalsPig.length && !loadingGoals}}">
+            <text class="goal-empty-text">暂无目标</text>
+          </view>
+        </view>
+        
+        <!-- 添加按钮 -->
+        <view class="goal-add-btn" bindtap="showAddGoalForm" data-owner="Pig">
+          <text class="goal-add-icon">+</text>
+          <text>添加目标</text>
+        </view>
+      </view>
+
+      <!-- 右栏：驴的目标 -->
+      <view class="goal-column goal-column-donkey">
+        <view class="goal-column-header goal-header-donkey">
+          <text class="goal-owner-emoji">🫏</text>
+          <text class="goal-owner-name">驴的目标</text>
+        </view>
+        
+        <view class="goal-list">
+          <!-- 目标列表 -->
+          <view 
+            class="goal-item {{item.completed ? 'goal-item-completed' : ''}}"
+            wx:for="{{goalsDonkey}}" 
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindlongpress="showGoalActions"
+          >
+            <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
+                  catchtap="toggleGoalComplete" data-id="{{item.id}}">
+              <text wx:if="{{item.completed}}">✓</text>
+            </view>
+            <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+          </view>
+          
+          <!-- 空状态 -->
+          <view class="goal-empty" wx:if="{{!goalsDonkey.length && !loadingGoals}}">
+            <text class="goal-empty-text">暂无目标</text>
+          </view>
+        </view>
+        
+        <!-- 添加按钮 -->
+        <view class="goal-add-btn" bindtap="showAddGoalForm" data-owner="Donkey">
+          <text class="goal-add-icon">+</text>
+          <text>添加目标</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 往年归档 -->
+    <view class="goal-archive-section" wx:if="{{goalArchivedYears.length}}">
+      <view class="goal-archive-header" bindtap="toggleGoalArchive">
+        <view class="goal-archive-title-wrap">
+          <text class="goal-archive-icon">📂</text>
+          <text class="goal-archive-title">往年归档</text>
+        </view>
+        <text class="expand-icon {{showGoalArchive ? 'expand-icon-up' : ''}}">›</text>
+      </view>
+      <view class="goal-archive-list {{showGoalArchive ? 'goal-archive-list-show' : ''}}">
+        <view 
+          class="goal-archive-year-item"
+          wx:for="{{goalArchivedYears}}" 
+          wx:key="*this"
+          bindtap="onGoalYearChange"
+          data-year="{{item}}"
+        >
+          <text class="archive-year-text">{{item}}年</text>
+          <text class="archive-year-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-container" wx:if="{{loadingGoals}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <!-- 新增目标弹窗 -->
+  <view class="goal-modal-mask {{showGoalForm ? 'show' : ''}}" bindtap="hideGoalForm"></view>
+  <view class="goal-modal {{showGoalForm ? 'show' : ''}}">
+    <view class="goal-modal-header">
+      <text class="goal-modal-title">{{goalFormOwner === 'Pig' ? '🐷 猪的新目标' : '🫏 驴的新目标'}}</text>
+      <view class="goal-modal-close" bindtap="hideGoalForm">✕</view>
+    </view>
+    <view class="goal-modal-body">
+      <input 
+        class="goal-input" 
+        placeholder="输入你的年度目标..." 
+        value="{{goalFormTitle}}"
+        bindinput="onGoalTitleInput"
+        focus="{{showGoalForm}}"
+      />
+    </view>
+    <view class="goal-modal-footer">
+      <button class="goal-modal-btn goal-modal-cancel" bindtap="hideGoalForm">取消</button>
+      <button class="goal-modal-btn goal-modal-confirm" bindtap="submitGoalForm">确定添加</button>
+    </view>
+  </view>
+
   <!-- 底部链接 -->
   <view class="footer-links">
     <navigator url="/pages/openid/openid" open-type="navigate" class="footer-link">

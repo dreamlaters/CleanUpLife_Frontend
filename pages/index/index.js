@@ -44,6 +44,19 @@ Page({
     visitedFormDate: '',
     visitedFormIsVisited: true,
     
+    // 年度目标模块
+    goalCurrentYear: new Date().getFullYear(),
+    goalYearList: [],
+    goalYearIndex: 0,
+    goalsPig: [],
+    goalsDonkey: [],
+    goalArchivedYears: [],
+    showGoalArchive: false,
+    loadingGoals: false,
+    showGoalForm: false,
+    goalFormOwner: 'Pig',
+    goalFormTitle: '',
+    
     // 操作菜单
     showActionSheet: false,
     actionSheetTitle: '',
@@ -83,6 +96,7 @@ Page({
     this.fetchProducts();
     this.fetchToBuyProducts();
     this.fetchTravelList();
+    this.fetchYearlyGoals();
   },
 
   // ==================== 物品列表 ====================
@@ -216,6 +230,8 @@ Page({
         this._deleteToBuy(actionSheetId);
       } else if (actionSheetType === 'travel') {
         this._deleteTravel(actionSheetId);
+      } else if (actionSheetType === 'goal') {
+        this._deleteGoal(actionSheetId);
       }
     }, 200);
   },
@@ -791,5 +807,188 @@ Page({
     if (moveX - this.data.touchStartX > 50) {
       this.setData({ [swipeKey]: -1 });
     }
+  },
+
+  // ==================== 年度目标模块 ====================
+  fetchYearlyGoals() {
+    this.setData({ loadingGoals: true });
+    const { goalCurrentYear } = this.data;
+    
+    // 同时获取目标和年份列表
+    Promise.all([
+      api.get(`/YearlyGoal?year=${goalCurrentYear}`, { showLoading: false }),
+      api.get('/YearlyGoal/years', { showLoading: false })
+    ]).then(([goals, years]) => {
+      const allGoals = goals || [];
+      const goalsPig = allGoals.filter(g => g.owner === 'Pig').sort((a, b) => {
+        // 未完成在前，完成在后；相同状态按优先级排序
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return a.priority - b.priority;
+      });
+      const goalsDonkey = allGoals.filter(g => g.owner === 'Donkey').sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return a.priority - b.priority;
+      });
+      
+      // 处理年份列表
+      const currentYear = new Date().getFullYear();
+      let yearList = years || [];
+      if (!yearList.includes(currentYear)) {
+        yearList = [currentYear, ...yearList];
+      }
+      yearList = [...new Set(yearList)].sort((a, b) => b - a);
+      
+      // 归档年份（除当前年份外）
+      const archivedYears = yearList.filter(y => y !== goalCurrentYear);
+      
+      this.setData({
+        goalsPig,
+        goalsDonkey,
+        goalYearList: yearList,
+        goalYearIndex: yearList.indexOf(goalCurrentYear),
+        goalArchivedYears: archivedYears,
+        loadingGoals: false
+      });
+    }).catch(() => {
+      this.setData({ loadingGoals: false });
+    });
+  },
+
+  // 切换年份
+  onGoalYearChange(e) {
+    let year;
+    if (e.currentTarget.dataset.year) {
+      // 从归档列表点击
+      year = e.currentTarget.dataset.year;
+    } else {
+      // 从picker选择
+      const index = e.detail.value;
+      year = this.data.goalYearList[index];
+    }
+    
+    if (year && year !== this.data.goalCurrentYear) {
+      this.setData({ 
+        goalCurrentYear: year,
+        showGoalArchive: false
+      }, () => {
+        this.fetchYearlyGoals();
+      });
+    }
+  },
+
+  // 切换归档展开/折叠
+  toggleGoalArchive() {
+    this.setData({ showGoalArchive: !this.data.showGoalArchive });
+  },
+
+  // 显示新增目标表单
+  showAddGoalForm(e) {
+    const owner = e.currentTarget.dataset.owner;
+    this.setData({
+      showGoalForm: true,
+      goalFormOwner: owner,
+      goalFormTitle: ''
+    });
+  },
+
+  // 隐藏目标表单
+  hideGoalForm() {
+    this.setData({ showGoalForm: false });
+  },
+
+  // 目标标题输入
+  onGoalTitleInput(e) {
+    this.setData({ goalFormTitle: e.detail.value });
+  },
+
+  // 提交新增目标
+  submitGoalForm() {
+    const { goalFormTitle, goalFormOwner, goalCurrentYear } = this.data;
+    
+    if (!goalFormTitle.trim()) {
+      util.showError('请输入目标内容');
+      return;
+    }
+    
+    const goal = {
+      title: goalFormTitle.trim(),
+      owner: goalFormOwner,
+      year: goalCurrentYear,
+      priority: 10
+    };
+    
+    api.post('/YearlyGoal', goal, { loadingText: '添加中...' })
+      .then(() => {
+        util.showSuccess('添加成功');
+        this.setData({ showGoalForm: false, goalFormTitle: '' });
+        this.fetchYearlyGoals();
+      })
+      .catch(() => {
+        util.showError('添加失败');
+      });
+  },
+
+  // 切换目标完成状态
+  toggleGoalComplete(e) {
+    const id = e.currentTarget.dataset.id;
+    
+    // 乐观更新UI
+    const updateGoalList = (list) => list.map(g => {
+      if (g.id === id) {
+        return Object.assign({}, g, { completed: !g.completed });
+      }
+      return g;
+    });
+    
+    this.setData({
+      goalsPig: updateGoalList(this.data.goalsPig),
+      goalsDonkey: updateGoalList(this.data.goalsDonkey)
+    });
+    
+    // 调用API
+    api.request({
+      url: `/YearlyGoal/${id}/toggle`,
+      method: 'PATCH',
+      showLoading: false
+    }).then(() => {
+      // 重新获取以保证排序正确
+      this.fetchYearlyGoals();
+    }).catch(() => {
+      // 恢复状态
+      this.setData({
+        goalsPig: updateGoalList(this.data.goalsPig),
+        goalsDonkey: updateGoalList(this.data.goalsDonkey)
+      });
+      util.showError('操作失败');
+    });
+  },
+
+  // 显示目标操作菜单
+  showGoalActions(e) {
+    const id = e.currentTarget.dataset.id;
+    const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
+    const item = allGoals.find(g => g.id === id);
+    
+    this.setData({
+      showActionSheet: true,
+      actionSheetTitle: item ? item.title : '操作',
+      actionSheetType: 'goal',
+      actionSheetId: id
+    });
+  },
+
+  // 删除目标
+  _deleteGoal(id) {
+    util.showConfirm('确认删除', '确定要删除该目标吗？')
+      .then(confirmed => {
+        if (confirmed) {
+          api.del(`/YearlyGoal/${id}`, { loadingText: '删除中...' })
+            .then(() => {
+              util.showSuccess('删除成功');
+              this.fetchYearlyGoals();
+            })
+            .catch(() => util.showError('删除失败'));
+        }
+      });
   }
 });
