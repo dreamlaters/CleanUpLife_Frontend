@@ -472,8 +472,8 @@
   </view>
 
   <!-- 新增/编辑目标弹窗 -->
-  <view class="goal-modal-mask {{showGoalForm ? 'show' : ''}}" bindtap="hideGoalForm"></view>
-  <view class="goal-modal {{showGoalForm ? 'show' : ''}}">
+  <view class="goal-modal-mask {{showGoalForm ? 'show' : ''}}" bindtap="hideGoalForm" wx:if="{{showGoalForm}}"></view>
+  <view class="goal-modal {{showGoalForm ? 'show' : ''}}" wx:if="{{showGoalForm}}">
     <view class="goal-modal-header">
       <text class="goal-modal-title">{{editingGoalId ? (goalFormOwner === 'Pig' ? '🐷 编辑猪的目标' : '🫏 编辑驴的目标') : (goalFormOwner === 'Pig' ? '🐷 猪的新目标' : '🫏 驴的新目标')}}</text>
       <view class="goal-modal-close" bindtap="hideGoalForm">✕</view>
