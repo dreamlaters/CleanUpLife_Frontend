@@ -89,7 +89,7 @@ const put = (url, data, options = {}) => {
  * DELETE 请求
  */
 const del = (url, options = {}) => {
-  return request({ url, method: 'DELETE', ...options });
+  return request({ url, method: 'DELETE', data: options.data, ...options });
 };
 
 module.exports = {

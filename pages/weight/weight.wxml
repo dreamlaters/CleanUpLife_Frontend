@@ -1,0 +1,184 @@
+<!-- 体重追踪页面 -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-center">
+      <text class="page-title">体重追踪</text>
+      <text class="page-subtitle">记录每一天的变化 📊</text>
+    </view>
+    <view class="header-right"></view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-grid">
+    <view class="stat-card" wx:for="{{personList}}" wx:key="*this" wx:for-item="person">
+      <view class="stat-emoji">{{personConfig[person].emoji}}</view>
+      <view class="stat-info">
+        <text class="stat-name" style="color: {{personConfig[person].color}}">{{person}}</text>
+        <text class="stat-value">{{latestWeights[person] || '--'}} <text class="stat-unit">斤</text></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图表区域 -->
+  <view class="chart-section">
+    <view class="section-header">
+      <text class="section-title">📈 体重趋势</text>
+    </view>
+    
+    <!-- 时间范围筛选 -->
+    <view class="time-range-tabs">
+      <view class="time-tab {{timeRange === 'week' ? 'time-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="week">近7天</view>
+      <view class="time-tab {{timeRange === 'month' ? 'time-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="month">近30天</view>
+      <view class="time-tab {{timeRange === '3month' ? 'time-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="3month">近3月</view>
+      <view class="time-tab {{timeRange === 'all' ? 'time-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="all">全部</view>
+    </view>
+
+    <!-- Canvas 折线图 -->
+    <view class="chart-container">
+      <canvas type="2d" id="weight-canvas" class="weight-canvas"></canvas>
+    </view>
+  </view>
+
+  <!-- 记录列表 -->
+  <view class="list-section">
+    <view class="section-header">
+      <text class="section-title">📋 记录明细</text>
+      <view class="add-btn" bindtap="showAddForm">
+        <text class="add-btn-icon">+</text>
+        <text>添加</text>
+      </view>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-container" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 按人员分组显示 -->
+    <view class="records-by-person" wx:elif="{{weightRecords.length}}">
+      <view class="person-group" wx:for="{{personList}}" wx:key="*this" wx:for-item="person">
+        <view class="person-header" wx:if="{{groupedRecords[person].length}}">
+          <text class="person-emoji">{{personConfig[person].emoji}}</text>
+          <text class="person-name" style="color: {{personConfig[person].color}}">{{person}}</text>
+          <text class="person-count">{{groupedRecords[person].length}}条</text>
+        </view>
+        
+        <view class="record-list" wx:if="{{groupedRecords[person].length}}">
+          <view 
+            class="record-item"
+            wx:for="{{groupedRecords[person]}}" 
+            wx:key="id"
+            wx:for-item="record"
+            data-id="{{record.id}}"
+            data-person="{{person}}"
+            bindtap="onRecordTap"
+            bindlongpress="onRecordLongPress"
+          >
+            <view class="record-date">{{record.recordDateFormatted}}</view>
+            <view class="record-weight" style="color: {{personConfig[person].color}}">
+              {{record.weight}} <text class="weight-unit">斤</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && !weightRecords.length}}">
+      <text class="empty-icon">⚖️</text>
+      <text class="empty-title">还没有体重记录</text>
+      <text class="empty-text">点击添加按钮，开始记录体重</text>
+      <view class="empty-btn" bindtap="showAddForm">+ 添加记录</view>
+    </view>
+  </view>
+
+  <!-- 添加/编辑表单弹窗 -->
+  <view class="form-overlay {{showForm ? 'show' : ''}}" catchtap="hideForm" wx:if="{{showForm}}">
+    <view class="form-popup" catchtap="stopPropagation">
+      <view class="form-header">
+        <text class="form-title">{{editingId ? '✏️ 编辑记录' : '➕ 添加记录'}}</text>
+        <view class="form-close" bindtap="hideForm">✕</view>
+      </view>
+
+      <view class="form-body" catchtap="stopPropagation">
+        <!-- 选择人员 -->
+        <view class="form-row">
+          <text class="form-label">👤 选择人员</text>
+          <picker mode="selector" range="{{personList}}" value="{{formPersonIndex}}" bindchange="onPersonChange">
+            <view class="form-picker">
+              <text class="picker-emoji">{{personConfig[personList[formPersonIndex]].emoji}}</text>
+              <text class="picker-text">{{personList[formPersonIndex]}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 输入体重 -->
+        <view class="form-row">
+          <text class="form-label">⚖️ 体重（斤）</text>
+          <view class="form-input-wrap">
+            <input 
+              class="form-input" 
+              type="digit" 
+              placeholder="请输入体重"
+              value="{{formWeight}}"
+              bindinput="onWeightInput"
+              adjust-position="{{false}}"
+              hold-keyboard="{{true}}"
+              catchtap=""
+            />
+            <text class="input-unit">斤</text>
+          </view>
+        </view>
+
+        <!-- 选择日期 -->
+        <view class="form-row">
+          <text class="form-label">📅 记录日期</text>
+          <picker mode="date" value="{{formDate}}" bindchange="onDateChange">
+            <view class="form-picker">
+              <text class="picker-text">{{formDate}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-footer">
+        <button class="form-btn form-btn-cancel" bindtap="hideForm">取消</button>
+        <button class="form-btn form-btn-submit" bindtap="submitForm">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作菜单 -->
+  <view class="action-sheet-overlay {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
+    <view class="action-sheet" catchtap="">
+      <view class="action-sheet-header">
+        <text>{{actionSheetPerson}} 的体重记录</text>
+      </view>
+      <view class="action-sheet-item" bindtap="onEditAction">
+        <text class="action-icon">✏️</text>
+        <text>编辑</text>
+      </view>
+      <view class="action-sheet-item action-sheet-danger" bindtap="onDeleteAction">
+        <text class="action-icon">🗑️</text>
+        <text>删除</text>
+      </view>
+      <view class="action-sheet-cancel" bindtap="hideActionSheet">取消</view>
+    </view>
+  </view>
+
+  <!-- 悬浮添加按钮 -->
+  <view class="fab-button" bindtap="showAddForm" wx:if="{{weightRecords.length && !showForm}}">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

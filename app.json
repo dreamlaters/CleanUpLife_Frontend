@@ -5,7 +5,8 @@
     "pages/update/update",
     "pages/openid/openid",
     "pages/tobuy/add",
-    "pages/tobuy/update"
+    "pages/tobuy/update",
+    "pages/weight/weight"
   ],
   "window": {
     "navigationBarBackgroundColor": "#667eea",
