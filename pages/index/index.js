@@ -120,7 +120,7 @@ Page({
           if (diffDays < 0) {
             dateClass = 'date-expired';
             expiredCount++;
-          } else if (diffDays <= 7) {
+          } else if (diffDays <= 30) {
             dateClass = 'date-soon';
             expiringSoonCount++;
           }
