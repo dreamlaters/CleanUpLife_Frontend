@@ -1,0 +1,296 @@
+<!-- 计划页面 - 出行计划 + 年度目标 -->
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
+    <view class="navbar-content">
+      <text class="navbar-title">我的计划</text>
+    </view>
+  </view>
+  <view class="navbar-placeholder" style="height: {{navbarHeight}}px"></view>
+
+  <!-- 顶部Tab切换 -->
+  <view class="top-tabs">
+    <view class="top-tab {{currentTab === 'travel' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="travel">
+      <text class="top-tab-icon">✈️</text>
+      <text class="top-tab-text">出行计划</text>
+    </view>
+    <view class="top-tab {{currentTab === 'goals' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="goals">
+      <text class="top-tab-icon">🎯</text>
+      <text class="top-tab-text">年度目标</text>
+    </view>
+  </view>
+
+  <!-- ==================== 出行计划内容 ==================== -->
+  <view class="tab-content" wx:if="{{currentTab === 'travel'}}">
+    <!-- 出行子Tab -->
+    <view class="sub-tabs">
+      <view class="sub-tab {{travelTab === 'pending' ? 'sub-tab-active' : ''}}" 
+            bindtap="switchTravelTab" data-tab="pending">
+        <text>🗺️ 想去的</text>
+        <view class="sub-tab-badge" wx:if="{{pendingCount}}">{{pendingCount}}</view>
+      </view>
+      <view class="sub-tab {{travelTab === 'visited' ? 'sub-tab-active' : ''}}" 
+            bindtap="switchTravelTab" data-tab="visited">
+        <text>✅ 去过的</text>
+        <view class="sub-tab-badge" wx:if="{{visitedCount}}">{{visitedCount}}</view>
+      </view>
+    </view>
+
+    <!-- 出行列表 -->
+    <view class="section-card">
+      <view class="loading-container" wx:if="{{loadingTravel}}">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <view class="item-list" wx:elif="{{travelList.length}}">
+        <view 
+          class="item-card travel-item"
+          wx:for="{{travelList}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindlongpress="showTravelActions"
+        >
+          <view class="item-emoji">{{item.type === 'Domestic' ? '🇨🇳' : '🌍'}}</view>
+          <view class="item-content">
+            <text class="item-name">{{item.displayName}}</text>
+            <view class="item-info">
+              <view class="type-badge {{item.type === 'Domestic' ? 'type-domestic' : 'type-international'}}">
+                {{item.type === 'Domestic' ? '国内' : '国际'}}
+              </view>
+              <text class="priority-text" wx:if="{{travelTab === 'pending'}}">想去 {{item.priority}}</text>
+              <view class="date-badge" wx:if="{{travelTab === 'visited' && item.visitedDateFormatted}}">
+                📅 {{item.visitedDateFormatted}}
+              </view>
+            </view>
+          </view>
+          <view class="mark-btn" catchtap="onMarkVisited" data-id="{{item.id}}" wx:if="{{travelTab === 'pending'}}">
+            <text>✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{!loadingTravel && !travelList.length}}">
+        <text class="empty-icon">{{travelTab === 'pending' ? '✈️' : '🎉'}}</text>
+        <text class="empty-title">{{travelTab === 'pending' ? '还没有想去的地方' : '还没有出行记录'}}</text>
+        <text class="empty-text">{{travelTab === 'pending' ? '添加你梦想中的目的地' : '把想去的地方标记为已去过'}}</text>
+        <view class="empty-btn" bindtap="showAddTravelForm" wx:if="{{travelTab === 'pending'}}">+ 添加目的地</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ==================== 年度目标内容 ==================== -->
+  <view class="tab-content" wx:if="{{currentTab === 'goals'}}">
+    <!-- 年份选择 -->
+    <view class="year-selector">
+      <picker mode="selector" range="{{goalYearList}}" value="{{goalYearIndex}}" bindchange="onGoalYearChange">
+        <view class="year-picker">
+          <text class="year-text">{{goalCurrentYear}}年</text>
+          <text class="year-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 双栏布局 -->
+    <view class="goal-columns">
+      <!-- 猪的目标 -->
+      <view class="goal-column">
+        <view class="goal-column-header goal-header-pig">
+          <text class="goal-owner-emoji">🐷</text>
+          <text class="goal-owner-name">猪的目标</text>
+        </view>
+        
+        <view class="goal-list">
+          <view 
+            class="goal-item {{item.completed ? 'goal-item-completed' : ''}}"
+            wx:for="{{goalsPig}}" 
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindlongpress="showGoalActions"
+          >
+            <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
+                  catchtap="toggleGoalComplete" data-id="{{item.id}}">
+              <text wx:if="{{item.completed}}">✓</text>
+            </view>
+            <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+          </view>
+          
+          <view class="goal-empty" wx:if="{{!goalsPig.length && !loadingGoals}}">
+            <text>暂无目标</text>
+          </view>
+        </view>
+        
+        <view class="goal-add-btn" bindtap="showAddGoalForm" data-owner="Pig">
+          <text class="goal-add-icon">+</text>
+          <text>添加</text>
+        </view>
+      </view>
+
+      <!-- 驴的目标 -->
+      <view class="goal-column">
+        <view class="goal-column-header goal-header-donkey">
+          <text class="goal-owner-emoji">🫏</text>
+          <text class="goal-owner-name">驴的目标</text>
+        </view>
+        
+        <view class="goal-list">
+          <view 
+            class="goal-item {{item.completed ? 'goal-item-completed' : ''}}"
+            wx:for="{{goalsDonkey}}" 
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindlongpress="showGoalActions"
+          >
+            <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
+                  catchtap="toggleGoalComplete" data-id="{{item.id}}">
+              <text wx:if="{{item.completed}}">✓</text>
+            </view>
+            <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+          </view>
+          
+          <view class="goal-empty" wx:if="{{!goalsDonkey.length && !loadingGoals}}">
+            <text>暂无目标</text>
+          </view>
+        </view>
+        
+        <view class="goal-add-btn" bindtap="showAddGoalForm" data-owner="Donkey">
+          <text class="goal-add-icon">+</text>
+          <text>添加</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-container" wx:if="{{loadingGoals}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <!-- 悬浮添加按钮（出行计划时显示） -->
+  <view class="fab-btn" bindtap="showAddTravelForm" wx:if="{{currentTab === 'travel' && travelTab === 'pending' && !showTravelForm}}">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <!-- 底部消息推送入口 -->
+  <view class="footer-link-wrap">
+    <navigator url="/pages/openid/openid" class="footer-link">
+      <text class="footer-link-icon">🔔</text>
+      <text class="footer-link-text">消息推送设置</text>
+      <text class="footer-link-arrow">›</text>
+    </navigator>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>
+
+<!-- 出行表单弹窗 -->
+<view class="modal-overlay {{showTravelForm ? 'show' : ''}}" catchtap="cancelTravelForm" wx:if="{{showTravelForm}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingTravelId ? '✨ 编辑目的地' : '✨ 添加目的地'}}</text>
+      <view class="modal-close" bindtap="cancelTravelForm">×</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">目的地类型</text>
+        <picker mode="selector" range="{{['🇨🇳 国内', '🌍 国外']}}" value="{{travelFormTypeIndex}}" bindchange="onTravelTypeChange">
+          <view class="form-picker">
+            <text>{{travelFormTypeIndex === 0 ? '🇨🇳 国内' : '🌍 国外'}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 国内选择省市 -->
+      <view class="form-group" wx:if="{{travelFormTypeIndex === 0}}">
+        <text class="form-label">省市</text>
+        <picker mode="region" level="city" value="{{travelRegion}}" bindchange="onRegionChange">
+          <view class="form-picker">
+            <text>{{travelRegionDisplay || '请选择省市'}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 国外选择国家 -->
+      <view class="form-group" wx:if="{{travelFormTypeIndex === 1}}">
+        <text class="form-label">国家</text>
+        <picker mode="selector" range="{{countryList}}" value="{{travelCountryIndex}}" bindchange="onCountryChange">
+          <view class="form-picker">
+            <text>{{countryList[travelCountryIndex] || '请选择国家'}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      
+      <view class="form-group">
+        <text class="form-label">备注名称</text>
+        <input class="form-input" placeholder="可选，如：迪士尼" value="{{travelFormName}}" bindinput="onTravelNameInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="form-label">想去程度 (1-30)</text>
+        <slider min="1" max="30" value="{{travelFormPriority}}" show-value="true" 
+                activeColor="#667eea" block-color="#667eea" bindchange="onTravelPriorityChange" />
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="cancelTravelForm">取消</button>
+      <button class="btn btn-primary" bindtap="submitTravelForm">确定</button>
+    </view>
+  </view>
+</view>
+
+<!-- 目标表单弹窗 -->
+<view class="modal-overlay {{showGoalForm ? 'show' : ''}}" catchtap="hideGoalForm" wx:if="{{showGoalForm}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingGoalId ? (goalFormOwner === 'Pig' ? '🐷 编辑目标' : '🫏 编辑目标') : (goalFormOwner === 'Pig' ? '🐷 新目标' : '🫏 新目标')}}</text>
+      <view class="modal-close" bindtap="hideGoalForm">×</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">📅 目标年份</text>
+        <picker mode="selector" range="{{goalFormYearList}}" value="{{goalFormYearIndex}}" bindchange="onGoalFormYearChange">
+          <view class="form-picker">
+            <text>{{goalFormYear}}年</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      
+      <view class="form-group">
+        <text class="form-label">🎯 目标内容</text>
+        <input class="form-input" placeholder="输入你的年度目标..." value="{{goalFormTitle}}" bindinput="onGoalTitleInput" />
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideGoalForm">取消</button>
+      <button class="btn btn-primary" bindtap="submitGoalForm">确定</button>
+    </view>
+  </view>
+</view>
+
+<!-- 操作菜单 -->
+<view class="action-overlay {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
+  <view class="action-sheet" catchtap="">
+    <view class="action-header">
+      <text class="action-title">{{actionSheetTitle}}</text>
+    </view>
+    <view class="action-item" bindtap="onActionEdit">
+      <text class="action-icon">✏️</text>
+      <text class="action-text">编辑</text>
+    </view>
+    <view class="action-item action-danger" bindtap="onActionDelete">
+      <text class="action-icon">🗑️</text>
+      <text class="action-text">删除</text>
+    </view>
+    <view class="action-cancel" bindtap="hideActionSheet">取消</view>
+  </view>
+</view>

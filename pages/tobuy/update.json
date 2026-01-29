@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "更新待购物品"
+  "navigationBarTitleText": "更新待购物品",
+  "navigationStyle": "default"
 }

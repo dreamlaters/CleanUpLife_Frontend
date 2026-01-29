@@ -1,21 +1,56 @@
 {
   "pages": [
-    "pages/index/index",
+    "pages/home/home",
+    "pages/items/items",
+    "pages/plan/plan",
+    "pages/pet/pet",
     "pages/add/add",
     "pages/update/update",
     "pages/openid/openid",
     "pages/tobuy/add",
-    "pages/tobuy/update",
-    "pages/weight/weight"
+    "pages/tobuy/update"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#667eea",
+    "navigationBarBackgroundColor": "#6366f1",
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "CleanUpLife",
     "backgroundColor": "#f8fafc",
     "backgroundTextStyle": "dark",
     "backgroundColorTop": "#f8fafc",
-    "backgroundColorBottom": "#e2e8f0"
+    "backgroundColorBottom": "#eef2f7",
+    "navigationStyle": "custom"
+  },
+  "tabBar": {
+    "color": "#9ca3af",
+    "selectedColor": "#6366f1",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/items/items",
+        "text": "物品",
+        "iconPath": "images/tab-items.png",
+        "selectedIconPath": "images/tab-items-active.png"
+      },
+      {
+        "pagePath": "pages/plan/plan",
+        "text": "计划",
+        "iconPath": "images/tab-plan.png",
+        "selectedIconPath": "images/tab-plan-active.png"
+      },
+      {
+        "pagePath": "pages/pet/pet",
+        "text": "宠物",
+        "iconPath": "images/tab-pet.png",
+        "selectedIconPath": "images/tab-pet-active.png"
+      }
+    ]
   },
   "lazyCodeLoading": "requiredComponents",
   "renderer": "webview",

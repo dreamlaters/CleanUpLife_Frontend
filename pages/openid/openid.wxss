@@ -1,92 +1,103 @@
 /**
- * OpenID 页面样式 - 现代化设计
+ * OpenID 页面样式 - 统一设计语言 v2.0
  */
 
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
 /* ==================== 卡片布局 ==================== */
-.openid-card {
-  margin-top: var(--spacing-xl);
+.form-card {
+  background: #fff;
+  border-radius: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+  padding: 32rpx;
+  margin-top: 24rpx;
 }
 
 /* ==================== 标题区域 ==================== */
 .form-header {
   text-align: center;
-  padding-bottom: var(--spacing-2xl);
-  margin-bottom: var(--spacing-xl);
-  border-bottom: 1rpx solid var(--border-light);
+  padding-bottom: 32rpx;
+  margin-bottom: 28rpx;
+  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .notification-icon-wrap {
-  width: 120rpx;
-  height: 120rpx;
-  margin: 0 auto var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
-  border-radius: var(--radius-2xl);
+  width: 100rpx;
+  height: 100rpx;
+  margin: 0 auto 20rpx;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 28rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .notification-icon {
-  font-size: 56rpx;
+  font-size: 48rpx;
 }
 
 .form-title {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-xs);
+  color: #1a1a2e;
+  margin-bottom: 8rpx;
 }
 
 .form-subtitle {
-  font-size: 26rpx;
-  color: var(--text-hint);
+  font-size: 24rpx;
+  color: #9ca3af;
   display: block;
 }
 
 /* ==================== OpenID 区域 ==================== */
 .openid-section {
-  background: var(--bg-hover);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
+  background: #fafafa;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 28rpx;
 }
 
 .openid-label {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  font-size: 26rpx;
-  color: var(--text-secondary);
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: #6b7280;
   font-weight: 500;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 12rpx;
 }
 
 .openid-label-icon {
-  font-size: 28rpx;
+  font-size: 24rpx;
 }
 
 .openid-box {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  border: 1rpx solid var(--border-color);
+  background: #fff;
+  border-radius: 14rpx;
+  padding: 20rpx;
+  border: 1rpx solid #f0f0f0;
 }
 
 .openid-loading {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-hint);
-  font-size: 26rpx;
+  gap: 12rpx;
+  color: #9ca3af;
+  font-size: 24rpx;
 }
 
 .loading-spinner-small {
-  width: 32rpx;
-  height: 32rpx;
-  border: 3rpx solid var(--border-color);
-  border-top-color: var(--primary-color);
+  width: 28rpx;
+  height: 28rpx;
+  border: 3rpx solid #f3f4f6;
+  border-top-color: #667eea;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {
@@ -94,8 +105,8 @@
 }
 
 .openid-text {
-  font-size: 24rpx;
-  color: var(--text-secondary);
+  font-size: 22rpx;
+  color: #6b7280;
   font-family: 'SF Mono', Monaco, 'Courier New', monospace;
   line-height: 1.6;
   word-break: break-all;
@@ -103,14 +114,14 @@
 
 /* ==================== 功能说明 ==================== */
 .features-section {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: 32rpx;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  padding: var(--spacing-md) 0;
-  border-bottom: 1rpx solid var(--border-light);
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .feature-item:last-child {
@@ -118,72 +129,79 @@
 }
 
 .feature-icon {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: var(--radius-lg);
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28rpx;
+  font-size: 26rpx;
   flex-shrink: 0;
 }
 
 .feature-icon-warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
 }
 
 .feature-icon-info {
-  background: var(--primary-soft);
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
 }
 
 .feature-icon-success {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.15) 100%);
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
 }
 
 .feature-content {
   flex: 1;
-  margin-left: var(--spacing-md);
+  margin-left: 16rpx;
 }
 
 .feature-title {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #1a1a2e;
   display: block;
 }
 
 .feature-desc {
-  font-size: 24rpx;
-  color: var(--text-hint);
+  font-size: 22rpx;
+  color: #9ca3af;
   margin-top: 4rpx;
   display: block;
 }
 
 /* ==================== 订阅按钮 ==================== */
 .subscribe-btn {
-  background: var(--success-gradient) !important;
-  box-shadow: 0 8rpx 24rpx rgba(16, 185, 129, 0.3) !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
+  gap: 10rpx;
+  width: 100%;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
+  border-radius: 20rpx;
+  box-shadow: 0 6rpx 20rpx rgba(16, 185, 129, 0.35);
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #fff;
+  transition: all 0.2s ease;
 }
 
 .subscribe-btn-icon {
-  font-size: 32rpx;
+  font-size: 28rpx;
 }
 
 .subscribe-btn:active {
-  opacity: 0.9;
   transform: scale(0.98);
+  opacity: 0.9;
 }
 
 .subscribe-tip {
   text-align: center;
-  margin-top: var(--spacing-lg);
+  margin-top: 20rpx;
 }
 
 .subscribe-tip text {
-  font-size: 24rpx;
-  color: var(--text-hint);
+  font-size: 22rpx;
+  color: #9ca3af;
 }

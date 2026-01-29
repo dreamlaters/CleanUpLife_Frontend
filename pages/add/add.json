@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "CleanUpLife - 添加物品"
+  "navigationBarTitleText": "添加物品",
+  "navigationStyle": "default"
 }

@@ -1,0 +1,153 @@
+<!-- 首页 - 过期提醒 + 快捷入口 -->
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
+    <view class="navbar-content">
+      <view class="navbar-left">
+        <text class="greeting">{{greeting}}</text>
+        <text class="date-text">{{dateText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 占位，避免内容被导航栏遮挡 -->
+  <view class="navbar-placeholder" style="height: {{navbarHeight}}px"></view>
+
+  <!-- 过期提醒区域 -->
+  <view class="section-card alert-card" wx:if="{{expiredItems.length || expiringSoonItems.length}}">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon">⚠️</view>
+        <text class="section-title">过期提醒</text>
+      </view>
+      <view class="alert-badge" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
+        {{expiredItems.length + expiringSoonItems.length}}件
+      </view>
+    </view>
+
+    <!-- 已过期物品 -->
+    <view class="alert-group" wx:if="{{expiredItems.length}}">
+      <view class="alert-group-header alert-danger">
+        <text class="alert-dot"></text>
+        <text class="alert-group-title">已过期 ({{expiredItems.length}})</text>
+      </view>
+      <view class="alert-list">
+        <view 
+          class="alert-item"
+          wx:for="{{expiredItems}}" 
+          wx:key="id"
+          bindtap="goToUpdateItem"
+          data-id="{{item.id}}"
+          data-category="{{item.category}}"
+        >
+          <text class="alert-item-emoji">{{item.emoji || '📦'}}</text>
+          <view class="alert-item-info">
+            <text class="alert-item-name">{{item.name}}</text>
+            <text class="alert-item-date danger">过期{{item.daysText}}</text>
+          </view>
+          <text class="alert-item-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 即将过期物品 -->
+    <view class="alert-group" wx:if="{{expiringSoonItems.length}}">
+      <view class="alert-group-header alert-warning">
+        <text class="alert-dot"></text>
+        <text class="alert-group-title">即将过期 ({{expiringSoonItems.length}})</text>
+      </view>
+      <view class="alert-list">
+        <view 
+          class="alert-item"
+          wx:for="{{expiringSoonItems}}" 
+          wx:key="id"
+          bindtap="goToUpdateItem"
+          data-id="{{item.id}}"
+          data-category="{{item.category}}"
+        >
+          <text class="alert-item-emoji">{{item.emoji || '📦'}}</text>
+          <view class="alert-item-info">
+            <text class="alert-item-name">{{item.name}}</text>
+            <text class="alert-item-date warning">{{item.daysText}}后过期</text>
+          </view>
+          <text class="alert-item-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 无提醒时的空状态 -->
+  <view class="section-card empty-alert-card" wx:if="{{!loading && !expiredItems.length && !expiringSoonItems.length}}">
+    <view class="empty-alert-content">
+      <text class="empty-alert-icon">✨</text>
+      <text class="empty-alert-title">太棒了！</text>
+      <text class="empty-alert-text">没有即将过期的物品</text>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon">⚡</view>
+        <text class="section-title">快捷操作</text>
+      </view>
+    </view>
+    
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="goToAddItem">
+        <view class="quick-icon quick-icon-primary">📦</view>
+        <text class="quick-label">添加物品</text>
+      </view>
+      <view class="quick-item" bindtap="goToToBuyList">
+        <view class="quick-icon quick-icon-success">🛒</view>
+        <text class="quick-label">待购清单</text>
+      </view>
+      <view class="quick-item" bindtap="goToTravel">
+        <view class="quick-icon quick-icon-info">✈️</view>
+        <text class="quick-label">出行计划</text>
+      </view>
+      <view class="quick-item" bindtap="goToGoals">
+        <view class="quick-icon quick-icon-warning">🎯</view>
+        <text class="quick-label">年度目标</text>
+      </view>
+    </view>
+
+    <!-- 统计概览 - 放在快捷操作卡片内 -->
+    <view class="stats-section">
+      <view class="stats-divider"></view>
+      <view class="stats-grid">
+        <view class="stat-item" bindtap="goToItems">
+          <text class="stat-value">{{totalItems}}</text>
+          <text class="stat-label">物品</text>
+        </view>
+        <view class="stat-item" bindtap="goToToBuyList">
+          <text class="stat-value">{{toBuyCount}}</text>
+          <text class="stat-label">待购</text>
+        </view>
+        <view class="stat-item" bindtap="goToTravel">
+          <text class="stat-value">{{travelCount}}</text>
+          <text class="stat-label">想去</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 底部消息推送入口 -->
+  <view class="footer-link-wrap">
+    <navigator url="/pages/openid/openid" class="footer-link">
+      <text class="footer-link-icon">🔔</text>
+      <text class="footer-link-text">消息推送设置</text>
+      <text class="footer-link-arrow">›</text>
+    </navigator>
+  </view>
+
+  <!-- 底部安全区 -->
+  <view class="safe-bottom"></view>
+</view>

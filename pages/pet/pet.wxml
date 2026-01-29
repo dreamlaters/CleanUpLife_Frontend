@@ -1,0 +1,224 @@
+<!-- 宠物页面 - 体重追踪 -->
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
+    <view class="navbar-content">
+      <text class="navbar-title">我的宠物</text>
+    </view>
+  </view>
+  <view class="navbar-placeholder" style="height: {{navbarHeight}}px"></view>
+
+  <!-- 宠物卡片 -->
+  <view class="pet-cards">
+    <view 
+      class="pet-card" 
+      wx:for="{{personList}}" 
+      wx:key="*this" 
+      wx:for-item="person"
+      style="--accent-color: {{personConfig[person].color}}"
+    >
+      <view class="pet-card-accent"></view>
+      <view class="pet-avatar">
+        <text class="pet-emoji">{{personConfig[person].emoji}}</text>
+      </view>
+      <view class="pet-info">
+        <text class="pet-name">{{person}}</text>
+        <view class="pet-weight-wrap">
+          <text class="pet-weight">{{latestWeights[person] || '--'}}</text>
+          <text class="pet-unit">斤</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图表区域 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon">📈</view>
+        <text class="section-title">体重趋势</text>
+      </view>
+    </view>
+    
+    <!-- 时间范围筛选 -->
+    <view class="filter-tabs">
+      <view class="filter-tab {{timeRange === 'week' ? 'filter-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="week">近7天</view>
+      <view class="filter-tab {{timeRange === 'month' ? 'filter-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="month">近30天</view>
+      <view class="filter-tab {{timeRange === '3month' ? 'filter-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="3month">近3月</view>
+      <view class="filter-tab {{timeRange === 'all' ? 'filter-tab-active' : ''}}" 
+            bindtap="onTimeRangeChange" data-range="all">全部</view>
+    </view>
+
+    <!-- Canvas 折线图 -->
+    <view class="chart-wrapper">
+      <view class="chart-container" wx:if="{{!showForm}}">
+        <canvas type="2d" id="weight-canvas" class="weight-canvas"></canvas>
+      </view>
+      <view class="chart-container chart-placeholder" wx:else>
+        <text class="placeholder-icon">📊</text>
+        <text class="placeholder-text">编辑中...</text>
+      </view>
+    </view>
+
+    <!-- 图例 -->
+    <view class="chart-legend">
+      <view class="legend-item" wx:for="{{personList}}" wx:key="*this" wx:for-item="person">
+        <view class="legend-dot" style="background: {{personConfig[person].color}}"></view>
+        <text class="legend-text">{{person}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 记录列表 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon">📋</view>
+        <text class="section-title">记录明细</text>
+      </view>
+      <view class="section-badge" wx:if="{{weightRecords.length}}">{{weightRecords.length}}条</view>
+    </view>
+
+    <view class="loading-container" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <view class="records-container" wx:elif="{{weightRecords.length}}">
+      <view class="person-group" wx:for="{{personList}}" wx:key="*this" wx:for-item="person" wx:if="{{groupedRecords[person].length}}">
+        <view class="person-header">
+          <view class="person-info">
+            <text class="person-emoji">{{personConfig[person].emoji}}</text>
+            <text class="person-name" style="color: {{personConfig[person].color}}">{{person}}</text>
+          </view>
+          <view class="person-badge">{{groupedRecords[person].length}}条</view>
+        </view>
+        
+        <view class="record-grid">
+          <view 
+            class="record-card"
+            wx:for="{{groupedRecords[person]}}" 
+            wx:key="id"
+            wx:for-item="record"
+            data-id="{{record.id}}"
+            data-person="{{person}}"
+            bindtap="onRecordTap"
+            bindlongpress="onRecordLongPress"
+          >
+            <text class="record-date">{{record.recordDateFormatted}}</text>
+            <view class="record-value" style="color: {{personConfig[person].color}}">
+              <text class="record-weight">{{record.weight}}</text>
+              <text class="record-unit">斤</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{!loading && !weightRecords.length}}">
+      <text class="empty-icon">⚖️</text>
+      <text class="empty-title">还没有体重记录</text>
+      <text class="empty-text">点击下方按钮，开始记录宝贝的体重</text>
+      <view class="empty-btn" bindtap="showAddForm">+ 添加记录</view>
+    </view>
+  </view>
+
+  <!-- 悬浮添加按钮 -->
+  <view class="fab-btn" bindtap="showAddForm" wx:if="{{!showForm}}">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <!-- 底部消息推送入口 -->
+  <view class="footer-link-wrap">
+    <navigator url="/pages/openid/openid" class="footer-link">
+      <text class="footer-link-icon">🔔</text>
+      <text class="footer-link-text">消息推送设置</text>
+      <text class="footer-link-arrow">›</text>
+    </navigator>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>
+
+<!-- 添加/编辑表单弹窗 -->
+<view class="modal-overlay {{showForm ? 'show' : ''}}" catchtap="hideForm" wx:if="{{showForm}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '✏️ 编辑记录' : '➕ 添加记录'}}</text>
+      <view class="modal-close" bindtap="hideForm">×</view>
+    </view>
+
+    <view class="modal-body" catchtap="stopPropagation">
+      <!-- 选择宠物 -->
+      <view class="form-group">
+        <text class="form-label">🐾 选择宝贝</text>
+        <view class="person-selector">
+          <view 
+            class="person-option {{formPersonIndex === index ? 'person-option-active' : ''}}"
+            wx:for="{{personList}}"
+            wx:key="*this"
+            wx:for-item="person"
+            data-index="{{index}}"
+            bindtap="onPersonSelect"
+            style="--person-color: {{personConfig[person].color}}"
+          >
+            <text class="option-emoji">{{personConfig[person].emoji}}</text>
+            <text class="option-name">{{person}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 输入体重 -->
+      <view class="form-group">
+        <text class="form-label">⚖️ 体重（斤）</text>
+        <view class="input-wrapper">
+          <input 
+            class="weight-input" 
+            type="digit" 
+            placeholder="请输入体重"
+            value="{{formWeight}}"
+            bindinput="onWeightInput"
+          />
+          <text class="input-suffix">斤</text>
+        </view>
+      </view>
+
+      <!-- 选择日期 -->
+      <view class="form-group">
+        <text class="form-label">📅 记录日期</text>
+        <picker mode="date" value="{{formDate}}" bindchange="onDateChange">
+          <view class="date-picker">
+            <text class="date-value">{{formDate}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideForm">取消</button>
+      <button class="btn btn-primary" bindtap="submitForm">确定</button>
+    </view>
+  </view>
+</view>
+
+<!-- 操作菜单 -->
+<view class="action-overlay {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
+  <view class="action-sheet" catchtap="">
+    <view class="action-header">
+      <text class="action-title">{{actionSheetPerson}} 的记录</text>
+    </view>
+    <view class="action-item" bindtap="onEditAction">
+      <text class="action-icon">✏️</text>
+      <text class="action-text">编辑记录</text>
+    </view>
+    <view class="action-item action-danger" bindtap="onDeleteAction">
+      <text class="action-icon">🗑️</text>
+      <text class="action-text">删除记录</text>
+    </view>
+    <view class="action-cancel" bindtap="hideActionSheet">取消</view>
+  </view>
+</view>

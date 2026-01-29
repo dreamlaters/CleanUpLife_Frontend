@@ -1,29 +1,28 @@
 /**
- * 体重追踪页面
- * 支持记录、修改、删除体重数据
- * 使用原生Canvas折线图展示趋势
+ * 宠物页面逻辑
+ * 体重追踪
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
 
-// 人员配置：名称、颜色、emoji
+// 宠物配置
 const PERSON_CONFIG = {
-  '猪': { color: '#FF6B6B', emoji: '🐷', lineColor: '#FF6B6B' },
-  '驴': { color: '#4ECDC4', emoji: '🫏', lineColor: '#4ECDC4' },
   '豌豆黄': { color: '#F4D03F', emoji: '🟡', lineColor: '#F4D03F' },
   '小立夏': { color: '#27AE60', emoji: '🌱', lineColor: '#27AE60' }
 };
 
-const PERSON_LIST = ['猪', '驴', '豌豆黄', '小立夏'];
+const PERSON_LIST = ['豌豆黄', '小立夏'];
 
 Page({
   data: {
+    // 导航栏
+    statusBarHeight: 20,
+    navbarHeight: 88,
+    
     // 数据列表
     weightRecords: [],
-    groupedRecords: {}, // 按人员分组的记录
-    
-    // 统计数据
-    latestWeights: {}, // 每人最新体重
+    groupedRecords: {},
+    latestWeights: {},
     
     // 表单数据
     showForm: false,
@@ -34,8 +33,8 @@ Page({
     personList: PERSON_LIST,
     personConfig: PERSON_CONFIG,
     
-    // 时间范围筛选
-    timeRange: 'all', // 'week', 'month', '3month', 'all'
+    // 时间范围
+    timeRange: 'all',
     
     // 加载状态
     loading: false,
@@ -47,15 +46,13 @@ Page({
   },
 
   onLoad() {
-    // 设置默认日期为今天
+    this.initNavbar();
     this.setData({
       formDate: util.formatDate(new Date())
     });
-    this.fetchWeightRecords();
   },
 
   onReady() {
-    // 获取canvas上下文
     this.initCanvas();
   },
 
@@ -63,15 +60,26 @@ Page({
     this.fetchWeightRecords();
   },
 
+  initNavbar() {
+    try {
+      const systemInfo = wx.getSystemInfoSync();
+      const statusBarHeight = systemInfo.statusBarHeight || 20;
+      const navbarHeight = statusBarHeight + 44 + 10;
+      this.setData({ statusBarHeight, navbarHeight });
+    } catch (e) {
+      console.error('获取系统信息失败', e);
+    }
+  },
+
+  stopPropagation() {},
+
   // ==================== 数据获取 ====================
-  
   async fetchWeightRecords() {
     this.setData({ loading: true });
 
     try {
       const records = await api.get('/Weight/list');
       
-      // 按人员分组
       const grouped = {};
       const latest = {};
       
@@ -88,11 +96,9 @@ Page({
         }
       });
       
-      // 获取每人最新体重
       PERSON_LIST.forEach(person => {
         const personRecords = grouped[person];
         if (personRecords.length > 0) {
-          // 按日期排序，获取最新的
           personRecords.sort((a, b) => new Date(b.recordDate) - new Date(a.recordDate));
           latest[person] = personRecords[0].weight;
         }
@@ -105,7 +111,6 @@ Page({
         loading: false
       });
 
-      // 更新图表
       this.drawChart();
     } catch (err) {
       console.error('获取体重记录失败', err);
@@ -119,8 +124,7 @@ Page({
     return `${date.getMonth() + 1}/${date.getDate()}`;
   },
 
-  // ==================== 图表相关 ====================
-
+  // ==================== 图表 ====================
   initCanvas() {
     const query = wx.createSelectorQuery();
     query.select('#weight-canvas')
@@ -153,19 +157,14 @@ Page({
     const height = this.canvasHeight;
     const { groupedRecords, timeRange } = this.data;
     
-    // 清除画布
     ctx.clearRect(0, 0, width, height);
-    
-    // 背景
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#f9fafb';
     ctx.fillRect(0, 0, width, height);
     
-    // 图表边距
-    const padding = { left: 35, right: 5, top: 15, bottom: 50 };
+    const padding = { left: 35, right: 10, top: 15, bottom: 45 };
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
     
-    // 收集所有日期和数据
     const allDates = new Set();
     const seriesData = {};
     
@@ -179,10 +178,8 @@ Page({
       });
     });
 
-    // 排序日期
     let sortedDates = Array.from(allDates).sort();
     
-    // 根据时间范围筛选
     if (timeRange !== 'all' && sortedDates.length > 0) {
       const now = new Date();
       let startDate;
@@ -205,7 +202,6 @@ Page({
     }
     
     if (sortedDates.length === 0) {
-      // 绘制空状态
       ctx.fillStyle = '#999';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
@@ -213,7 +209,6 @@ Page({
       return;
     }
     
-    // 计算Y轴范围
     let minWeight = Infinity;
     let maxWeight = -Infinity;
     
@@ -227,13 +222,12 @@ Page({
       });
     });
     
-    // Y轴范围留一些余量
     const yRange = maxWeight - minWeight || 10;
     minWeight = Math.floor(minWeight - yRange * 0.1);
     maxWeight = Math.ceil(maxWeight + yRange * 0.1);
     
-    // 绘制网格线
-    ctx.strokeStyle = '#f0f0f0';
+    // 网格线
+    ctx.strokeStyle = '#e5e7eb';
     ctx.lineWidth = 1;
     const ySteps = 5;
     for (let i = 0; i <= ySteps; i++) {
@@ -244,8 +238,8 @@ Page({
       ctx.stroke();
     }
     
-    // 绘制Y轴标签
-    ctx.fillStyle = '#666';
+    // Y轴标签
+    ctx.fillStyle = '#6b7280';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'right';
     for (let i = 0; i <= ySteps; i++) {
@@ -254,11 +248,9 @@ Page({
       ctx.fillText(value.toFixed(0), padding.left - 8, y + 4);
     }
     
-    // 绘制X轴标签
+    // X轴标签
     ctx.textAlign = 'center';
     const xStep = chartWidth / Math.max(sortedDates.length - 1, 1);
-    
-    // 决定显示哪些标签（避免重叠）
     const maxLabels = Math.floor(chartWidth / 40);
     const labelStep = Math.max(1, Math.ceil(sortedDates.length / maxLabels));
     
@@ -267,11 +259,11 @@ Page({
         const x = padding.left + xStep * index;
         const date = new Date(dateStr);
         const label = `${date.getMonth() + 1}/${date.getDate()}`;
-        ctx.fillText(label, x, height - padding.bottom + 20);
+        ctx.fillText(label, x, height - padding.bottom + 18);
       }
     });
     
-    // 绘制每个人的折线
+    // 折线
     PERSON_LIST.forEach(person => {
       const points = [];
       sortedDates.forEach((date, index) => {
@@ -286,7 +278,6 @@ Page({
       if (points.length > 0) {
         const config = PERSON_CONFIG[person];
         
-        // 绘制折线
         ctx.strokeStyle = config.lineColor;
         ctx.lineWidth = 2.5;
         ctx.lineJoin = 'round';
@@ -301,7 +292,7 @@ Page({
         });
         ctx.stroke();
         
-        // 绘制数据点
+        // 数据点
         points.forEach(point => {
           ctx.fillStyle = '#fff';
           ctx.beginPath();
@@ -315,37 +306,15 @@ Page({
         });
       }
     });
-    
-    // 绘制图例
-    const legendY = height - 15;
-    const legendItemWidth = 60;
-    const legendStartX = (width - legendItemWidth * PERSON_LIST.length) / 2;
-    
-    PERSON_LIST.forEach((person, index) => {
-      const config = PERSON_CONFIG[person];
-      const x = legendStartX + index * legendItemWidth;
-      
-      // 图例颜色块
-      ctx.fillStyle = config.lineColor;
-      ctx.fillRect(x, legendY - 6, 16, 8);
-      
-      // 图例文字
-      ctx.fillStyle = '#666';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(person, x + 20, legendY);
-    });
   },
 
-  // 时间范围切换
   onTimeRangeChange(e) {
     const range = e.currentTarget.dataset.range;
     this.setData({ timeRange: range });
     this.drawChart();
   },
 
-  // ==================== 表单操作 ====================
-
+  // ==================== 表单 ====================
   showAddForm() {
     this.setData({
       showForm: true,
@@ -356,33 +325,24 @@ Page({
     });
   },
 
-  showEditForm(record) {
-    const personIndex = PERSON_LIST.indexOf(record.personName);
-    this.setData({
-      showForm: true,
-      editingId: record.id,
-      formPersonIndex: personIndex >= 0 ? personIndex : 0,
-      formWeight: String(record.weight),
-      formDate: record.recordDate.split('T')[0]
-    });
-  },
-
   hideForm() {
     this.setData({
       showForm: false,
       editingId: null
+    }, () => {
+      setTimeout(() => {
+        this.initCanvas();
+      }, 100);
     });
   },
 
-  onPersonChange(e) {
-    this.setData({
-      formPersonIndex: parseInt(e.detail.value)
-    });
+  onPersonSelect(e) {
+    const index = parseInt(e.currentTarget.dataset.index);
+    this.setData({ formPersonIndex: index });
   },
 
   onWeightInput(e) {
     let value = e.detail.value;
-    // 限制为数字和一位小数
     if (value && !/^\d*\.?\d{0,1}$/.test(value)) {
       value = this.data.formWeight;
     }
@@ -390,9 +350,7 @@ Page({
   },
 
   onDateChange(e) {
-    this.setData({
-      formDate: e.detail.value
-    });
+    this.setData({ formDate: e.detail.value });
   },
 
   async submitForm() {
@@ -403,28 +361,18 @@ Page({
       return;
     }
 
-    const personName = PERSON_LIST[formPersonIndex];
-    const weight = parseFloat(formWeight);
-    const recordDate = new Date(formDate).toISOString();
+    const data = {
+      personName: PERSON_LIST[formPersonIndex],
+      weight: parseFloat(formWeight),
+      recordDate: formDate
+    };
 
     try {
-      wx.showLoading({ title: '保存中...' });
-
       if (editingId) {
-        // 更新
-        await api.put(`/Weight/${editingId}`, {
-          personName,
-          weight,
-          recordDate
-        });
-        wx.showToast({ title: '修改成功', icon: 'success' });
+        await api.put(`/Weight/${editingId}`, { ...data, id: editingId }, { loadingText: '更新中...' });
+        wx.showToast({ title: '更新成功', icon: 'success' });
       } else {
-        // 创建
-        await api.post('/Weight', {
-          personName,
-          weight,
-          recordDate
-        });
+        await api.post('/Weight', data, { loadingText: '添加中...' });
         wx.showToast({ title: '添加成功', icon: 'success' });
       }
 
@@ -433,19 +381,23 @@ Page({
     } catch (err) {
       console.error('保存失败', err);
       wx.showToast({ title: '保存失败', icon: 'error' });
-    } finally {
-      wx.hideLoading();
     }
   },
 
-  // ==================== 列表操作 ====================
-
+  // ==================== 记录操作 ====================
   onRecordTap(e) {
-    const { id } = e.currentTarget.dataset;
-    const record = this.data.weightRecords.find(r => r.id === id);
-    if (record) {
-      this.showEditForm(record);
-    }
+    const { id, person } = e.currentTarget.dataset;
+    const record = this.data.groupedRecords[person].find(r => r.id === id);
+    if (!record) return;
+
+    const personIndex = PERSON_LIST.indexOf(person);
+    this.setData({
+      showForm: true,
+      editingId: record.id,
+      formPersonIndex: personIndex >= 0 ? personIndex : 0,
+      formWeight: String(record.weight),
+      formDate: record.recordDate.split('T')[0]
+    });
   },
 
   onRecordLongPress(e) {
@@ -458,55 +410,46 @@ Page({
   },
 
   hideActionSheet() {
-    this.setData({
-      showActionSheet: false,
-      actionSheetId: '',
-      actionSheetPerson: ''
-    });
+    this.setData({ showActionSheet: false });
   },
 
   onEditAction() {
-    const { actionSheetId } = this.data;
-    const record = this.data.weightRecords.find(r => r.id === actionSheetId);
+    const { actionSheetId, actionSheetPerson } = this.data;
     this.hideActionSheet();
-    if (record) {
-      this.showEditForm(record);
-    }
+    
+    setTimeout(() => {
+      const record = this.data.groupedRecords[actionSheetPerson].find(r => r.id === actionSheetId);
+      if (!record) return;
+
+      const personIndex = PERSON_LIST.indexOf(actionSheetPerson);
+      this.setData({
+        showForm: true,
+        editingId: record.id,
+        formPersonIndex: personIndex >= 0 ? personIndex : 0,
+        formWeight: String(record.weight),
+        formDate: record.recordDate.split('T')[0]
+      });
+    }, 200);
   },
 
-  async onDeleteAction() {
+  onDeleteAction() {
     const { actionSheetId } = this.data;
-
     this.hideActionSheet();
 
     wx.showModal({
       title: '确认删除',
-      content: '确定要删除这条体重记录吗？',
+      content: '确定要删除这条记录吗？',
       success: async (res) => {
         if (res.confirm) {
           try {
-            wx.showLoading({ title: '删除中...' });
-            await api.del(`/Weight/${actionSheetId}`);
+            await api.del(`/Weight/${actionSheetId}`, { loadingText: '删除中...' });
             wx.showToast({ title: '删除成功', icon: 'success' });
             this.fetchWeightRecords();
           } catch (err) {
-            console.error('删除失败', err);
             wx.showToast({ title: '删除失败', icon: 'error' });
-          } finally {
-            wx.hideLoading();
           }
         }
       }
     });
-  },
-
-  // 阻止事件冒泡
-  stopPropagation() {
-    // 空函数，仅用于阻止事件冒泡
-  },
-
-  // 返回首页
-  goBack() {
-    wx.navigateBack();
   }
 });

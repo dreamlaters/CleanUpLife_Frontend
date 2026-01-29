@@ -1,0 +1,208 @@
+<!-- 物品管理页面 -->
+<view class="container">
+  <!-- 自定义导航栏 -->
+  <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
+    <view class="navbar-content">
+      <text class="navbar-title">我的物品</text>
+    </view>
+  </view>
+  <view class="navbar-placeholder" style="height: {{navbarHeight}}px"></view>
+
+  <!-- 顶部Tab切换 -->
+  <view class="top-tabs">
+    <view class="top-tab {{currentTab === 'items' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="items">
+      <text class="top-tab-icon">📦</text>
+      <text class="top-tab-text">物品管理</text>
+      <view class="top-tab-badge" wx:if="{{products.length}}">{{products.length}}</view>
+    </view>
+    <view class="top-tab {{currentTab === 'tobuy' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="tobuy">
+      <text class="top-tab-icon">🛒</text>
+      <text class="top-tab-text">待购清单</text>
+      <view class="top-tab-badge" wx:if="{{toBuyPending.length}}">{{toBuyPending.length}}</view>
+    </view>
+  </view>
+
+  <!-- 物品管理内容 -->
+  <view class="tab-content" wx:if="{{currentTab === 'items'}}">
+    <!-- 统计概览 -->
+    <view class="stats-row">
+      <view class="stat-mini stat-primary">
+        <text class="stat-mini-value">{{products.length}}</text>
+        <text class="stat-mini-label">总数</text>
+      </view>
+      <view class="stat-mini stat-warning">
+        <text class="stat-mini-value">{{expiringSoonCount}}</text>
+        <text class="stat-mini-label">即将过期</text>
+      </view>
+      <view class="stat-mini stat-danger">
+        <text class="stat-mini-value">{{expiredCount}}</text>
+        <text class="stat-mini-label">已过期</text>
+      </view>
+    </view>
+
+    <!-- 筛选标签 -->
+    <scroll-view scroll-x class="filter-scroll" wx:if="{{products.length}}">
+      <view class="filter-tabs">
+        <view class="filter-tab {{currentFilter === 'all' ? 'filter-tab-active' : ''}}" 
+              bindtap="onFilterChange" data-filter="all">全部</view>
+        <view class="filter-tab {{currentFilter === 'Food' ? 'filter-tab-active' : ''}}" 
+              bindtap="onFilterChange" data-filter="Food">🥖 食物</view>
+        <view class="filter-tab {{currentFilter === 'CatFood' ? 'filter-tab-active' : ''}}" 
+              bindtap="onFilterChange" data-filter="CatFood">🐱 猫粮</view>
+        <view class="filter-tab {{currentFilter === 'Medicine' ? 'filter-tab-active' : ''}}" 
+              bindtap="onFilterChange" data-filter="Medicine">💊 药品</view>
+      </view>
+    </scroll-view>
+
+    <!-- 物品列表 -->
+    <view class="section-card">
+      <view class="loading-container" wx:if="{{loadingProducts}}">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+      
+      <view class="item-list" wx:elif="{{filteredProducts.length}}">
+        <view 
+          class="item-card"
+          wx:for="{{filteredProducts}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          data-category="{{item.category}}"
+          bindtap="onUpdate"
+          bindlongpress="showItemActions"
+        >
+          <view class="item-emoji">{{item.emoji || '📦'}}</view>
+          <view class="item-content">
+            <text class="item-name">{{item.name}}</text>
+            <view class="item-info">
+              <text class="item-location">📍 {{item.location.roomPlacement}}</text>
+              <text class="item-date-badge {{item.dateClass}}">{{item.bestByFormatted}}</text>
+            </view>
+          </view>
+          <text class="item-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{!loadingProducts && !products.length}}">
+        <text class="empty-icon">📭</text>
+        <text class="empty-title">还没有添加物品</text>
+        <text class="empty-text">点击下方按钮，开始记录你的物品</text>
+        <view class="empty-btn" bindtap="goToAddItem">+ 添加物品</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 待购清单内容 -->
+  <view class="tab-content" wx:if="{{currentTab === 'tobuy'}}">
+    <view class="section-card">
+      <view class="loading-container" wx:if="{{loadingToBuy}}">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <!-- 未完成列表 -->
+      <view class="item-list" wx:elif="{{toBuyPending.length}}">
+        <view 
+          class="item-card tobuy-item"
+          wx:for="{{toBuyPending}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onUpdateToBuy"
+          bindlongpress="showToBuyActions"
+        >
+          <view class="tobuy-checkbox {{item.completed ? 'tobuy-checkbox-checked' : ''}}" 
+                catchtap="toggleToBuyComplete" data-id="{{item.id}}">
+            <text wx:if="{{item.completed}}">✓</text>
+          </view>
+          <view class="item-content">
+            <text class="item-name">{{item.name}}</text>
+            <view class="item-info">
+              <view class="priority-badge priority-{{item.priority <= 3 ? 'high' : item.priority <= 7 ? 'medium' : 'low'}}">
+                P{{item.priority}}
+              </view>
+            </view>
+          </view>
+          <text class="item-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{!loadingToBuy && !toBuyProducts.length}}">
+        <text class="empty-icon">🛒</text>
+        <text class="empty-title">购物清单是空的</text>
+        <text class="empty-text">记录需要购买的物品</text>
+        <view class="empty-btn" bindtap="goToAddToBuy">+ 添加待购</view>
+      </view>
+    </view>
+
+    <!-- 已完成的待购物品 -->
+    <view class="section-card completed-section" wx:if="{{toBuyCompleted.length}}">
+      <view class="completed-header" bindtap="toggleCompletedList">
+        <view class="completed-title-wrap">
+          <text class="completed-icon">✅</text>
+          <text class="completed-title">已完成 ({{toBuyCompleted.length}})</text>
+        </view>
+        <view class="completed-actions">
+          <view class="clear-btn" catchtap="clearCompletedToBuy">清除</view>
+          <text class="expand-icon {{showCompleted ? 'expand-icon-up' : ''}}">›</text>
+        </view>
+      </view>
+      
+      <view class="completed-list {{showCompleted ? 'completed-list-show' : ''}}">
+        <view 
+          class="item-card tobuy-item item-card-completed"
+          wx:for="{{toBuyCompleted}}" 
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onUpdateToBuy"
+          bindlongpress="showToBuyActions"
+        >
+          <view class="tobuy-checkbox tobuy-checkbox-checked" 
+                catchtap="toggleToBuyComplete" data-id="{{item.id}}">
+            <text>✓</text>
+          </view>
+          <view class="item-content item-completed">
+            <text class="item-name">{{item.name}}</text>
+          </view>
+          <text class="item-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 悬浮添加按钮 -->
+  <view class="fab-btn" bindtap="{{currentTab === 'items' ? 'goToAddItem' : 'goToAddToBuy'}}">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <!-- 底部消息推送入口 -->
+  <view class="footer-link-wrap">
+    <navigator url="/pages/openid/openid" class="footer-link">
+      <text class="footer-link-icon">🔔</text>
+      <text class="footer-link-text">消息推送设置</text>
+      <text class="footer-link-arrow">›</text>
+    </navigator>
+  </view>
+
+  <!-- 底部安全区 -->
+  <view class="safe-bottom"></view>
+</view>
+
+<!-- 操作菜单 -->
+<view class="action-overlay {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
+  <view class="action-sheet" catchtap="">
+    <view class="action-header">
+      <text class="action-title">{{actionSheetTitle}}</text>
+    </view>
+    <view class="action-item" bindtap="onActionEdit">
+      <text class="action-icon">✏️</text>
+      <text class="action-text">编辑</text>
+    </view>
+    <view class="action-item action-danger" bindtap="onActionDelete">
+      <text class="action-icon">🗑️</text>
+      <text class="action-text">删除</text>
+    </view>
+    <view class="action-cancel" bindtap="hideActionSheet">取消</view>
+  </view>
+</view>

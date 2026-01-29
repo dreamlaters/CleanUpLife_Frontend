@@ -1,0 +1,677 @@
+/**
+ * 物品管理页面样式 - 统一设计语言 v3.0
+ * CleanUpLife - 清新简约风格
+ */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  display: block !important;
+  align-items: stretch !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* ==================== 自定义导航栏 ==================== */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow: 0 4rpx 20rpx rgba(99, 102, 241, 0.25);
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 92rpx;
+}
+
+.navbar-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.5rpx;
+}
+
+.navbar-placeholder {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* ==================== 顶部Tab ==================== */
+.top-tabs {
+  display: flex;
+  background: #ffffff;
+  margin: 20rpx 24rpx;
+  border-radius: 20rpx;
+  padding: 6rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.top-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 18rpx 14rpx;
+  border-radius: 16rpx;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.top-tab-active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
+}
+
+.top-tab-icon {
+  font-size: 24rpx;
+}
+
+.top-tab-text {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.15s;
+}
+
+.top-tab-active .top-tab-text {
+  color: #fff;
+}
+
+.top-tab-badge {
+  position: absolute;
+  top: 4rpx;
+  right: 18rpx;
+  min-width: 30rpx;
+  height: 30rpx;
+  padding: 0 8rpx;
+  background: #ef4444;
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 600;
+  border-radius: 15rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-tab-active .top-tab-badge {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ==================== 统计行 ==================== */
+.stats-row {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 24rpx;
+  margin-bottom: 16rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stat-mini {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 20rpx 14rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border: 1rpx solid #f3f4f6;
+  min-width: 0;
+}
+
+.stat-mini::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3rpx;
+}
+
+.stat-primary::before {
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.stat-warning::before {
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.stat-danger::before {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+}
+
+.stat-mini-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+.stat-mini-label {
+  font-size: 20rpx;
+  color: #9ca3af;
+  margin-top: 2rpx;
+}
+
+/* ==================== 筛选标签 ==================== */
+.filter-scroll {
+  white-space: nowrap;
+  padding: 0 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.filter-tabs {
+  display: inline-flex;
+  gap: 10rpx;
+}
+
+.filter-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 12rpx 20rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  color: #6b7280;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1rpx solid #f3f4f6;
+}
+
+.filter-tab:active {
+  transform: scale(0.96);
+}
+
+.filter-tab-active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.3);
+}
+
+/* ==================== 区块卡片 ==================== */
+.section-card {
+  margin: 0 24rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* ==================== 物品列表 ==================== */
+.item-list {
+  padding: 16rpx 20rpx;
+  background: #ffffff;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 18rpx;
+  margin-bottom: 12rpx;
+  background: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%);
+  border-radius: 18rpx;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1rpx solid #eef0f2;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.02);
+}
+
+.item-card:last-child {
+  margin-bottom: 0;
+}
+
+.item-card:active {
+  transform: scale(0.98);
+  background: linear-gradient(135deg, #f0f1f3 0%, #ebedf0 100%);
+  border-color: #e5e7eb;
+}
+
+.item-emoji {
+  font-size: 32rpx;
+  width: 60rpx;
+  height: 60rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  border: 1rpx solid #eef0f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.04);
+}
+
+.item-content {
+  flex: 1;
+  margin-left: 14rpx;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #111827;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 6rpx;
+  flex-wrap: wrap;
+}
+
+.item-location {
+  font-size: 20rpx;
+  color: #9ca3af;
+  background: #ffffff;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+}
+
+.item-date-badge {
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  color: #fff;
+}
+
+.date-normal {
+  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+}
+
+.date-soon {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.date-expired {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+}
+
+.item-arrow {
+  font-size: 22rpx;
+  color: #d1d5db;
+  margin-left: 6rpx;
+}
+
+/* ==================== 待购清单样式 ==================== */
+.tobuy-checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #d1d5db;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14rpx;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.tobuy-checkbox-checked {
+  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+  border-color: transparent;
+  box-shadow: 0 2rpx 8rpx rgba(34, 197, 94, 0.3);
+}
+
+.tobuy-checkbox-checked text {
+  font-size: 22rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tobuy-item {
+  padding: 16rpx 14rpx;
+}
+
+.item-card-completed {
+  opacity: 0.65;
+}
+
+.item-card-completed .item-name {
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.item-completed {
+  opacity: 0.7;
+}
+
+.item-completed .item-name {
+  text-decoration: line-through;
+}
+
+/* ==================== 优先级标签 ==================== */
+.priority-badge {
+  font-size: 18rpx;
+  font-weight: 600;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+}
+
+.priority-high {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.priority-medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.priority-low {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+/* ==================== 已完成区域 ==================== */
+.completed-section {
+  margin-top: 16rpx;
+}
+
+.completed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 24rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.completed-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.completed-icon {
+  font-size: 22rpx;
+}
+
+.completed-title {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.completed-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.clear-btn {
+  font-size: 22rpx;
+  color: #ef4444;
+  padding: 6rpx 14rpx;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 10rpx;
+}
+
+.expand-icon {
+  font-size: 24rpx;
+  color: #9ca3af;
+  transition: transform 0.25s ease;
+  transform: rotate(90deg);
+}
+
+.expand-icon-up {
+  transform: rotate(-90deg);
+}
+
+.completed-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.completed-list-show {
+  max-height: 800rpx;
+}
+
+/* ==================== 空状态 ==================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56rpx 28rpx;
+}
+
+.empty-icon {
+  font-size: 64rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 8rpx;
+}
+
+.empty-text {
+  font-size: 24rpx;
+  color: #9ca3af;
+  text-align: center;
+  margin-bottom: 28rpx;
+}
+
+.empty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 40rpx;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 500;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.empty-btn:active {
+  transform: scale(0.96);
+}
+
+/* ==================== 加载状态 ==================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56rpx 0;
+}
+
+.loading-spinner {
+  width: 40rpx;
+  height: 40rpx;
+  border: 3rpx solid #f3f4f6;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: #9ca3af;
+}
+
+/* ==================== 悬浮按钮 ==================== */
+.fab-btn {
+  position: fixed;
+  right: 28rpx;
+  bottom: calc(180rpx + env(safe-area-inset-bottom));
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(99, 102, 241, 0.4);
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 50;
+}
+
+.fab-btn:active {
+  transform: scale(0.88);
+}
+
+.fab-icon {
+  font-size: 48rpx;
+  color: #fff;
+  font-weight: 300;
+}
+
+/* ==================== 底部链接 ==================== */
+.footer-link-wrap {
+  padding: 20rpx 24rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-link:active {
+  transform: scale(0.98);
+  background: #f9fafb;
+}
+
+.footer-link-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+}
+
+.footer-link-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.footer-link-arrow {
+  font-size: 28rpx;
+  color: #d1d5db;
+}
+
+/* ==================== 安全区域 ==================== */
+.safe-bottom {
+  height: calc(env(safe-area-inset-bottom) + 16rpx);
+}
+
+/* ==================== 操作菜单 ==================== */
+.action-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+.action-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.action-sheet {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 28rpx 28rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.action-overlay.show .action-sheet {
+  transform: translateY(0);
+}
+
+.action-header {
+  padding: 24rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.action-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #111827;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 28rpx;
+  font-size: 30rpx;
+  color: #111827;
+  transition: background 0.15s ease;
+}
+
+.action-item:active {
+  background: #f9fafb;
+}
+
+.action-icon {
+  font-size: 26rpx;
+}
+
+.action-text {
+  font-weight: 500;
+}
+
+.action-danger {
+  color: #ef4444;
+}
+
+.action-cancel {
+  padding: 24rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #6b7280;
+  background: #f9fafb;
+  margin-top: 8rpx;
+}

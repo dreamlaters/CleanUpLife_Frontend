@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "OpenID"
+  "navigationBarTitleText": "消息推送设置",
+  "navigationStyle": "default"
 }

@@ -92,11 +92,45 @@ const del = (url, options = {}) => {
   return request({ url, method: 'DELETE', data: options.data, ...options });
 };
 
+// ==================== 业务 API ====================
+
+/**
+ * 获取物品列表
+ */
+const getProductList = (options = {}) => {
+  return get('/Products', { showLoading: false, ...options }).then(data => ({ data }));
+};
+
+/**
+ * 获取待购列表
+ */
+const getToBuyList = (options = {}) => {
+  return get('/ToBuy', { showLoading: false, ...options }).then(data => ({ data }));
+};
+
+/**
+ * 获取出行列表
+ */
+const getTravelList = (options = {}) => {
+  return get('/Travel', { showLoading: false, ...options }).then(data => ({ data }));
+};
+
+/**
+ * 获取想去的地方列表（pending状态）
+ */
+const getPendingTravelList = (options = {}) => {
+  return get('/Travel/status/0', { showLoading: false, ...options }).then(data => ({ data }));
+};
+
 module.exports = {
   BASE_URL,
   request,
   get,
   post,
   put,
-  del
+  del,
+  getProductList,
+  getToBuyList,
+  getTravelList,
+  getPendingTravelList
 };
