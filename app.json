@@ -3,12 +3,13 @@
     "pages/home/home",
     "pages/items/items",
     "pages/plan/plan",
-    "pages/pet/pet",
+    "pages/record/record",
     "pages/add/add",
     "pages/update/update",
     "pages/openid/openid",
     "pages/tobuy/add",
-    "pages/tobuy/update"
+    "pages/tobuy/update",
+    "pages/pet/pet"
   ],
   "window": {
     "navigationBarBackgroundColor": "#6366f1",
@@ -45,10 +46,10 @@
         "selectedIconPath": "images/tab-plan-active.png"
       },
       {
-        "pagePath": "pages/pet/pet",
-        "text": "宠物",
-        "iconPath": "images/tab-pet.png",
-        "selectedIconPath": "images/tab-pet-active.png"
+        "pagePath": "pages/record/record",
+        "text": "记录",
+        "iconPath": "images/tab-record.png",
+        "selectedIconPath": "images/tab-record-active.png"
       }
     ]
   },

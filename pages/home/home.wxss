@@ -279,6 +279,56 @@
   color: #9ca3af;
 }
 
+/* ==================== 姨妈记录卡片 ==================== */
+.period-card {
+  border-left: 5rpx solid #ec4899;
+  background: linear-gradient(135deg, #fdf2f8 0%, #ffffff 30%);
+}
+
+.period-card-content {
+  display: flex;
+  align-items: center;
+  padding: 28rpx;
+  gap: 20rpx;
+}
+
+.period-icon {
+  font-size: 44rpx;
+  width: 72rpx;
+  height: 72rpx;
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.period-info {
+  flex: 1;
+}
+
+.period-status {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.period-main-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #be185d;
+}
+
+.period-sub-text {
+  font-size: 24rpx;
+  color: #9ca3af;
+}
+
+.period-arrow {
+  font-size: 32rpx;
+  color: #f9a8d4;
+}
+
 /* ==================== 快捷入口 ==================== */
 .quick-grid {
   display: grid;

@@ -69,10 +69,14 @@ Page({
   // ==================== 消息订阅 ====================
   onRequestSubscribe() {
     wx.requestSubscribeMessage({
-      tmplIds: ['UxALkgoVSieSCdFhfkeX50yu_ORs6zMdpgmMkVMWiJY'],
+      tmplIds: [
+        'UxALkgoVSieSCdFhfkeX50yu_ORs6zMdpgmMkVMWiJY', // 物品过期提醒
+        'dP6v-vSLEDMqM_mMEk3YZgCE5P7cP0NnxEJS42KfGZE'  // 经期提醒
+      ],
       success: (res) => {
-        const status = Object.values(res).find(v => v === 'accept') 
-          ? '已授权' 
+        const acceptCount = Object.values(res).filter(v => v === 'accept').length;
+        const status = acceptCount > 0 
+          ? `已授权 ${acceptCount} 个模板` 
           : '授权被拒绝';
         util.showSuccess(status);
       },

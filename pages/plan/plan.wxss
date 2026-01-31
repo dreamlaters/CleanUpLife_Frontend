@@ -976,26 +976,7 @@
   z-index: 50;
 }
 
-.fab-btn {
-  width: 112rpx;
-  height: 112rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
-  transition: all 0.2s ease;
-}
-
-.fab-btn:active {
-  transform: scale(0.9);
-}
-
-.fab-icon {
-  font-size: 52rpx;
-  color: #fff;
-}
+/* fab-btn 样式已在上方定义，此处移除重复 */
 
 /* ==================== 弹窗表单（已在上方定义，此处移除重复） ==================== */
 

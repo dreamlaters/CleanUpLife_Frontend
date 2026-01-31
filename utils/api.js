@@ -122,6 +122,57 @@ const getPendingTravelList = (options = {}) => {
   return get('/Travel/status/0', { showLoading: false, ...options }).then(data => ({ data }));
 };
 
+// ==================== 姨妈记录 API ====================
+
+/**
+ * 获取姨妈记录列表
+ */
+const getPeriodList = (options = {}) => {
+  return get('/Period/list', { showLoading: false, ...options }).then(data => ({ data }));
+};
+
+/**
+ * 获取姨妈统计信息
+ */
+const getPeriodStats = (options = {}) => {
+  return get('/Period/stats', { showLoading: false, ...options });
+};
+
+/**
+ * 获取最新姨妈记录
+ */
+const getLatestPeriod = (options = {}) => {
+  return get('/Period/latest', { showLoading: false, ...options });
+};
+
+/**
+ * 记录姨妈开始
+ */
+const recordPeriodStart = (startDate, notes = '', options = {}) => {
+  return post('/Period/start', { startDate, notes }, options);
+};
+
+/**
+ * 记录姨妈结束
+ */
+const recordPeriodEnd = (id, endDate, options = {}) => {
+  return post(`/Period/${id}/end`, { endDate }, options);
+};
+
+/**
+ * 更新姨妈记录
+ */
+const updatePeriod = (id, data, options = {}) => {
+  return put(`/Period/${id}`, data, options);
+};
+
+/**
+ * 删除姨妈记录
+ */
+const deletePeriod = (id, options = {}) => {
+  return del(`/Period/${id}`, options);
+};
+
 module.exports = {
   BASE_URL,
   request,
@@ -132,5 +183,13 @@ module.exports = {
   getProductList,
   getToBuyList,
   getTravelList,
-  getPendingTravelList
+  getPendingTravelList,
+  // 姨妈记录
+  getPeriodList,
+  getPeriodStats,
+  getLatestPeriod,
+  recordPeriodStart,
+  recordPeriodEnd,
+  updatePeriod,
+  deletePeriod
 };

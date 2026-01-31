@@ -78,6 +78,7 @@ page {
   font-size: 28rpx;
   background: var(--bg-page);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* ==================== 容器布局 ==================== */

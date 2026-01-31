@@ -85,6 +85,34 @@
     </view>
   </view>
 
+  <!-- 姨妈记录状态卡片 -->
+  <view class="section-card period-card" bindtap="goToPeriod" wx:if="{{periodStats}}">
+    <view class="period-card-content">
+      <view class="period-icon">🌸</view>
+      <view class="period-info">
+        <view class="period-status" wx:if="{{periodStats.status === 'none'}}">
+          <text class="period-main-text">暂无记录</text>
+          <text class="period-sub-text">点击开始记录</text>
+        </view>
+        <view class="period-status" wx:elif="{{periodStats.status === 'in-period'}}">
+          <text class="period-main-text">经期中</text>
+          <text class="period-sub-text">注意保暖 💕</text>
+        </view>
+        <view class="period-status" wx:else>
+          <text class="period-main-text" wx:if="{{periodStats.daysUntilNextPeriod > 0}}">距下次姨妈还有 {{periodStats.daysUntilNextPeriod}} 天</text>
+          <text class="period-main-text" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">
+            预计今天开始
+          </text>
+          <text class="period-main-text" wx:else>
+            已超出预计 {{-periodStats.daysUntilNextPeriod}} 天
+          </text>
+          <text class="period-sub-text">平均周期 {{periodStats.averageCycleDays}} 天</text>
+        </view>
+      </view>
+      <view class="period-arrow">›</view>
+    </view>
+  </view>
+
   <!-- 快捷入口 -->
   <view class="section-card">
     <view class="section-header">

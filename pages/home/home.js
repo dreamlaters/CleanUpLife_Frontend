@@ -24,6 +24,9 @@ Page({
     toBuyCount: 0,
     travelCount: 0,
     
+    // 姨妈记录
+    periodStats: null,
+    
     // 加载状态
     loading: false
   },
@@ -74,10 +77,11 @@ Page({
     
     try {
       // 并行获取数据
-      const [products, toBuyList, travelList] = await Promise.all([
+      const [products, toBuyList, travelList, periodStats] = await Promise.all([
         this.fetchProducts(),
         this.fetchToBuyCount(),
-        this.fetchTravelCount()
+        this.fetchTravelCount(),
+        this.fetchPeriodStats()
       ]);
       
       this.setData({ loading: false });
@@ -159,6 +163,22 @@ Page({
     }
   },
 
+  // 获取姨妈统计信息
+  async fetchPeriodStats() {
+    try {
+      const stats = await api.getPeriodStats();
+      // 四舍五入平均周期天数
+      if (stats && stats.averageCycleDays) {
+        stats.averageCycleDays = Math.round(stats.averageCycleDays);
+      }
+      this.setData({ periodStats: stats });
+      return stats;
+    } catch (err) {
+      console.error('获取姨妈统计失败', err);
+      return null;
+    }
+  },
+
   // 获取分类 emoji
   getCategoryEmoji(category) {
     const emojiMap = {
@@ -218,6 +238,15 @@ Page({
     getApp().globalData.targetTab = 'goals';
     wx.switchTab({
       url: '/pages/plan/plan'
+    });
+  },
+
+  // 跳转到姨妈记录
+  goToPeriod() {
+    getApp().globalData = getApp().globalData || {};
+    getApp().globalData.targetTab = 'period';
+    wx.switchTab({
+      url: '/pages/record/record'
     });
   }
 });

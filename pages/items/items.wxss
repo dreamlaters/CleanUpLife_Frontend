@@ -13,6 +13,8 @@
   padding-right: 0 !important;
   width: 100% !important;
   max-width: none !important;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* ==================== 自定义导航栏 ==================== */
