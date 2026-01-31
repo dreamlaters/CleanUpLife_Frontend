@@ -42,14 +42,11 @@ Page({
 
   // 初始化导航栏高度
   initNavbar() {
-    try {
-      const systemInfo = wx.getSystemInfoSync();
-      const statusBarHeight = systemInfo.statusBarHeight || 20;
-      const navbarHeight = statusBarHeight + 44 + 10; // 状态栏 + 导航内容 + 额外间距
-      this.setData({ statusBarHeight, navbarHeight });
-    } catch (e) {
-      console.error('获取系统信息失败', e);
-    }
+    const app = getApp();
+    const systemInfo = app.getSystemInfo();
+    const statusBarHeight = systemInfo.statusBarHeight || 20;
+    const navbarHeight = statusBarHeight + 44 + 10;
+    this.setData({ statusBarHeight, navbarHeight });
   },
 
   // 更新问候语和日期
@@ -71,28 +68,35 @@ Page({
     this.setData({ greeting, dateText });
   },
 
-  // 获取所有数据
+  // 获取所有数据 - 优化：合并 setData 减少渲染次数
   async fetchData() {
     this.setData({ loading: true });
     
     try {
       // 并行获取数据
-      const [products, toBuyList, travelList, periodStats] = await Promise.all([
-        this.fetchProducts(),
-        this.fetchToBuyCount(),
-        this.fetchTravelCount(),
-        this.fetchPeriodStats()
+      const [productsResult, toBuyResult, travelResult, periodStats] = await Promise.all([
+        this._fetchProductsData(),
+        this._fetchToBuyData(),
+        this._fetchTravelData(),
+        this._fetchPeriodData()
       ]);
       
-      this.setData({ loading: false });
+      // 合并所有数据，一次性 setData
+      this.setData({
+        loading: false,
+        ...productsResult,
+        ...toBuyResult,
+        ...travelResult,
+        periodStats
+      });
     } catch (err) {
       console.error('获取数据失败', err);
       this.setData({ loading: false });
     }
   },
 
-  // 获取物品列表并分析过期情况
-  async fetchProducts() {
+  // 获取物品数据（不 setData，返回处理后的数据）
+  async _fetchProductsData() {
     try {
       const res = await api.getProductList();
       const products = res.data || [];
@@ -101,77 +105,67 @@ Page({
       const expiredItems = [];
       const expiringSoonItems = [];
       
-      products.forEach(item => {
+      for (let i = 0; i < products.length; i++) {
+        const item = products[i];
         const bestByDate = new Date(item.bestBy);
         const diffDays = Math.ceil((bestByDate - now) / (1000 * 60 * 60 * 24));
         
-        // 添加 emoji
         item.emoji = this.getCategoryEmoji(item.category);
         
         if (diffDays < 0) {
-          // 已过期
           item.daysText = Math.abs(diffDays) + '天';
           expiredItems.push(item);
         } else if (diffDays <= 7) {
-          // 7天内过期
           item.daysText = diffDays === 0 ? '今天' : diffDays + '天';
           expiringSoonItems.push(item);
         }
-      });
+      }
       
-      // 按过期时间排序
+      // 排序
       expiredItems.sort((a, b) => new Date(a.bestBy) - new Date(b.bestBy));
       expiringSoonItems.sort((a, b) => new Date(a.bestBy) - new Date(b.bestBy));
       
-      this.setData({
+      return {
         totalItems: products.length,
         expiredItems,
         expiringSoonItems
-      });
-      
-      return products;
+      };
     } catch (err) {
       console.error('获取物品列表失败', err);
-      return [];
+      return { totalItems: 0, expiredItems: [], expiringSoonItems: [] };
     }
   },
 
-  // 获取待购数量
-  async fetchToBuyCount() {
+  // 获取待购数据
+  async _fetchToBuyData() {
     try {
       const res = await api.getToBuyList();
       const list = res.data || [];
-      const pendingCount = list.filter(item => !item.completed).length;
-      this.setData({ toBuyCount: pendingCount });
-      return list;
+      return { toBuyCount: list.filter(item => !item.completed).length };
     } catch (err) {
       console.error('获取待购列表失败', err);
-      return [];
+      return { toBuyCount: 0 };
     }
   },
 
-  // 获取出行计划数量
-  async fetchTravelCount() {
+  // 获取出行数据
+  async _fetchTravelData() {
     try {
       const res = await api.getPendingTravelList();
-      const list = res.data || [];
-      this.setData({ travelCount: list.length });
-      return list;
+      return { travelCount: (res.data || []).length };
     } catch (err) {
       console.error('获取出行列表失败', err);
-      return [];
+      return { travelCount: 0 };
     }
   },
 
-  // 获取姨妈统计信息
-  async fetchPeriodStats() {
+  // 获取姨妈统计
+  async _fetchPeriodData() {
     try {
       const stats = await api.getPeriodStats();
-      // 四舍五入平均周期天数
       if (stats && stats.averageCycleDays) {
         stats.averageCycleDays = Math.round(stats.averageCycleDays);
       }
-      this.setData({ periodStats: stats });
       return stats;
     } catch (err) {
       console.error('获取姨妈统计失败', err);

@@ -16,7 +16,6 @@ Page({
     
     // 物品列表
     products: [],
-    filteredProducts: [],
     currentFilter: 'all',
     expiringSoonCount: 0,
     expiredCount: 0,
@@ -57,14 +56,11 @@ Page({
 
   // 初始化导航栏高度
   initNavbar() {
-    try {
-      const systemInfo = wx.getSystemInfoSync();
-      const statusBarHeight = systemInfo.statusBarHeight || 20;
-      const navbarHeight = statusBarHeight + 44 + 10;
-      this.setData({ statusBarHeight, navbarHeight });
-    } catch (e) {
-      console.error('获取系统信息失败', e);
-    }
+    const app = getApp();
+    const systemInfo = app.getSystemInfo();
+    const statusBarHeight = systemInfo.statusBarHeight || 20;
+    const navbarHeight = statusBarHeight + 44 + 10;
+    this.setData({ statusBarHeight, navbarHeight });
   },
 
   // Tab切换
@@ -106,9 +102,9 @@ Page({
         // 按过期时间排序
         products.sort((a, b) => new Date(a.bestBy) - new Date(b.bestBy));
         
+        // 不再存储 filteredProducts，改用 WXS 在模板层过滤
         this.setData({ 
           products,
-          filteredProducts: this.filterProducts(products, this.data.currentFilter),
           expiringSoonCount,
           expiredCount,
           loadingProducts: false
@@ -120,17 +116,9 @@ Page({
       });
   },
 
-  filterProducts(products, filter) {
-    if (filter === 'all') return products;
-    return products.filter(item => item.category === filter);
-  },
-
   onFilterChange(e) {
     const filter = e.currentTarget.dataset.filter;
-    this.setData({ 
-      currentFilter: filter,
-      filteredProducts: this.filterProducts(this.data.products, filter)
-    });
+    this.setData({ currentFilter: filter });
   },
 
   onUpdate(e) {
@@ -188,20 +176,27 @@ Page({
 
   toggleToBuyComplete(e) {
     const id = e.currentTarget.dataset.id;
-    const item = this.data.toBuyProducts.find(p => p.id === id);
-    if (!item) return;
+    const { toBuyProducts } = this.data;
+    const index = toBuyProducts.findIndex(p => p.id === id);
+    if (index === -1) return;
     
+    const item = toBuyProducts[index];
     const newCompleted = !item.completed;
     
-    // 乐观更新
-    const newList = this.data.toBuyProducts.map(p => 
-      p.id === id ? { ...p, completed: newCompleted } : p
-    );
+    // 优化：使用路径更新，只更新变化的字段
     this.setData({
-      toBuyProducts: newList,
-      toBuyPending: newList.filter(item => !item.completed),
-      toBuyCompleted: newList.filter(item => item.completed)
+      [`toBuyProducts[${index}].completed`]: newCompleted
     });
+    
+    // 延迟更新分组列表，避免频繁重绘
+    if (this._updatePendingTimer) clearTimeout(this._updatePendingTimer);
+    this._updatePendingTimer = setTimeout(() => {
+      const list = this.data.toBuyProducts;
+      this.setData({
+        toBuyPending: list.filter(item => !item.completed),
+        toBuyCompleted: list.filter(item => item.completed)
+      });
+    }, 300);
     
     // 发送请求
     api.put(`/ToBuy/${id}`, {

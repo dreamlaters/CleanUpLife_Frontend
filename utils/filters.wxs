@@ -1,0 +1,35 @@
+/**
+ * WXS 过滤器模块
+ * 在模板层过滤数据，避免 setData 传输大量重复数据
+ */
+
+/**
+ * 过滤物品列表
+ * @param {Array} products 物品列表
+ * @param {string} filter 过滤条件
+ * @returns {Array} 过滤后的列表
+ */
+function filterProducts(products, filter) {
+  if (!products || !products.length) return [];
+  if (filter === 'all') return products;
+  
+  var result = [];
+  for (var i = 0; i < products.length; i++) {
+    if (products[i].category === filter) {
+      result.push(products[i]);
+    }
+  }
+  return result;
+}
+
+/**
+ * 获取列表长度
+ */
+function getLength(arr) {
+  return arr ? arr.length : 0;
+}
+
+module.exports = {
+  filterProducts: filterProducts,
+  getLength: getLength
+};

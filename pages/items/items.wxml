@@ -1,4 +1,5 @@
 <!-- 物品管理页面 -->
+<wxs module="filters" src="../../utils/filters.wxs"></wxs>
 <view class="container">
   <!-- 自定义导航栏 -->
   <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
@@ -61,10 +62,10 @@
         <text class="loading-text">加载中...</text>
       </view>
       
-      <view class="item-list" wx:elif="{{filteredProducts.length}}">
+      <view class="item-list" wx:elif="{{filters.getLength(filters.filterProducts(products, currentFilter)) > 0}}">
         <view 
           class="item-card"
-          wx:for="{{filteredProducts}}" 
+          wx:for="{{filters.filterProducts(products, currentFilter)}}" 
           wx:key="id"
           data-id="{{item.id}}"
           data-category="{{item.category}}"

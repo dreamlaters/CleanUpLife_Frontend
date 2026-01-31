@@ -86,14 +86,11 @@ Page({
   },
 
   initNavbar() {
-    try {
-      const systemInfo = wx.getSystemInfoSync();
-      const statusBarHeight = systemInfo.statusBarHeight || 20;
-      const navbarHeight = statusBarHeight + 44 + 10;
-      this.setData({ statusBarHeight, navbarHeight });
-    } catch (e) {
-      console.error('获取系统信息失败', e);
-    }
+    const app = getApp();
+    const systemInfo = app.getSystemInfo();
+    const statusBarHeight = systemInfo.statusBarHeight || 20;
+    const navbarHeight = statusBarHeight + 44 + 10;
+    this.setData({ statusBarHeight, navbarHeight });
   },
 
   switchTab(e) {

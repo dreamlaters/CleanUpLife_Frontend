@@ -114,14 +114,11 @@ Page({
   },
 
   initNavbar() {
-    try {
-      const systemInfo = wx.getSystemInfoSync();
-      const statusBarHeight = systemInfo.statusBarHeight || 20;
-      const navbarHeight = statusBarHeight + 44 + 10;
-      this.setData({ statusBarHeight, navbarHeight });
-    } catch (e) {
-      console.error('获取系统信息失败', e);
-    }
+    const app = getApp();
+    const systemInfo = app.getSystemInfo();
+    const statusBarHeight = systemInfo.statusBarHeight || 20;
+    const navbarHeight = statusBarHeight + 44 + 10;
+    this.setData({ statusBarHeight, navbarHeight });
   },
 
   stopPropagation() {},
@@ -200,7 +197,9 @@ Page({
           const canvas = res[0].node;
           const ctx = canvas.getContext('2d');
           
-          const dpr = wx.getSystemInfoSync().pixelRatio;
+          // 使用缓存的 systemInfo
+          const app = getApp();
+          const dpr = app.getSystemInfo().pixelRatio || 2;
           canvas.width = res[0].width * dpr;
           canvas.height = res[0].height * dpr;
           ctx.scale(dpr, dpr);
