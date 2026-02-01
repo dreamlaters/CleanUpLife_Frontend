@@ -404,7 +404,7 @@ Page({
 
   toggleGoalComplete(e) {
     const id = e.currentTarget.dataset.id;
-    api.post(`/YearlyGoal/${id}/toggle-completed`, {}, { showLoading: false })
+    api.request({ url: `/YearlyGoal/${id}/toggle`, method: 'PATCH', showLoading: false })
       .then(() => {
         this.fetchYearlyGoals();
       })

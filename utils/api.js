@@ -119,7 +119,7 @@ const getTravelList = (options = {}) => {
  * 获取想去的地方列表（pending状态）
  */
 const getPendingTravelList = (options = {}) => {
-  return get('/Travel/status/0', { showLoading: false, ...options }).then(data => ({ data }));
+  return get('/Travel/status/Pending', { showLoading: false, ...options }).then(data => ({ data }));
 };
 
 // ==================== 姨妈记录 API ====================

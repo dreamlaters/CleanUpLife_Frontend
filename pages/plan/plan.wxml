@@ -278,19 +278,19 @@
 </view>
 
 <!-- 操作菜单 -->
-<view class="action-overlay {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
-  <view class="action-sheet" catchtap="">
-    <view class="action-header">
-      <text class="action-title">{{actionSheetTitle}}</text>
+<view class="action-sheet-mask {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
+  <view class="action-sheet {{showActionSheet ? 'show' : ''}}" catchtap="">
+    <view class="action-sheet-header">
+      <text class="action-sheet-title">{{actionSheetTitle}}</text>
     </view>
-    <view class="action-item" bindtap="onActionEdit">
-      <text class="action-icon">✏️</text>
-      <text class="action-text">编辑</text>
+    <view class="action-sheet-item" bindtap="onActionEdit">
+      <text>✏️</text>
+      <text>编辑</text>
     </view>
-    <view class="action-item action-danger" bindtap="onActionDelete">
-      <text class="action-icon">🗑️</text>
-      <text class="action-text">删除</text>
+    <view class="action-sheet-item action-sheet-item-danger" bindtap="onActionDelete">
+      <text>🗑️</text>
+      <text>删除</text>
     </view>
-    <view class="action-cancel" bindtap="hideActionSheet">取消</view>
+    <view class="action-sheet-item action-sheet-cancel" bindtap="hideActionSheet">取消</view>
   </view>
 </view>
