@@ -50,6 +50,13 @@ Page({
     goalFormYearList: [],
     goalFormYearIndex: 0,
     
+    // 子目标相关
+    expandedGoals: {},  // 展开状态 { goalId: true/false }
+    showSubGoalForm: false,
+    subGoalFormTitle: '',
+    editingSubGoalId: null,
+    currentGoalId: null,
+    
     // 操作菜单
     showActionSheet: false,
     actionSheetTitle: '',
@@ -281,7 +288,13 @@ Page({
       api.get(`/YearlyGoal?year=${goalCurrentYear}`, { showLoading: false }),
       api.get('/YearlyGoal/years', { showLoading: false })
     ]).then(([goals, years]) => {
-      const allGoals = goals || [];
+      const allGoals = (goals || []).map(g => ({
+        ...g,
+        subGoals: g.subGoals || [],
+        progress: g.progress || 0,
+        completedSubGoalsCount: g.completedSubGoalsCount || 0,
+        totalSubGoalsCount: g.totalSubGoalsCount || 0
+      }));
       const goalsPig = allGoals.filter(g => g.owner === 'Pig').sort((a, b) => {
         if (a.completed !== b.completed) return a.completed ? 1 : -1;
         return a.priority - b.priority;
@@ -429,7 +442,7 @@ Page({
   },
 
   onActionEdit() {
-    const { actionSheetType, actionSheetId } = this.data;
+    const { actionSheetType, actionSheetId, currentGoalId } = this.data;
     this.hideActionSheet();
     
     setTimeout(() => {
@@ -437,12 +450,14 @@ Page({
         this.showEditTravelForm(actionSheetId);
       } else if (actionSheetType === 'goal') {
         this.showEditGoalForm(actionSheetId);
+      } else if (actionSheetType === 'subgoal') {
+        this.showEditSubGoalForm(currentGoalId, actionSheetId);
       }
     }, 200);
   },
 
   onActionDelete() {
-    const { actionSheetType, actionSheetId } = this.data;
+    const { actionSheetType, actionSheetId, currentGoalId } = this.data;
     this.hideActionSheet();
     
     setTimeout(() => {
@@ -450,6 +465,8 @@ Page({
         this.deleteTravel(actionSheetId);
       } else if (actionSheetType === 'goal') {
         this.deleteGoal(actionSheetId);
+      } else if (actionSheetType === 'subgoal') {
+        this.deleteSubGoal(currentGoalId, actionSheetId);
       }
     }, 200);
   },
@@ -528,6 +545,143 @@ Page({
       .then(confirmed => {
         if (confirmed) {
           api.del(`/YearlyGoal/${id}`, { loadingText: '删除中...' })
+            .then(() => {
+              util.showSuccess('删除成功');
+              this.fetchYearlyGoals();
+            })
+            .catch(() => util.showError('删除失败'));
+        }
+      });
+  },
+
+  // ==================== 子目标相关 ====================
+  
+  // 展开/收起子目标
+  toggleGoalExpand(e) {
+    const id = e.currentTarget.dataset.id;
+    const expanded = this.data.expandedGoals[id];
+    this.setData({
+      [`expandedGoals.${id}`]: !expanded
+    });
+  },
+
+  // 切换子目标完成状态
+  toggleSubGoalComplete(e) {
+    const { goalId, subId } = e.currentTarget.dataset;
+    
+    // 获取当前目标状态，用于判断是否自动完成
+    const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
+    const goal = allGoals.find(g => g.id === goalId);
+    const wasCompleted = goal?.completed;
+    
+    api.request({
+      url: `/YearlyGoal/${goalId}/subgoals/${subId}/toggle`,
+      method: 'PATCH',
+      showLoading: false
+    }).then((updatedGoal) => {
+      // 检查主目标是否自动完成了
+      if (!wasCompleted && updatedGoal && updatedGoal.completed) {
+        util.showSuccess('目标完成！');
+      }
+      this.fetchYearlyGoals();
+    }).catch(() => util.showError('操作失败'));
+  },
+
+  // 显示添加子目标表单
+  showAddSubGoalForm(e) {
+    const goalId = e.currentTarget.dataset.goalId;
+    this.setData({
+      showSubGoalForm: true,
+      currentGoalId: goalId,
+      subGoalFormTitle: '',
+      editingSubGoalId: null
+    });
+  },
+
+  // 隐藏子目标表单
+  hideSubGoalForm() {
+    this.setData({
+      showSubGoalForm: false,
+      currentGoalId: null,
+      editingSubGoalId: null
+    });
+  },
+
+  // 子目标标题输入
+  onSubGoalTitleInput(e) {
+    this.setData({ subGoalFormTitle: e.detail.value });
+  },
+
+  // 提交子目标表单
+  submitSubGoalForm() {
+    const { subGoalFormTitle, currentGoalId, editingSubGoalId } = this.data;
+    
+    if (!subGoalFormTitle.trim()) {
+      util.showError('请输入子目标内容');
+      return;
+    }
+
+    const data = { title: subGoalFormTitle.trim() };
+
+    if (editingSubGoalId) {
+      // 更新
+      api.put(`/YearlyGoal/${currentGoalId}/subgoals/${editingSubGoalId}`, data, { loadingText: '更新中...' })
+        .then(() => {
+          util.showSuccess('更新成功');
+          this.hideSubGoalForm();
+          this.fetchYearlyGoals();
+        })
+        .catch(() => util.showError('更新失败'));
+    } else {
+      // 新增
+      api.post(`/YearlyGoal/${currentGoalId}/subgoals`, data, { loadingText: '添加中...' })
+        .then(() => {
+          util.showSuccess('添加成功');
+          this.hideSubGoalForm();
+          this.fetchYearlyGoals();
+        })
+        .catch(() => util.showError('添加失败'));
+    }
+  },
+
+  // 显示子目标操作菜单
+  showSubGoalActions(e) {
+    const { goalId, subId } = e.currentTarget.dataset;
+    const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
+    const goal = allGoals.find(g => g.id === goalId);
+    const subGoal = goal?.subGoals?.find(s => s.id === subId);
+    
+    this.setData({
+      showActionSheet: true,
+      actionSheetTitle: subGoal ? subGoal.title : '子目标操作',
+      actionSheetType: 'subgoal',
+      actionSheetId: subId,
+      currentGoalId: goalId
+    });
+  },
+
+  // 显示编辑子目标表单
+  showEditSubGoalForm(goalId, subGoalId) {
+    const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
+    const goal = allGoals.find(g => g.id === goalId);
+    const subGoal = goal?.subGoals?.find(s => s.id === subGoalId);
+    
+    if (!subGoal) return;
+    
+    this.setData({
+      showSubGoalForm: true,
+      currentGoalId: goalId,
+      subGoalFormTitle: subGoal.title,
+      editingSubGoalId: subGoalId
+    });
+  },
+
+  // 删除子目标
+  deleteSubGoal(goalId, subGoalId) {
+    util.showConfirm('确认删除', '确定要删除该子目标吗？')
+      .then(confirmed => {
+        if (confirmed) {
+          api.del(`/YearlyGoal/${goalId}/subgoals/${subGoalId}`, { loadingText: '删除中...' })
             .then(() => {
               util.showSuccess('删除成功');
               this.fetchYearlyGoals();

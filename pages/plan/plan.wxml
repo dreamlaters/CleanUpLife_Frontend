@@ -103,17 +103,50 @@
         
         <view class="goal-list">
           <view 
-            class="goal-item {{item.completed ? 'goal-item-completed' : ''}}"
+            class="goal-item-wrap {{item.completed ? 'goal-item-completed' : ''}}"
             wx:for="{{goalsPig}}" 
             wx:key="id"
-            data-id="{{item.id}}"
-            bindlongpress="showGoalActions"
           >
-            <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
-                  catchtap="toggleGoalComplete" data-id="{{item.id}}">
-              <text wx:if="{{item.completed}}">✓</text>
+            <!-- 主目标行 -->
+            <view class="goal-item" data-id="{{item.id}}" bindtap="toggleGoalExpand" bindlongpress="showGoalActions">
+              <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
+                    catchtap="toggleGoalComplete" data-id="{{item.id}}">
+                <text wx:if="{{item.completed}}">✓</text>
+              </view>
+              <view class="goal-content">
+                <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+                <!-- 进度条（有子目标时显示） -->
+                <view class="goal-progress" wx:if="{{item.subGoals.length}}">
+                  <view class="progress-bar">
+                    <view class="progress-fill" style="width: {{item.progress}}%"></view>
+                  </view>
+                  <text class="progress-text">{{item.completedSubGoalsCount}}/{{item.totalSubGoalsCount}}</text>
+                </view>
+              </view>
+              <view class="goal-expand-icon" wx:if="{{item.subGoals.length}}">
+                <text>{{expandedGoals[item.id] ? '▼' : '▶'}}</text>
+              </view>
             </view>
-            <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+            
+            <!-- 子目标列表 -->
+            <view class="sub-goals" wx:if="{{expandedGoals[item.id] || !item.subGoals.length}}">
+              <view class="sub-goal-item {{sub.completed ? 'sub-goal-completed' : ''}}"
+                    wx:for="{{item.subGoals}}" wx:for-item="sub" wx:key="id"
+                    data-goal-id="{{item.id}}" data-sub-id="{{sub.id}}"
+                    bindlongpress="showSubGoalActions">
+                <view class="sub-goal-checkbox {{sub.completed ? 'sub-goal-checkbox-checked' : ''}}"
+                      catchtap="toggleSubGoalComplete" 
+                      data-goal-id="{{item.id}}" data-sub-id="{{sub.id}}">
+                  <text wx:if="{{sub.completed}}">✓</text>
+                </view>
+                <text class="sub-goal-title {{sub.completed ? 'sub-goal-title-completed' : ''}}">{{sub.title}}</text>
+              </view>
+              
+              <!-- 添加子目标按钮 -->
+              <view class="add-sub-goal-btn" catchtap="showAddSubGoalForm" data-goal-id="{{item.id}}">
+                <text>+ 子目标</text>
+              </view>
+            </view>
           </view>
           
           <view class="goal-empty" wx:if="{{!goalsPig.length && !loadingGoals}}">
@@ -136,17 +169,50 @@
         
         <view class="goal-list">
           <view 
-            class="goal-item {{item.completed ? 'goal-item-completed' : ''}}"
+            class="goal-item-wrap {{item.completed ? 'goal-item-completed' : ''}}"
             wx:for="{{goalsDonkey}}" 
             wx:key="id"
-            data-id="{{item.id}}"
-            bindlongpress="showGoalActions"
           >
-            <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
-                  catchtap="toggleGoalComplete" data-id="{{item.id}}">
-              <text wx:if="{{item.completed}}">✓</text>
+            <!-- 主目标行 -->
+            <view class="goal-item" data-id="{{item.id}}" bindtap="toggleGoalExpand" bindlongpress="showGoalActions">
+              <view class="goal-checkbox {{item.completed ? 'goal-checkbox-checked' : ''}}" 
+                    catchtap="toggleGoalComplete" data-id="{{item.id}}">
+                <text wx:if="{{item.completed}}">✓</text>
+              </view>
+              <view class="goal-content">
+                <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+                <!-- 进度条（有子目标时显示） -->
+                <view class="goal-progress" wx:if="{{item.subGoals.length}}">
+                  <view class="progress-bar">
+                    <view class="progress-fill" style="width: {{item.progress}}%"></view>
+                  </view>
+                  <text class="progress-text">{{item.completedSubGoalsCount}}/{{item.totalSubGoalsCount}}</text>
+                </view>
+              </view>
+              <view class="goal-expand-icon" wx:if="{{item.subGoals.length}}">
+                <text>{{expandedGoals[item.id] ? '▼' : '▶'}}</text>
+              </view>
             </view>
-            <text class="goal-title {{item.completed ? 'goal-title-completed' : ''}}">{{item.title}}</text>
+            
+            <!-- 子目标列表 -->
+            <view class="sub-goals" wx:if="{{expandedGoals[item.id] || !item.subGoals.length}}">
+              <view class="sub-goal-item {{sub.completed ? 'sub-goal-completed' : ''}}"
+                    wx:for="{{item.subGoals}}" wx:for-item="sub" wx:key="id"
+                    data-goal-id="{{item.id}}" data-sub-id="{{sub.id}}"
+                    bindlongpress="showSubGoalActions">
+                <view class="sub-goal-checkbox {{sub.completed ? 'sub-goal-checkbox-checked' : ''}}"
+                      catchtap="toggleSubGoalComplete" 
+                      data-goal-id="{{item.id}}" data-sub-id="{{sub.id}}">
+                  <text wx:if="{{sub.completed}}">✓</text>
+                </view>
+                <text class="sub-goal-title {{sub.completed ? 'sub-goal-title-completed' : ''}}">{{sub.title}}</text>
+              </view>
+              
+              <!-- 添加子目标按钮 -->
+              <view class="add-sub-goal-btn" catchtap="showAddSubGoalForm" data-goal-id="{{item.id}}">
+                <text>+ 子目标</text>
+              </view>
+            </view>
           </view>
           
           <view class="goal-empty" wx:if="{{!goalsDonkey.length && !loadingGoals}}">
@@ -273,6 +339,28 @@
     <view class="modal-footer">
       <button class="btn btn-secondary" bindtap="hideGoalForm">取消</button>
       <button class="btn btn-primary" bindtap="submitGoalForm">确定</button>
+    </view>
+  </view>
+</view>
+
+<!-- 子目标表单弹窗 -->
+<view class="modal-overlay {{showSubGoalForm ? 'show' : ''}}" catchtap="hideSubGoalForm" wx:if="{{showSubGoalForm}}">
+  <view class="modal-content modal-content-small" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingSubGoalId ? '✏️ 编辑子目标' : '📝 添加子目标'}}</text>
+      <view class="modal-close" bindtap="hideSubGoalForm">×</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">子目标内容</text>
+        <input class="form-input" placeholder="输入子目标..." value="{{subGoalFormTitle}}" bindinput="onSubGoalTitleInput" focus="{{showSubGoalForm}}" />
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideSubGoalForm">取消</button>
+      <button class="btn btn-primary" bindtap="submitSubGoalForm">确定</button>
     </view>
   </view>
 </view>
