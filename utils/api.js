@@ -16,50 +16,80 @@ const BASE_URL = 'https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsite
  * @returns {Promise} 返回 Promise
  */
 const request = (options) => {
-  return new Promise((resolve, reject) => {
-    const {
-      url,
-      method = 'GET',
-      data = {},
-      showLoading = true,
-      loadingText = '加载中...'
-    } = options;
+  const app = getApp();
 
-    if (showLoading) {
-      wx.showLoading({ title: loadingText });
-    }
+  // 确保登录完成后再发请求（跳过登录接口本身）
+  const loginReady = (options.skipAuth || options.url === '/OpenId/wechat')
+    ? Promise.resolve()
+    : (app._loginPromise || app.login());
 
-    wx.request({
-      url: `${BASE_URL}${url}`,
-      method,
-      data,
-      header: {
-        'content-type': 'application/json'
-      },
-      success: (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
-        } else if (res.statusCode === 409) {
-          // 冲突响应，返回完整信息供调用方处理
-          const error = new Error(res.data?.message || '发现重复记录');
-          error.statusCode = 409;
-          error.data = res.data;
-          reject(error);
-        } else {
-          const errorMsg = res.data?.message || '请求失败';
-          wx.showToast({ title: errorMsg, icon: 'error' });
-          reject(new Error(errorMsg));
-        }
-      },
-      fail: (err) => {
-        wx.showToast({ title: '网络错误', icon: 'error' });
-        reject(err);
-      },
-      complete: () => {
-        if (showLoading) {
-          wx.hideLoading();
-        }
+  return loginReady.then(() => {
+    return new Promise((resolve, reject) => {
+      const {
+        url,
+        method = 'GET',
+        data = {},
+        showLoading = true,
+        loadingText = '加载中...'
+      } = options;
+
+      if (showLoading) {
+        wx.showLoading({ title: loadingText });
       }
+
+      wx.request({
+        url: `${BASE_URL}${url}`,
+        method,
+        data,
+        header: {
+          'content-type': 'application/json',
+          'X-Auth-Token': app.globalData.token || ''
+        },
+        success: (res) => {
+          if (res.statusCode === 401) {
+            // token 过期或无效，重新登录后重试（最多重试3次）
+            const retryCount = options._retryCount || 0;
+            if (retryCount >= 3) {
+              reject(new Error('认证失败，请重新打开小程序'));
+              return;
+            }
+            console.warn('Token 无效，正在重新登录...');
+            app._loginPromise = null;
+            app.login().then(() => {
+              request({ ...options, _retryCount: retryCount + 1 }).then(resolve).catch(reject);
+            }).catch((err) => {
+              reject(err);
+            });
+            return;
+          }
+          if (res.statusCode === 403) {
+            wx.redirectTo({ url: '/pages/blocked/blocked' });
+            reject(new Error('无权限访问'));
+            return;
+          }
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data);
+          } else if (res.statusCode === 409) {
+            const error = new Error(res.data?.message || '发现重复记录');
+            error.statusCode = 409;
+            error.data = res.data;
+            reject(error);
+          } else {
+            const errorMsg = res.data?.message || '请求失败';
+            wx.showToast({ title: errorMsg, icon: 'error' });
+            reject(new Error(errorMsg));
+          }
+        },
+        fail: (err) => {
+          wx.showToast({ title: '网络错误', icon: 'error' });
+          reject(err);
+        },
+        complete: () => {
+          if (showLoading) {
+            wx.hideLoading();
+          }
+        }
+      });
     });
   });
 };

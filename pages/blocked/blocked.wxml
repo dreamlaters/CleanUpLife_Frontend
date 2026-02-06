@@ -1,0 +1,18 @@
+<!-- 访问受限页面 -->
+<view class="container">
+  <view class="blocked-card">
+    <!-- 图标 -->
+    <view class="blocked-icon-wrap">
+      <text class="blocked-icon">🚫</text>
+    </view>
+
+    <!-- 标题 -->
+    <view class="blocked-title">访问受限</view>
+    <view class="blocked-subtitle">{{message}}</view>
+
+    <!-- 提示 -->
+    <view class="hint-section">
+      <text class="hint-text">如需获取访问权限，请联系管理员申请加入白名单。</text>
+    </view>
+  </view>
+</view>

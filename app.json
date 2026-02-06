@@ -9,7 +9,8 @@
     "pages/openid/openid",
     "pages/tobuy/add",
     "pages/tobuy/update",
-    "pages/pet/pet"
+    "pages/pet/pet",
+    "pages/blocked/blocked"
   ],
   "window": {
     "navigationBarBackgroundColor": "#6366f1",

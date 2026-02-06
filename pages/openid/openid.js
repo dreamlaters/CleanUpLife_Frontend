@@ -17,52 +17,19 @@ Page({
 
   // ==================== 获取 OpenID ====================
   _getOpenid() {
-    wx.login({
-      success: (res) => {
-        if (res.code) {
-          this._fetchOpenid(res.code);
-        } else {
-          this.setData({ 
-            openid: '获取登录凭证失败',
-            loading: false 
-          });
-        }
-      },
-      fail: () => {
-        this.setData({ 
-          openid: 'wx.login失败',
-          loading: false 
-        });
-      }
-    });
-  },
-
-  _fetchOpenid(code) {
-    wx.request({
-      url: `${api.BASE_URL}/OpenId/wechat`,
-      method: 'POST',
-      data: { Code: code },
-      success: (resp) => {
-        let openid = '';
-        if (resp.data?.openid) {
-          openid = resp.data.openid;
-        } else if (typeof resp.data === 'string') {
-          try {
-            // 兼容处理特殊格式响应
-            const parsed = JSON.parse(resp.data.toString().substr(18));
-            openid = parsed.openid;
-          } catch (e) {
-            openid = '解析响应失败';
-          }
-        }
-        this.setData({ openid, loading: false });
-      },
-      fail: () => {
-        this.setData({ 
-          openid: '请求失败',
-          loading: false 
-        });
-      }
+    const app = getApp();
+    // 等待登录完成后从 globalData 获取，避免重复调用登录接口
+    const loginPromise = app._loginPromise || app.login();
+    loginPromise.then(() => {
+      this.setData({
+        openid: app.globalData.openid || '未获取',
+        loading: false
+      });
+    }).catch(() => {
+      this.setData({
+        openid: '获取失败',
+        loading: false
+      });
     });
   },
 
