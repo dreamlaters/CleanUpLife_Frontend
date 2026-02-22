@@ -59,6 +59,43 @@ const COUNTRY_LIST = [
   '丹麦', '芬兰', '冰岛', '其他'
 ];
 
+// ==================== 体检相关 ====================
+
+// 检查项状态
+const CHECKUP_STATUS = {
+  Normal: '正常',
+  High: '偏高',
+  Low: '偏低',
+  Abnormal: '异常'
+};
+
+// 体检人
+const CHECKUP_OWNERS = ['Pig', 'Donkey'];
+const CHECKUP_OWNER_CONFIG = {
+  'Pig': { emoji: '🐷', name: '猪猪' },
+  'Donkey': { emoji: '🫏', name: '毛驴' }
+};
+
+// 体检项分类
+const CHECKUP_CATEGORIES = [
+  '基础检查', '血常规', '尿常规', '肿瘤标志物', 
+  '肝功能', '血糖', '肾功能', '血脂', '甲状腺', '其他'
+];
+
+// 体检预设模板分类及项目数量（实际定义存储在后端 metadata）
+const CHECKUP_TEMPLATE_COUNTS = {
+  '基础检查': 6,
+  '血常规': 20,
+  '尿常规': 3,
+  '肿瘤标志物': 3,
+  '肝功能': 5,
+  '血糖': 1,
+  '肾功能': 3,
+  '血脂': 6,
+  '甲状腺': 1,
+  '其他': 1
+};
+
 module.exports = {
   CATEGORIES,
   CATEGORY_MAP,
@@ -70,5 +107,11 @@ module.exports = {
   LOCATION_SITES,
   TRAVEL_TYPES,
   TRAVEL_STATUS,
-  COUNTRY_LIST
+  COUNTRY_LIST,
+  // 体检相关
+  CHECKUP_STATUS,
+  CHECKUP_OWNERS,
+  CHECKUP_OWNER_CONFIG,
+  CHECKUP_CATEGORIES,
+  CHECKUP_TEMPLATE_COUNTS
 };

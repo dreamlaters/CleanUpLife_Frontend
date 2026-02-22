@@ -1,4 +1,4 @@
-<!-- 记录页面 - 猫猫体重 + 姨妈记录 -->
+<!-- 记录页面 - 猫猫体重 + 姨妈记录 + 体检记录 -->
 <view class="container">
   <!-- 自定义导航栏 -->
   <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
@@ -17,6 +17,10 @@
     <view class="top-tab {{currentTab === 'period' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="period">
       <text class="top-tab-icon">🌸</text>
       <text class="top-tab-text">姨妈记录</text>
+    </view>
+    <view class="top-tab {{currentTab === 'checkup' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="checkup">
+      <text class="top-tab-icon">🏥</text>
+      <text class="top-tab-text">体检记录</text>
     </view>
   </view>
 
@@ -300,7 +304,106 @@
       <text class="loading-text">加载中...</text>
     </view>
   </view>
+  <!-- ==================== 体检内容 ==================== -->
+  <view class="tab-content" wx:if="{{currentTab === 'checkup'}}">
+    <!-- 人员切换 -->
+    <view class="checkup-owner-tabs">
+      <view 
+        class="checkup-owner-tab {{checkupOwner === item ? 'checkup-owner-tab-active' : ''}}"
+        wx:for="{{checkupOwners}}"
+        wx:key="*this"
+        wx:for-item="item"
+        bindtap="onCheckupOwnerChange"
+        data-owner="{{item}}"
+      >
+        <text class="checkup-owner-emoji">{{checkupOwnerConfig[item].emoji}}</text>
+        <text class="checkup-owner-name">{{checkupOwnerConfig[item].name}}</text>
+      </view>
+    </view>
 
+    <!-- 加载状态 -->
+    <view class="loading-container" wx:if="{{loadingCheckup}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 最近体检概览卡片 -->
+    <view class="checkup-summary-card" wx:if="{{checkupRecords.length > 0 && !loadingCheckup}}">
+      <view class="checkup-summary-icon">📋</view>
+      <view class="checkup-summary-info">
+        <text class="checkup-summary-title">最近一次体检</text>
+        <text class="checkup-summary-date">{{checkupRecords[0].checkupDateFormatted}}</text>
+        <text class="checkup-summary-hospital" wx:if="{{checkupRecords[0].hospital}}">{{checkupRecords[0].hospital}}</text>
+      </view>
+      <view class="checkup-summary-stats">
+        <view class="checkup-stat-item" wx:if="{{checkupRecords[0].abnormalCount > 0}}">
+          <text class="checkup-stat-num abnormal">{{checkupRecords[0].abnormalCount}}</text>
+          <text class="checkup-stat-label">异常</text>
+        </view>
+        <view class="checkup-stat-item">
+          <text class="checkup-stat-num normal">{{checkupRecords[0].normalCount}}</text>
+          <text class="checkup-stat-label">正常</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 体检记录列表 -->
+    <view class="section-card" wx:if="{{checkupRecords.length > 0 && !loadingCheckup}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-icon">📅</view>
+          <text class="section-title">历史记录</text>
+        </view>
+        <view class="section-badge">{{checkupRecords.length}}次</view>
+      </view>
+
+      <view class="checkup-record-list">
+        <view 
+          class="checkup-record-item"
+          wx:for="{{checkupRecords}}"
+          wx:key="id"
+          bindtap="goToCheckupDetail"
+          bindlongpress="onCheckupLongPress"
+          data-id="{{item.id}}"
+        >
+          <view class="checkup-record-left">
+            <text class="checkup-record-date">{{item.checkupDateFormatted}}</text>
+            <text class="checkup-record-hospital" wx:if="{{item.hospital}}">{{item.hospital}}</text>
+          </view>
+          <view class="checkup-record-right">
+            <view class="checkup-badge abnormal" wx:if="{{item.abnormalCount > 0}}">
+              <text>⚠️ {{item.abnormalCount}}项异常</text>
+            </view>
+            <view class="checkup-badge normal">
+              <text>✅ {{item.normalCount}}项正常</text>
+            </view>
+            <text class="checkup-record-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loadingCheckup && checkupRecords.length === 0}}">
+      <text class="empty-icon">🏥</text>
+      <text class="empty-title">暂无体检记录</text>
+      <text class="empty-text">点击下方按钮，开始记录体检结果</text>
+    </view>
+
+    <!-- 悬浮添加按钮 -->
+    <view class="fab-btn" bindtap="goToAddCheckup">
+      <text class="fab-icon">+</text>
+    </view>
+
+    <!-- 底部消息推送入口 -->
+    <view class="footer-link-wrap">
+      <navigator url="/pages/openid/openid" class="footer-link">
+        <text class="footer-link-icon">🔔</text>
+        <text class="footer-link-text">消息推送设置</text>
+        <text class="footer-link-arrow">›</text>
+      </navigator>
+    </view>
+  </view>
   <view class="safe-bottom"></view>
 </view>
 
@@ -471,5 +574,23 @@
       <button class="btn btn-danger" bindtap="deletePeriodRecord">删除</button>
       <button class="btn btn-primary btn-pink" bindtap="submitPeriodEdit">保存</button>
     </view>
+  </view>
+</view>
+
+<!-- ==================== 体检操作菜单 ==================== -->
+<view class="action-overlay {{showCheckupActionSheet ? 'show' : ''}}" bindtap="hideCheckupActionSheet" wx:if="{{showCheckupActionSheet}}">
+  <view class="action-sheet" catchtap="">
+    <view class="action-header">
+      <text class="action-title">体检记录操作</text>
+    </view>
+    <view class="action-item" bindtap="onEditCheckupAction">
+      <text class="action-icon">✏️</text>
+      <text class="action-text">编辑记录</text>
+    </view>
+    <view class="action-item action-danger" bindtap="onDeleteCheckupAction">
+      <text class="action-icon">🗑️</text>
+      <text class="action-text">删除记录</text>
+    </view>
+    <view class="action-cancel" bindtap="hideCheckupActionSheet">取消</view>
   </view>
 </view>

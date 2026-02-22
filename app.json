@@ -10,7 +10,9 @@
     "pages/tobuy/add",
     "pages/tobuy/update",
     "pages/pet/pet",
-    "pages/blocked/blocked"
+    "pages/blocked/blocked",
+    "pages/checkup/add",
+    "pages/checkup/detail"
   ],
   "window": {
     "navigationBarBackgroundColor": "#6366f1",

@@ -1,0 +1,248 @@
+<!-- 新增/编辑体检记录 -->
+<view class="container">
+  <!-- 基础信息 -->
+  <view class="form-card">
+    <view class="form-card-title">{{isEdit ? '✏️ 编辑体检记录' : '📋 新增体检记录'}}</view>
+
+    <!-- 体检人 -->
+    <view class="form-group">
+      <text class="form-label">👤 体检人</text>
+      <picker mode="selector" range="{{owners}}" value="{{ownerIndex}}" bindchange="onOwnerChange">
+        <view class="picker-display">
+          <text class="picker-emoji">{{ownerConfig[owner].emoji}}</text>
+          <text class="picker-text">{{ownerConfig[owner].name}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 日期 -->
+    <view class="form-group">
+      <text class="form-label">📅 体检日期</text>
+      <picker mode="date" value="{{checkupDate}}" bindchange="onDateChange">
+        <view class="picker-display">
+          <text class="picker-text">{{checkupDate}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 机构 -->
+    <view class="form-group">
+      <text class="form-label">🏥 体检机构</text>
+      <input class="form-input" placeholder="请输入体检机构（选填）" value="{{hospital}}" bindinput="onHospitalInput" />
+    </view>
+  </view>
+
+  <!-- 检查项列表 -->
+  <view class="form-card">
+    <view class="items-header">
+      <text class="form-card-title">🔬 检查项目</text>
+      <view class="items-header-actions">
+        <view class="template-btn" bindtap="showTemplates">
+          <text class="template-btn-icon">📑</text>
+          <text>快速添加</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 已添加的检查项 — 快速编辑模式（仅输入值，状态由后端自判） -->
+    <view class="items-list" wx:if="{{items.length > 0}}">
+      <view class="items-category-group" wx:for="{{categoryList}}" wx:key="*this" wx:for-item="cat">
+        <block wx:if="{{categoriesWithItems[cat]}}">
+          <view class="items-category-title">{{cat}}</view>
+          <view 
+            class="quick-item-row"
+            wx:for="{{items}}" 
+            wx:key="name"
+            wx:for-item="item"
+            wx:for-index="idx"
+            wx:if="{{item.category === cat}}"
+          >
+            <view class="quick-item-name">
+              <text>{{item.name}}</text>
+            </view>
+            <view class="quick-item-controls">
+              <input 
+                wx:if="{{!item.isComputed}}"
+                class="quick-value-input"
+                type="digit"
+                placeholder="结果"
+                value="{{item.value}}"
+                data-index="{{idx}}"
+                bindinput="onQuickValueInput"
+              />
+              <view wx:else class="quick-value-computed">
+                <text class="computed-value">{{item.value || '自动计算'}}</text>
+                <text class="computed-tag">自动</text>
+              </view>
+              <view class="quick-item-actions">
+                <text class="quick-edit-btn" bindtap="showEditItem" data-index="{{idx}}">✏️</text>
+                <text class="quick-delete-btn" bindtap="deleteItem" data-index="{{idx}}">✕</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <!-- 未分类的项 -->
+      <block wx:if="{{hasUncategorizedItems}}">
+        <view class="items-category-title">其他</view>
+        <view 
+          class="quick-item-row"
+          wx:for="{{items}}" 
+          wx:key="name"
+          wx:for-item="item"
+          wx:for-index="idx"
+          wx:if="{{item._uncategorized}}"
+        >
+          <view class="quick-item-name">
+            <text>{{item.name}}</text>
+          </view>
+          <view class="quick-item-controls">
+            <input 
+              wx:if="{{!item.isComputed}}"
+              class="quick-value-input"
+              type="digit"
+              placeholder="结果"
+              value="{{item.value}}"
+              data-index="{{idx}}"
+              bindinput="onQuickValueInput"
+            />
+            <view wx:else class="quick-value-computed">
+              <text class="computed-value">{{item.value || '自动计算'}}</text>
+              <text class="computed-tag">自动</text>
+            </view>
+            <view class="quick-item-actions">
+              <text class="quick-edit-btn" bindtap="showEditItem" data-index="{{idx}}">✏️</text>
+              <text class="quick-delete-btn" bindtap="deleteItem" data-index="{{idx}}">✕</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="items-empty" wx:if="{{items.length === 0}}">
+      <text class="items-empty-icon">📭</text>
+      <text class="items-empty-text">还没有添加检查项</text>
+      <text class="items-empty-hint">点击「快速添加」从模板导入，或手动添加</text>
+    </view>
+
+    <!-- 添加按钮 -->
+    <view class="add-item-btn" bindtap="showAddItem">
+      <text class="add-item-icon">+</text>
+      <text>手动添加检查项</text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="form-card">
+    <view class="form-group">
+      <text class="form-label">📝 备注</text>
+      <textarea 
+        class="form-textarea"
+        placeholder="体检总结备注（选填）"
+        value="{{notes}}"
+        bindinput="onNotesInput"
+        auto-height
+        maxlength="500"
+      />
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <button class="submit-button {{submitting ? 'submitting' : ''}}" bindtap="submitForm" disabled="{{submitting}}">
+    <text class="submit-icon">✓</text>
+    <text>{{isEdit ? '更新记录' : '保存记录'}}</text>
+  </button>
+  <view class="items-count" wx:if="{{items.length > 0}}">
+    共 {{items.length}} 项检查
+  </view>
+  <view class="auto-judge-hint">
+    <text>💡 提交后系统将自动判定各项指标状态</text>
+  </view>
+</view>
+
+<!-- ==================== 模板选择弹窗 ==================== -->
+<view class="modal-overlay {{showTemplateModal ? 'show' : ''}}" catchtap="hideTemplateModal" wx:if="{{showTemplateModal}}">
+  <view class="modal-content modal-tall" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">📑 快速添加检查项</text>
+      <view class="modal-close" bindtap="hideTemplateModal">×</view>
+    </view>
+
+    <scroll-view class="modal-body template-scroll" scroll-y>
+      <view class="template-hint">选择要添加的检查套餐，已有项目不会重复添加</view>
+      <view 
+        class="template-option {{selectedTemplates[cat] ? 'template-selected' : ''}}"
+        wx:for="{{templateCategories}}"
+        wx:key="*this"
+        wx:for-item="cat"
+        bindtap="toggleTemplate"
+        data-category="{{cat}}"
+      >
+        <view class="template-check">
+          <view class="template-checkbox {{selectedTemplates[cat] ? 'checked' : ''}}">
+            <text wx:if="{{selectedTemplates[cat]}}">✓</text>
+          </view>
+        </view>
+        <view class="template-info">
+          <text class="template-name">{{cat}}</text>
+          <text class="template-count">({{templateCounts[cat]}}项)</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideTemplateModal">取消</button>
+      <button class="btn btn-primary" bindtap="applyTemplates">确认添加</button>
+    </view>
+  </view>
+</view>
+
+<!-- ==================== 检查项编辑弹窗（简化：仅名称、分类、值、备注） ==================== -->
+<view class="modal-overlay {{showItemForm ? 'show' : ''}}" catchtap="hideItemForm" wx:if="{{showItemForm}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingItemIndex >= 0 ? '编辑检查项' : '添加检查项'}}</text>
+      <view class="modal-close" bindtap="hideItemForm">×</view>
+    </view>
+
+    <scroll-view class="modal-body" scroll-y style="max-height: 60vh;">
+      <view class="form-group">
+        <text class="form-label">项目名称 *</text>
+        <input class="form-input" placeholder="如：空腹血糖" value="{{itemForm.name}}" bindinput="onItemNameInput" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">分类</text>
+        <picker mode="selector" range="{{categoryList}}" value="{{itemForm.categoryIndex}}" bindchange="onItemCategoryChange">
+          <view class="picker-display">
+            <text class="picker-text">{{categoryList[itemForm.categoryIndex]}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">结果值</text>
+        <input class="form-input" placeholder="如: 5.8" value="{{itemForm.value}}" bindinput="onItemValueInput" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">备注</text>
+        <input class="form-input" placeholder="选填" value="{{itemForm.notes}}" bindinput="onItemNotesInput" />
+      </view>
+
+      <view class="auto-judge-note">
+        <text>💡 单位、参考范围和状态由系统自动判定</text>
+      </view>
+    </scroll-view>
+
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideItemForm">取消</button>
+      <button class="btn btn-primary" bindtap="saveItem">确定</button>
+    </view>
+  </view>
+</view>

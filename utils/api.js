@@ -203,6 +203,51 @@ const deletePeriod = (id, options = {}) => {
   return del(`/Period/${id}`, options);
 };
 
+// ==================== 体检记录 API ====================
+
+/**
+ * 获取体检记录列表
+ */
+const getCheckupList = (owner, options = {}) => {
+  const url = owner ? `/HealthCheckup/list?owner=${owner}` : '/HealthCheckup/list';
+  return get(url, { showLoading: false, ...options });
+};
+
+/**
+ * 获取单条体检记录
+ */
+const getCheckupById = (id, options = {}) => {
+  return get(`/HealthCheckup/${id}`, { showLoading: false, ...options });
+};
+
+/**
+ * 创建体检记录
+ */
+const createCheckup = (data, options = {}) => {
+  return post('/HealthCheckup', data, options);
+};
+
+/**
+ * 更新体检记录
+ */
+const updateCheckup = (id, data, options = {}) => {
+  return put(`/HealthCheckup/${id}`, data, options);
+};
+
+/**
+ * 删除体检记录
+ */
+const deleteCheckup = (id, options = {}) => {
+  return del(`/HealthCheckup/${id}`, options);
+};
+
+/**
+ * 获取体检检查项元数据定义（参考范围、单位等）
+ */
+const getCheckupMetadata = (options = {}) => {
+  return get('/CheckupMetadata', { showLoading: false, ...options });
+};
+
 module.exports = {
   BASE_URL,
   request,
@@ -221,5 +266,12 @@ module.exports = {
   recordPeriodStart,
   recordPeriodEnd,
   updatePeriod,
-  deletePeriod
+  deletePeriod,
+  // 体检记录
+  getCheckupList,
+  getCheckupById,
+  createCheckup,
+  updateCheckup,
+  deleteCheckup,
+  getCheckupMetadata
 };

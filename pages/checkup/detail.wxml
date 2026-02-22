@@ -1,0 +1,90 @@
+<!-- 体检详情页面 -->
+<view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{checkup && !loading}}">
+    <!-- 头部信息卡片 -->
+    <view class="detail-header-card">
+      <view class="detail-header-top">
+        <view class="detail-owner">
+          <text class="detail-owner-emoji">{{ownerConfig[checkup.owner].emoji}}</text>
+          <text class="detail-owner-name">{{ownerConfig[checkup.owner].name}}</text>
+        </view>
+        <view class="detail-date">{{checkup.checkupDateFormatted}}</view>
+      </view>
+      <view class="detail-hospital" wx:if="{{checkup.hospital}}">
+        <text class="hospital-icon">🏥</text>
+        <text>{{checkup.hospital}}</text>
+      </view>
+      <view class="detail-stats-row">
+        <view class="detail-stat">
+          <text class="detail-stat-num total">{{checkup.items.length}}</text>
+          <text class="detail-stat-label">检查项</text>
+        </view>
+        <view class="detail-stat" wx:if="{{checkup.abnormalCount > 0}}">
+          <text class="detail-stat-num abnormal">{{checkup.abnormalCount}}</text>
+          <text class="detail-stat-label">异常</text>
+        </view>
+        <view class="detail-stat">
+          <text class="detail-stat-num normal">{{checkup.normalCount}}</text>
+          <text class="detail-stat-label">正常</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类展示 -->
+    <view class="category-section" wx:for="{{groupedItems}}" wx:key="category">
+      <view class="category-header" bindtap="toggleCategory" data-category="{{item.category}}">
+        <view class="category-title-wrap">
+          <text class="category-title">{{item.category}}</text>
+          <view class="category-abnormal-badge" wx:if="{{item.abnormalCount > 0}}">
+            <text>{{item.abnormalCount}}项异常</text>
+          </view>
+          <view class="category-normal-tag" wx:else>
+            <text>正常</text>
+          </view>
+        </view>
+        <text class="category-arrow {{expandedCategories[item.category] ? 'expanded' : ''}}">›</text>
+      </view>
+
+      <view class="category-items" wx:if="{{expandedCategories[item.category]}}">
+        <view 
+          class="checkup-item-row {{subItem.status !== 'Normal' ? 'item-abnormal' : ''}}"
+          wx:for="{{item.items}}" 
+          wx:key="id"
+          wx:for-item="subItem"
+        >
+          <view class="item-left">
+            <text class="item-name">{{subItem.name}}</text>
+            <text class="item-reference" wx:if="{{subItem.referenceRange}}">参考: {{subItem.referenceRange}} {{subItem.unit || ''}}</text>
+          </view>
+          <view class="item-right">
+            <view class="item-value-wrap">
+              <text class="item-value {{subItem.status !== 'Normal' ? 'value-abnormal' : ''}}">{{subItem.value}}</text>
+              <text class="item-unit" wx:if="{{subItem.unit}}">{{subItem.unit}}</text>
+            </view>
+            <view class="item-status-badge status-{{subItem.status}}">
+              <text>{{statusMap[subItem.status]}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 备注 -->
+    <view class="detail-notes" wx:if="{{checkup.notes}}">
+      <text class="notes-label">📝 备注</text>
+      <text class="notes-content">{{checkup.notes}}</text>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="detail-actions">
+      <button class="action-btn edit-btn" bindtap="goToEdit">✏️ 编辑</button>
+      <button class="action-btn delete-btn" bindtap="deleteCheckup">🗑️ 删除</button>
+    </view>
+  </block>
+</view>

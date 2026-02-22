@@ -1,9 +1,10 @@
 /**
  * 记录页面逻辑
- * 猫猫体重 + 姨妈记录
+ * 猫猫体重 + 姨妈记录 + 体检记录
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
+const constants = require('../../utils/constants');
 
 // 宠物配置
 const PERSON_CONFIG = {
@@ -73,7 +74,16 @@ Page({
     showPeriodEditModal: false,
     editStartDate: '',
     editEndDate: '',
-    editNotes: ''
+    editNotes: '',
+
+    // ==================== 体检相关 ====================
+    checkupRecords: [],
+    checkupOwner: 'Pig',
+    checkupOwners: constants.CHECKUP_OWNERS,
+    checkupOwnerConfig: constants.CHECKUP_OWNER_CONFIG,
+    loadingCheckup: false,
+    showCheckupActionSheet: false,
+    checkupActionSheetId: ''
   },
 
   onLoad(options) {
@@ -104,13 +114,14 @@ Page({
     if (app.globalData && app.globalData.targetTab) {
       const targetTab = app.globalData.targetTab;
       app.globalData.targetTab = null;
-      if (targetTab === 'weight' || targetTab === 'period') {
+      if (targetTab === 'weight' || targetTab === 'period' || targetTab === 'checkup') {
         this.setData({ currentTab: targetTab });
       }
     }
     
     this.fetchWeightRecords();
     this.fetchPeriodData();
+    this.fetchCheckupRecords();
   },
 
   initNavbar() {
@@ -132,6 +143,9 @@ Page({
       setTimeout(() => {
         this.initCanvas();
       }, 100);
+    }
+    if (tab === 'checkup') {
+      this.fetchCheckupRecords();
     }
   },
 
@@ -875,6 +889,83 @@ Page({
           } catch (err) {
             wx.hideLoading();
             console.error('删除失败', err);
+            wx.showToast({ title: '删除失败', icon: 'error' });
+          }
+        }
+      }
+    });
+  },
+
+  // ==================== 体检功能 ====================
+  async fetchCheckupRecords() {
+    this.setData({ loadingCheckup: true });
+    try {
+      const records = await api.getCheckupList(this.data.checkupOwner);
+      // 格式化日期
+      const formatted = (records || []).map(r => ({
+        ...r,
+        checkupDateFormatted: r.checkupDate ? r.checkupDate.split('T')[0] : '',
+        abnormalCount: (r.items || []).filter(i => i.status !== 'Normal').length,
+        normalCount: (r.items || []).filter(i => i.status === 'Normal').length,
+        totalCount: (r.items || []).length
+      }));
+      this.setData({ checkupRecords: formatted, loadingCheckup: false });
+    } catch (err) {
+      console.error('获取体检记录失败', err);
+      this.setData({ loadingCheckup: false });
+    }
+  },
+
+  onCheckupOwnerChange(e) {
+    const owner = e.currentTarget.dataset.owner;
+    this.setData({ checkupOwner: owner }, () => {
+      this.fetchCheckupRecords();
+    });
+  },
+
+  goToCheckupDetail(e) {
+    const { id } = e.currentTarget.dataset;
+    wx.navigateTo({ url: `/pages/checkup/detail?id=${id}` });
+  },
+
+  goToAddCheckup() {
+    wx.navigateTo({ url: `/pages/checkup/add?owner=${this.data.checkupOwner}` });
+  },
+
+  onCheckupLongPress(e) {
+    const { id } = e.currentTarget.dataset;
+    this.setData({
+      showCheckupActionSheet: true,
+      checkupActionSheetId: id
+    });
+  },
+
+  hideCheckupActionSheet() {
+    this.setData({ showCheckupActionSheet: false });
+  },
+
+  onEditCheckupAction() {
+    const { checkupActionSheetId } = this.data;
+    this.hideCheckupActionSheet();
+    setTimeout(() => {
+      wx.navigateTo({ url: `/pages/checkup/add?id=${checkupActionSheetId}&edit=true` });
+    }, 200);
+  },
+
+  onDeleteCheckupAction() {
+    const { checkupActionSheetId } = this.data;
+    this.hideCheckupActionSheet();
+
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这条体检记录吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await api.deleteCheckup(checkupActionSheetId, { loadingText: '删除中...' });
+            wx.showToast({ title: '删除成功', icon: 'success' });
+            this.fetchCheckupRecords();
+          } catch (err) {
             wx.showToast({ title: '删除失败', icon: 'error' });
           }
         }
