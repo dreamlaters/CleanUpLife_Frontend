@@ -548,7 +548,11 @@ Page({
         api.getPeriodStats()
       ]);
       
-      const records = recordsRes.data || [];
+      const records = (recordsRes.data || []).map(r => ({
+        ...r,
+        startDateDisplay: r.startDate ? r.startDate.substring(0, 10) : '',
+        endDateDisplay: r.endDate ? r.endDate.substring(0, 10) : ''
+      }));
       const latestPeriodRecord = records.length > 0 ? records[0] : null;
       
       // 计算经期第几天
@@ -649,15 +653,15 @@ Page({
         }
       }
       
-      // 预测下次经期
-      if (!isPeriod && periodStats?.predictedNextStart) {
-        const predictedStart = new Date(periodStats.predictedNextStart);
-        const avgPeriodDays = periodStats.averagePeriodDays || 6;
-        const predictedEnd = new Date(predictedStart);
-        predictedEnd.setDate(predictedEnd.getDate() + avgPeriodDays - 1);
-        
-        if (dateObj >= predictedStart && dateObj <= predictedEnd) {
-          isPredicted = true;
+      // 预测未来经期（使用后端返回的 predictedPeriods 列表）
+      if (!isPeriod && periodStats?.predictedPeriods) {
+        for (const pp of periodStats.predictedPeriods) {
+          const pStart = new Date(pp.startDate);
+          const pEnd = new Date(pp.endDate);
+          if (dateObj >= pStart && dateObj <= pEnd) {
+            isPredicted = true;
+            break;
+          }
         }
       }
       

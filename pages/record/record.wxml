@@ -270,9 +270,9 @@
           data-record="{{item}}"
         >
           <view class="period-record-dates">
-            <text class="period-record-start">{{item.startDate.split('T')[0]}}</text>
+            <text class="period-record-start">{{item.startDateDisplay}}</text>
             <text class="period-record-arrow">→</text>
-            <text class="period-record-end">{{item.endDate ? item.endDate.split('T')[0] : '进行中'}}</text>
+            <text class="period-record-end">{{item.endDateDisplay || '进行中'}}</text>
           </view>
           <view class="period-record-info">
             <text class="period-record-days" wx:if="{{item.periodDays}}">{{item.periodDays}}天</text>

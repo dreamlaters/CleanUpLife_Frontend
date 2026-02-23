@@ -179,15 +179,15 @@ Page({
         }
       }
       
-      // 预测下次经期
-      if (!isPeriod && stats?.predictedNextStart) {
-        const predictedStart = new Date(stats.predictedNextStart);
-        const avgPeriodDays = stats.averagePeriodDays || 6;
-        const predictedEnd = new Date(predictedStart);
-        predictedEnd.setDate(predictedEnd.getDate() + avgPeriodDays - 1);
-        
-        if (dateObj >= predictedStart && dateObj <= predictedEnd) {
-          isPredicted = true;
+      // 预测未来经期（使用后端返回的 predictedPeriods 列表）
+      if (!isPeriod && stats?.predictedPeriods) {
+        for (const pp of stats.predictedPeriods) {
+          const pStart = new Date(pp.startDate);
+          const pEnd = new Date(pp.endDate);
+          if (dateObj >= pStart && dateObj <= pEnd) {
+            isPredicted = true;
+            break;
+          }
         }
       }
       
