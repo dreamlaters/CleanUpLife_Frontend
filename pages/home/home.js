@@ -115,7 +115,7 @@ Page({
         if (diffDays < 0) {
           item.daysText = Math.abs(diffDays) + '天';
           expiredItems.push(item);
-        } else if (diffDays <= 7) {
+        } else if (diffDays <= 30) {
           item.daysText = diffDays === 0 ? '今天' : diffDays + '天';
           expiringSoonItems.push(item);
         }

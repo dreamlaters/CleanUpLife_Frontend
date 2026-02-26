@@ -100,12 +100,8 @@
         </view>
         <view class="period-status" wx:else>
           <text class="period-main-text" wx:if="{{periodStats.daysUntilNextPeriod > 0}}">距下次姨妈还有 {{periodStats.daysUntilNextPeriod}} 天</text>
-          <text class="period-main-text" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">
-            预计今天开始
-          </text>
-          <text class="period-main-text" wx:else>
-            已超出预计 {{-periodStats.daysUntilNextPeriod}} 天
-          </text>
+          <text class="period-main-text" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">预计今天开始</text>
+          <text class="period-main-text" wx:else>已超出预计 {{-periodStats.daysUntilNextPeriod}} 天</text>
           <text class="period-sub-text">平均周期 {{periodStats.averageCycleDays}} 天</text>
         </view>
       </view>
