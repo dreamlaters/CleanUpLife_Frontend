@@ -20,9 +20,9 @@ Page({
     expiringSoonItems: [],
     
     // 统计数据
-    totalItems: 0,
-    toBuyCount: 0,
-    travelCount: 0,
+    totalItems: '--',
+    toBuyCount: '--',
+    travelCount: '--',
     
     // 姨妈记录
     periodStats: null,
