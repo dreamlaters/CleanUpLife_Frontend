@@ -93,8 +93,8 @@ Page({
       formDate: util.formatDate(now),
       currentYear: now.getFullYear(),
       currentMonth: now.getMonth() + 1,
-      startDate: this.formatDate(now),
-      endDate: this.formatDate(now)
+      startDate: util.formatDate(now),
+      endDate: util.formatDate(now)
     });
     
     if (options.tab) {
@@ -532,12 +532,6 @@ Page({
   },
 
   // ==================== 姨妈功能 ====================
-  formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  },
 
   async fetchPeriodData() {
     this.setData({ loadingPeriod: true });
@@ -737,7 +731,7 @@ Page({
   showRecordStart() {
     this.setData({
       showStartModal: true,
-      startDate: this.formatDate(new Date()),
+      startDate: util.formatDate(new Date()),
       notes: ''
     });
   },
@@ -745,7 +739,7 @@ Page({
   showRecordEnd() {
     this.setData({
       showEndModal: true,
-      endDate: this.formatDate(new Date())
+      endDate: util.formatDate(new Date())
     });
   },
 

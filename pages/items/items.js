@@ -72,8 +72,9 @@ Page({
   // ==================== 物品管理 ====================
   fetchProducts() {
     this.setData({ loadingProducts: true });
-    api.get('/Products', { showLoading: false })
-      .then(data => {
+    api.getProductList()
+      .then(res => {
+        const data = res.data;
         const now = new Date();
         let expiringSoonCount = 0;
         let expiredCount = 0;
@@ -147,14 +148,15 @@ Page({
   // ==================== 待购物品 ====================
   fetchToBuyProducts() {
     this.setData({ loadingToBuy: true });
-    api.get('/ToBuy', { showLoading: false })
-      .then(data => {
+    api.getToBuyList()
+      .then(res => {
+        const data = res.data;
         const list = (data || [])
           .map(item => ({
             ...item,
-            priority: item.priority ?? item.Priority ?? 0,
-            name: item.name ?? item.Name ?? '',
-            completed: item.completed ?? item.Completed ?? false
+            priority: item.priority ?? 0,
+            name: item.name ?? '',
+            completed: item.completed ?? false
           }))
           .sort((a, b) => a.priority - b.priority);
         
