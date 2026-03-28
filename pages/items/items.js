@@ -202,6 +202,7 @@ Page({
     api.put(`/ToBuy/${id}`, {
       name: item.name,
       priority: item.priority,
+      description: item.description || '',
       completed: newCompleted
     }, { showLoading: false }).catch(() => {
       this.fetchToBuyProducts(); // 失败时重新获取
