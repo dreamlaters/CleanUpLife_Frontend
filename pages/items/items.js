@@ -33,7 +33,14 @@ Page({
     actionSheetTitle: '',
     actionSheetType: '',
     actionSheetId: '',
-    actionSheetCategory: ''
+    actionSheetCategory: '',
+
+    // 待购表单弹窗
+    showToBuyForm: false,
+    editingToBuyId: null,
+    toBuyFormName: '',
+    toBuyFormPriority: 5,
+    toBuyFormDesc: ''
   },
 
   onLoad(options) {
@@ -228,13 +235,79 @@ Page({
       });
   },
 
-  onUpdateToBuy(e) {
-    const id = e.currentTarget.dataset.id;
-    wx.navigateTo({ url: `/pages/tobuy/update?id=${id}` });
+  // ==================== 待购表单弹窗 ====================
+  goToAddToBuy() {
+    this.setData({
+      showToBuyForm: true,
+      editingToBuyId: null,
+      toBuyFormName: '',
+      toBuyFormPriority: 5,
+      toBuyFormDesc: ''
+    });
   },
 
-  goToAddToBuy() {
-    wx.navigateTo({ url: '/pages/tobuy/add' });
+  showEditToBuyForm(e) {
+    const id = e.currentTarget.dataset.id;
+    const item = this.data.toBuyProducts.find(p => p.id === id);
+    if (!item) return;
+    this.setData({
+      showToBuyForm: true,
+      editingToBuyId: id,
+      toBuyFormName: item.name || '',
+      toBuyFormPriority: item.priority || 5,
+      toBuyFormDesc: item.description || ''
+    });
+  },
+
+  hideToBuyForm() {
+    this.setData({ showToBuyForm: false, editingToBuyId: null });
+  },
+
+  stopPropagation() {},
+
+  onToBuyNameInput(e) {
+    this.setData({ toBuyFormName: e.detail.value });
+  },
+
+  onToBuyPriorityChange(e) {
+    this.setData({ toBuyFormPriority: e.detail.value });
+  },
+
+  onToBuyDescInput(e) {
+    this.setData({ toBuyFormDesc: e.detail.value });
+  },
+
+  submitToBuyForm() {
+    const { editingToBuyId, toBuyFormName, toBuyFormPriority, toBuyFormDesc } = this.data;
+    if (!toBuyFormName.trim()) {
+      util.showError('物品名称不能为空');
+      return;
+    }
+
+    const data = {
+      Name: toBuyFormName.trim(),
+      Priority: toBuyFormPriority,
+      Description: toBuyFormDesc || ''
+    };
+
+    if (editingToBuyId) {
+      data.id = editingToBuyId;
+      api.put(`/ToBuy/${editingToBuyId}`, data, { loadingText: '更新中...' })
+        .then(() => {
+          util.showSuccess('更新成功');
+          this.hideToBuyForm();
+          this.fetchToBuyProducts();
+        })
+        .catch(() => util.showError('更新失败'));
+    } else {
+      api.post('/ToBuy', data, { loadingText: '添加中...' })
+        .then(() => {
+          util.showSuccess('添加成功');
+          this.hideToBuyForm();
+          this.fetchToBuyProducts();
+        })
+        .catch(() => util.showError('添加失败'));
+    }
   },
 
   showToBuyActions(e) {
@@ -263,7 +336,16 @@ Page({
           url: `/pages/update/update?id=${actionSheetId}&category=${actionSheetCategory}`
         });
       } else if (actionSheetType === 'tobuy') {
-        wx.navigateTo({ url: `/pages/tobuy/update?id=${actionSheetId}` });
+        const item = this.data.toBuyProducts.find(p => p.id === actionSheetId);
+        if (item) {
+          this.setData({
+            showToBuyForm: true,
+            editingToBuyId: actionSheetId,
+            toBuyFormName: item.name || '',
+            toBuyFormPriority: item.priority || 5,
+            toBuyFormDesc: item.description || ''
+          });
+        }
       }
     }, 200);
   },

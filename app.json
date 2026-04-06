@@ -7,8 +7,6 @@
     "pages/add/add",
     "pages/update/update",
     "pages/openid/openid",
-    "pages/tobuy/add",
-    "pages/tobuy/update",
     "pages/pet/pet",
     "pages/blocked/blocked",
     "pages/checkup/add",

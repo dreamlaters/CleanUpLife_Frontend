@@ -6,17 +6,19 @@
 .container {
   min-height: 100vh;
   background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  padding: 20rpx;
   padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
 /* ==================== 表单卡片 ==================== */
 .form-card {
+  width: auto;
+  max-width: none;
   background: #ffffff;
   border-radius: 24rpx;
   box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
   padding: 28rpx 24rpx;
+  margin: 20rpx 24rpx 0;
 }
 
 /* ==================== 表单头部 ==================== */

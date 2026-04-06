@@ -97,7 +97,7 @@
           wx:for="{{toBuyPending}}" 
           wx:key="id"
           data-id="{{item.id}}"
-          bindtap="onUpdateToBuy"
+          bindtap="showEditToBuyForm"
           bindlongpress="showToBuyActions"
         >
           <view class="tobuy-checkbox {{item.completed ? 'tobuy-checkbox-checked' : ''}}" 
@@ -143,7 +143,7 @@
           wx:for="{{toBuyCompleted}}" 
           wx:key="id"
           data-id="{{item.id}}"
-          bindtap="onUpdateToBuy"
+          bindtap="showEditToBuyForm"
           bindlongpress="showToBuyActions"
         >
           <view class="tobuy-checkbox tobuy-checkbox-checked" 
@@ -176,3 +176,36 @@
   show="{{showActionSheet}}" title="{{actionSheetTitle}}"
   bind:edit="onActionEdit" bind:delete="onActionDelete" bind:cancel="hideActionSheet"
 />
+
+<!-- 待购物品表单弹窗 -->
+<view class="modal-overlay" catchtap="hideToBuyForm" wx:if="{{showToBuyForm}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingToBuyId ? '✏️ 编辑待购' : '🛒 新增待购'}}</text>
+      <view class="modal-close" bindtap="hideToBuyForm">×</view>
+    </view>
+
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">物品名称</text>
+        <input class="form-input" placeholder="请输入物品名称" value="{{toBuyFormName}}" bindinput="onToBuyNameInput" focus="{{showToBuyForm}}" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">优先级 ({{toBuyFormPriority <= 3 ? '紧急' : toBuyFormPriority <= 7 ? '一般' : '不急'}})</text>
+        <slider min="1" max="10" value="{{toBuyFormPriority}}" show-value="true"
+                activeColor="#6366f1" block-color="#6366f1" bindchange="onToBuyPriorityChange" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">描述（可选）</text>
+        <input class="form-input" placeholder="添加备注..." value="{{toBuyFormDesc}}" bindinput="onToBuyDescInput" />
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn btn-cancel" bindtap="hideToBuyForm">取消</button>
+      <button class="btn btn-primary" bindtap="submitToBuyForm">确定</button>
+    </view>
+  </view>
+</view>
