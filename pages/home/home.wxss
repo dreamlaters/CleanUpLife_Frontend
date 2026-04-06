@@ -174,25 +174,23 @@
 
 .empty-alert-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 48rpx 24rpx;
+  padding: 24rpx 28rpx;
+  gap: 16rpx;
 }
 
 .empty-alert-icon {
-  font-size: 52rpx;
-  margin-bottom: 16rpx;
+  font-size: 36rpx;
 }
 
 .empty-alert-title {
   font-size: 28rpx;
   font-weight: 600;
   color: #22c55e;
-  margin-bottom: 6rpx;
 }
 
 .empty-alert-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #9ca3af;
 }
 
