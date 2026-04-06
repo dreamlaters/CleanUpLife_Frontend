@@ -887,8 +887,8 @@
 }
 
 .form-radio-active {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  color: #667eea;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  color: #6366f1;
 }
 
 .modal-footer {
@@ -918,8 +918,8 @@
 }
 
 .modal-btn-confirm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: #fff;
-  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.35);
+  box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
 }
 

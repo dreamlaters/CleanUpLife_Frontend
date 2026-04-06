@@ -48,8 +48,8 @@
           max="10" 
           value="{{formData.priority}}" 
           show-value="false" 
-          activeColor="#667eea"
-          block-color="#667eea"
+          activeColor="#6366f1"
+          block-color="#6366f1"
           bindchange="onPriorityChange" 
         />
       </view>

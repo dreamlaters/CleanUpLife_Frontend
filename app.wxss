@@ -5,11 +5,11 @@
 
 /* ==================== 变量定义 ==================== */
 page {
-  /* 主色调 - 清新蓝绿渐变 */
-  --primary-color: #667eea;
-  --primary-light: #764ba2;
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --primary-soft: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  /* 主色调 - Indigo→Violet 渐变 */
+  --primary-color: #6366f1;
+  --primary-light: #8b5cf6;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --primary-soft: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
   
   /* 功能色 */
   --success-color: #10b981;
@@ -49,7 +49,7 @@ page {
   --shadow-md: 0 8rpx 24rpx rgba(0, 0, 0, 0.08), 0 4rpx 8rpx rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 16rpx 48rpx rgba(0, 0, 0, 0.12), 0 8rpx 16rpx rgba(0, 0, 0, 0.08);
   --shadow-xl: 0 32rpx 64rpx rgba(0, 0, 0, 0.14);
-  --shadow-colored: 0 8rpx 24rpx rgba(102, 126, 234, 0.25);
+  --shadow-colored: 0 8rpx 24rpx rgba(99, 102, 241, 0.25);
   
   /* 圆角 */
   --radius-xs: 6rpx;
@@ -737,7 +737,7 @@ page {
 
 .form-input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 4rpx rgba(99, 102, 241, 0.1);
   background: var(--bg-card);
 }
 
@@ -791,7 +791,7 @@ page {
 
 .form-textarea:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 4rpx rgba(99, 102, 241, 0.1);
   background: var(--bg-card);
 }
 
