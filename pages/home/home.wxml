@@ -71,11 +71,13 @@
 
   <!-- 无提醒时的空状态 -->
   <view class="section-card empty-alert-card" wx:if="{{!loading && !expiredItems.length && !expiringSoonItems.length}}">
-    <view class="empty-alert-content">
-      <text class="empty-alert-icon">✨</text>
-      <view class="empty-alert-info">
-        <text class="empty-alert-title">太棒了！</text>
-        <text class="empty-alert-text">没有即将过期的物品</text>
+    <view class="period-card-content">
+      <view class="empty-alert-icon-wrap">✨</view>
+      <view class="period-info">
+        <view class="period-status">
+          <text class="empty-alert-title">太棒了！</text>
+          <text class="period-sub-text">没有即将过期的物品</text>
+        </view>
       </view>
     </view>
   </view>

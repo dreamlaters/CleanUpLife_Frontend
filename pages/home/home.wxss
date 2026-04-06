@@ -172,26 +172,21 @@
   background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 30%);
 }
 
-.empty-alert-content {
+.empty-alert-icon-wrap {
+  font-size: 44rpx;
+  width: 72rpx;
+  height: 72rpx;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-radius: 18rpx;
   display: flex;
   align-items: center;
-  padding: 24rpx 28rpx;
-  gap: 16rpx;
-}
-
-.empty-alert-icon {
-  font-size: 36rpx;
+  justify-content: center;
 }
 
 .empty-alert-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #22c55e;
-}
-
-.empty-alert-text {
-  font-size: 22rpx;
-  color: #9ca3af;
 }
 
 /* ==================== 姨妈记录卡片 ==================== */
