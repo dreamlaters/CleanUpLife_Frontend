@@ -5,9 +5,11 @@
 .container {
   min-height: 100vh;
   background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
-  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 350rpx 32rpx 32rpx;
   box-sizing: border-box;
-  padding-top: 350rpx;
 }
 
 .blocked-card {

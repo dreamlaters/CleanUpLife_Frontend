@@ -5,6 +5,9 @@
 .container {
   min-height: 100vh;
   background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 32rpx;
   box-sizing: border-box;
 }
