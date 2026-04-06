@@ -417,8 +417,10 @@
 
 .form-group .form-input {
   width: 100%;
-  min-height: auto;
-  padding: 18rpx 20rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  min-height: 0;
+  padding: 0 20rpx;
   background: #f9fafb;
   border: 2rpx solid transparent;
   border-radius: 14rpx;
