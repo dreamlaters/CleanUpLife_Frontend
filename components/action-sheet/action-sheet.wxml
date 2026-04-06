@@ -1,0 +1,16 @@
+<view class="action-overlay {{show ? 'show' : ''}}" bindtap="onCancel" wx:if="{{show}}">
+  <view class="action-sheet" catchtap="">
+    <view class="action-header">
+      <text class="action-title">{{title}}</text>
+    </view>
+    <view class="action-item" bindtap="onEdit">
+      <text class="action-icon">✏️</text>
+      <text class="action-text">编辑</text>
+    </view>
+    <view class="action-item action-danger" bindtap="onDelete">
+      <text class="action-icon">🗑️</text>
+      <text class="action-text">删除</text>
+    </view>
+    <view class="action-cancel" bindtap="onCancel">取消</view>
+  </view>
+</view>

@@ -1,10 +1,7 @@
 <!-- 体检详情页面 -->
 <view class="container">
   <!-- 加载状态 -->
-  <view class="loading-container" wx:if="{{loading}}">
-    <view class="loading-spinner"></view>
-    <text class="loading-text">加载中...</text>
-  </view>
+  <loading-state loading="{{loading}}" />
 
   <block wx:if="{{checkup && !loading}}">
     <!-- 头部信息卡片 -->

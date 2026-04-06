@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "loading-state": "/components/loading-state/loading-state"
+  },
   "navigationBarTitleText": "体检详情",
   "navigationStyle": "default"
 }

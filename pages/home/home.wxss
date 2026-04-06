@@ -1,87 +1,8 @@
 /**
  * 首页样式 - 统一设计语言 v3.0
  * CleanUpLife - 清新简约风格
+ * 通用样式（navbar, loading, footer, safe-bottom）已提取到组件和 app.wxss
  */
-
-/* ==================== 页面容器 ==================== */
-.container {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
-  display: block !important;
-  align-items: stretch !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box;
-}
-
-/* ==================== 自定义导航栏 ==================== */
-.custom-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  box-shadow: 0 4rpx 20rpx rgba(99, 102, 241, 0.25);
-}
-
-.navbar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 28rpx;
-  height: 92rpx;
-}
-
-.navbar-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-}
-
-.greeting {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.5rpx;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
-}
-
-.date-text {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 400;
-}
-
-.navbar-right {
-  display: flex;
-  align-items: center;
-}
-
-.avatar-wrap {
-  width: 76rpx;
-  height: 76rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10rpx);
-  border: 2rpx solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-}
-
-.avatar-emoji {
-  font-size: 32rpx;
-}
-
-.navbar-placeholder {
-  width: 100%;
-  flex-shrink: 0;
-}
 
 /* ==================== 通用区块卡片 ==================== */
 .section-card {
@@ -115,14 +36,6 @@
   justify-content: center;
   font-size: 22rpx;
   background: rgba(99, 102, 241, 0.1);
-}
-
-.section-icon-alert {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-}
-
-.section-icon-quick {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
 }
 
 .section-title {
@@ -385,7 +298,7 @@
   font-weight: 500;
 }
 
-/* ==================== 统计概览 - 集成在快捷操作卡片内 ==================== */
+/* ==================== 统计概览 ==================== */
 .stats-section {
   padding: 0 28rpx 28rpx;
 }
@@ -409,7 +322,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); */
 }
 
 .stat-item:active {
@@ -429,80 +341,4 @@
   color: #6b7280;
   margin-top: 6rpx;
   font-weight: 500;
-}
-
-/* ==================== 加载状态 ==================== */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 56rpx 0;
-}
-
-.loading-spinner {
-  width: 44rpx;
-  height: 44rpx;
-  border: 3rpx solid #f3f4f6;
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-text {
-  margin-top: 14rpx;
-  font-size: 24rpx;
-  color: #9ca3af;
-}
-
-/* ==================== 底部链接 ==================== */
-.footer-link-wrap {
-  padding: 20rpx 24rpx;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.footer-link {
-  display: flex;
-  align-items: center;
-  padding: 24rpx 28rpx;
-  background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.footer-link:active {
-  transform: scale(0.98);
-  background: #f9fafb;
-}
-
-.footer-link-icon {
-  font-size: 32rpx;
-  margin-right: 16rpx;
-}
-
-.footer-link-text {
-  flex: 1;
-  font-size: 28rpx;
-  color: #4b5563;
-  font-weight: 500;
-}
-
-.footer-link-arrow {
-  font-size: 28rpx;
-  color: #d1d5db;
-}
-
-/* ==================== 安全区 ==================== */
-.safe-bottom {
-  height: calc(env(safe-area-inset-bottom) + 20rpx);
 }

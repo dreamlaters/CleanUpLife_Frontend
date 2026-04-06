@@ -1,12 +1,7 @@
 <!-- 宠物页面 - 体重追踪 -->
 <view class="container">
   <!-- 自定义导航栏 -->
-  <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
-    <view class="navbar-content">
-      <text class="navbar-title">我的宠物</text>
-    </view>
-  </view>
-  <view class="navbar-placeholder" style="height: {{navbarHeight}}px"></view>
+  <custom-navbar title="我的宠物" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
 
   <!-- 宠物卡片 -->
   <view class="pet-cards">
@@ -82,12 +77,9 @@
       <view class="section-badge" wx:if="{{weightRecords.length}}">{{weightRecords.length}}条</view>
     </view>
 
-    <view class="loading-container" wx:if="{{loading}}">
-      <view class="loading-spinner"></view>
-      <text class="loading-text">加载中...</text>
-    </view>
+    <loading-state loading="{{loading}}" />
 
-    <view class="records-container" wx:elif="{{weightRecords.length}}">
+    <view class="records-container" wx:if="{{!loading && weightRecords.length}}">
       <view class="person-group" wx:for="{{personList}}" wx:key="*this" wx:for-item="person" wx:if="{{groupedRecords[person].length}}">
         <view class="person-header">
           <view class="person-info">
@@ -118,12 +110,11 @@
       </view>
     </view>
 
-    <view class="empty-state" wx:if="{{!loading && !weightRecords.length}}">
-      <text class="empty-icon">⚖️</text>
-      <text class="empty-title">还没有体重记录</text>
-      <text class="empty-text">点击下方按钮，开始记录宝贝的体重</text>
-      <view class="empty-btn" bindtap="showAddForm">+ 添加记录</view>
-    </view>
+    <empty-state
+      show="{{!loading && !weightRecords.length}}"
+      icon="⚖️" title="还没有体重记录" text="点击下方按钮，开始记录宝贝的体重"
+      buttonText="+ 添加记录" bind:buttontap="showAddForm"
+    />
   </view>
 
   <!-- 悬浮添加按钮 -->
@@ -132,13 +123,7 @@
   </view>
 
   <!-- 底部消息推送入口 -->
-  <view class="footer-link-wrap">
-    <navigator url="/pages/openid/openid" class="footer-link">
-      <text class="footer-link-icon">🔔</text>
-      <text class="footer-link-text">消息推送设置</text>
-      <text class="footer-link-arrow">›</text>
-    </navigator>
-  </view>
+  <footer-link />
 
   <view class="safe-bottom"></view>
 </view>
@@ -206,19 +191,7 @@
 </view>
 
 <!-- 操作菜单 -->
-<view class="action-overlay {{showActionSheet ? 'show' : ''}}" bindtap="hideActionSheet" wx:if="{{showActionSheet}}">
-  <view class="action-sheet" catchtap="">
-    <view class="action-header">
-      <text class="action-title">{{actionSheetPerson}} 的记录</text>
-    </view>
-    <view class="action-item" bindtap="onEditAction">
-      <text class="action-icon">✏️</text>
-      <text class="action-text">编辑记录</text>
-    </view>
-    <view class="action-item action-danger" bindtap="onDeleteAction">
-      <text class="action-icon">🗑️</text>
-      <text class="action-text">删除记录</text>
-    </view>
-    <view class="action-cancel" bindtap="hideActionSheet">取消</view>
-  </view>
-</view>
+<action-sheet
+  show="{{showActionSheet}}" title="{{actionSheetPerson}} 的记录"
+  bind:edit="onEditAction" bind:delete="onDeleteAction" bind:cancel="hideActionSheet"
+/>

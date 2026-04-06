@@ -84,12 +84,124 @@ page {
 /* ==================== 容器布局 ==================== */
 .container {
   min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* 用于表单页面的居中容器 */
+.container-centered {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: var(--spacing-xl) var(--spacing-md);
   padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
+}
+
+/* ==================== 通用区块卡片（页面级） ==================== */
+.section-card {
+  margin: 0 24rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* ==================== 通用顶部Tab ==================== */
+.top-tabs {
+  display: flex;
+  background: #ffffff;
+  margin: 20rpx 24rpx;
+  border-radius: 20rpx;
+  padding: 6rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.top-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 18rpx 14rpx;
+  border-radius: 16rpx;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.top-tab-active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
+}
+
+.top-tab-icon {
+  font-size: 24rpx;
+}
+
+.top-tab-text {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.15s;
+}
+
+.top-tab-active .top-tab-text {
+  color: #fff;
+}
+
+.top-tab-badge {
+  position: absolute;
+  top: 4rpx;
+  right: 18rpx;
+  min-width: 30rpx;
+  height: 30rpx;
+  padding: 0 8rpx;
+  background: #ef4444;
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 600;
+  border-radius: 15rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-tab-active .top-tab-badge {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ==================== 通用悬浮按钮 FAB ==================== */
+.fab-btn {
+  position: fixed;
+  right: 28rpx;
+  bottom: calc(180rpx + env(safe-area-inset-bottom));
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(99, 102, 241, 0.4);
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 50;
+}
+
+.fab-btn:active {
+  transform: scale(0.88);
+}
+
+.fab-icon {
+  font-size: 48rpx;
+  color: #fff;
+  font-weight: 300;
+}
+
+/* ==================== 安全区 ==================== */
+.safe-bottom {
+  height: calc(env(safe-area-inset-bottom) + 20rpx);
 }
 
 /* ==================== 页面头部 ==================== */
@@ -207,18 +319,7 @@ page {
   margin-top: var(--spacing-xs);
 }
 
-/* ==================== 区块卡片 ==================== */
-.section-card {
-  width: 100%;
-  max-width: 700rpx;
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(20rpx);
-  margin-bottom: var(--spacing-xl);
-  overflow: hidden;
-  transition: all var(--transition-normal);
-}
+/* ==================== 区块卡片（section-card 已移至全局容器布局区域） ==================== */
 
 .section-header {
   display: flex;
@@ -479,30 +580,7 @@ page {
   width: 100%;
 }
 
-/* ==================== 浮动添加按钮 FAB ==================== */
-.fab-btn {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  background: var(--primary-gradient);
-  box-shadow: var(--shadow-colored);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-bounce);
-}
-
-.fab-btn:active {
-  transform: scale(0.9);
-  box-shadow: var(--shadow-sm);
-}
-
-.fab-btn-icon {
-  font-size: 40rpx;
-  color: var(--text-white);
-  line-height: 1;
-  font-weight: 300;
-}
+/* FAB 按钮已移至全局容器布局区域 */
 
 /* ==================== 底部固定添加按钮 ==================== */
 .floating-add-btn {
@@ -832,76 +910,7 @@ page {
   padding: var(--spacing-md) 0;
 }
 
-/* ==================== 空状态 ==================== */
-.empty-state {
-  padding: var(--spacing-3xl) var(--spacing-xl);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.empty-icon {
-  font-size: 96rpx;
-  margin-bottom: var(--spacing-lg);
-  opacity: 0.8;
-}
-
-.empty-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.empty-text {
-  font-size: 26rpx;
-  color: var(--text-hint);
-}
-
-.empty-btn {
-  margin-top: var(--spacing-xl);
-  padding: 16rpx 40rpx;
-  background: var(--primary-soft);
-  color: var(--primary-color);
-  font-size: 28rpx;
-  font-weight: 600;
-  border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
-}
-
-.empty-btn:active {
-  background: var(--primary-gradient);
-  color: var(--text-white);
-}
-
-/* ==================== 加载状态 ==================== */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-3xl);
-}
-
-.loading-spinner {
-  width: 64rpx;
-  height: 64rpx;
-  border: 4rpx solid var(--border-color);
-  border-top-color: var(--primary-color);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  margin-top: var(--spacing-md);
-  font-size: 26rpx;
-  color: var(--text-hint);
-}
+/* 空状态和加载状态已提取为组件 (components/empty-state, components/loading-state) */
 
 /* ==================== 搜索栏 ==================== */
 .search-bar {

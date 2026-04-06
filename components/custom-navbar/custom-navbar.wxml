@@ -1,0 +1,17 @@
+<!-- 自定义导航栏组件 -->
+<view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
+  <view class="navbar-content">
+    <!-- 首页模式：左侧问候语 -->
+    <block wx:if="{{greeting}}">
+      <view class="navbar-left">
+        <text class="greeting">{{greeting}}</text>
+        <text class="date-text">{{dateText}}</text>
+      </view>
+    </block>
+    <!-- 标题模式 -->
+    <block wx:else>
+      <text class="navbar-title">{{title}}</text>
+    </block>
+  </view>
+</view>
+<view class="navbar-placeholder" style="height: {{navbarHeight}}px"></view>

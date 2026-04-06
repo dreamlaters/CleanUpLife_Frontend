@@ -1,4 +1,10 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "custom-navbar": "/components/custom-navbar/custom-navbar",
+    "loading-state": "/components/loading-state/loading-state",
+    "empty-state": "/components/empty-state/empty-state",
+    "footer-link": "/components/footer-link/footer-link",
+    "action-sheet": "/components/action-sheet/action-sheet"
+  },
   "navigationStyle": "custom"
 }
