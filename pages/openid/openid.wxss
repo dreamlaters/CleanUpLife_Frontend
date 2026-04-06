@@ -7,10 +7,13 @@
   background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
   padding-bottom: 32rpx;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* ==================== 卡片布局 ==================== */
 .form-card {
+  width: auto;
+  max-width: none;
   background: #fff;
   border-radius: 28rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
