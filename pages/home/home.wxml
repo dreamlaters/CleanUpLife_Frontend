@@ -1,7 +1,10 @@
-<!-- 首页 - 过期提醒 + 快捷入口 -->
+<!-- 首页 - 生活状态仪表盘 -->
 <view class="container">
   <!-- 自定义导航栏 -->
   <custom-navbar greeting="{{greeting}}" dateText="{{dateText}}" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
+
+  <!-- 加载状态 -->
+  <loading-state loading="{{loading}}" />
 
   <!-- 过期提醒区域 -->
   <view class="section-card alert-card" wx:if="{{expiredItems.length || expiringSoonItems.length}}">
@@ -22,9 +25,9 @@
         <text class="alert-group-title">已过期 ({{expiredItems.length}})</text>
       </view>
       <view class="alert-list">
-        <view 
+        <view
           class="alert-item"
-          wx:for="{{expiredItems}}" 
+          wx:for="{{expiredItems}}"
           wx:key="id"
           bindtap="goToUpdateItem"
           data-id="{{item.id}}"
@@ -47,9 +50,9 @@
         <text class="alert-group-title">即将过期 ({{expiringSoonItems.length}})</text>
       </view>
       <view class="alert-list">
-        <view 
+        <view
           class="alert-item"
-          wx:for="{{expiringSoonItems}}" 
+          wx:for="{{expiringSoonItems}}"
           wx:key="id"
           bindtap="goToUpdateItem"
           data-id="{{item.id}}"
@@ -99,56 +102,69 @@
     </view>
   </view>
 
-  <!-- 快捷入口 -->
-  <view class="section-card">
+  <!-- 猫猫体重卡片 -->
+  <view class="section-card cat-card" bindtap="goToWeight" wx:if="{{catWeights.length}}">
     <view class="section-header">
       <view class="section-title-wrap">
-        <view class="section-icon">⚡</view>
-        <text class="section-title">快捷操作</text>
+        <view class="section-icon">🐱</view>
+        <text class="section-title">猫猫体重</text>
       </view>
+      <text class="section-arrow">›</text>
     </view>
-    
-    <view class="quick-grid">
-      <view class="quick-item" bindtap="goToAddItem">
-        <view class="quick-icon quick-icon-primary">📦</view>
-        <text class="quick-label">添加物品</text>
-      </view>
-      <view class="quick-item" bindtap="goToToBuyList">
-        <view class="quick-icon quick-icon-success">🛒</view>
-        <text class="quick-label">待购清单</text>
-      </view>
-      <view class="quick-item" bindtap="goToTravel">
-        <view class="quick-icon quick-icon-info">✈️</view>
-        <text class="quick-label">出行计划</text>
-      </view>
-      <view class="quick-item" bindtap="goToGoals">
-        <view class="quick-icon quick-icon-warning">🎯</view>
-        <text class="quick-label">年度目标</text>
-      </view>
-    </view>
-
-    <!-- 统计概览 - 放在快捷操作卡片内 -->
-    <view class="stats-section">
-      <view class="stats-divider"></view>
-      <view class="stats-grid">
-        <view class="stat-item" bindtap="goToItems">
-          <text class="stat-value">{{totalItems}}</text>
-          <text class="stat-label">物品</text>
+    <view class="cat-grid">
+      <view class="cat-item" wx:for="{{catWeights}}" wx:key="personName">
+        <text class="cat-name">{{item.personName}}</text>
+        <view class="cat-weight-row">
+          <text class="cat-weight">{{item.weight}}</text>
+          <text class="cat-unit">斤</text>
         </view>
-        <view class="stat-item" bindtap="goToToBuyList">
-          <text class="stat-value">{{toBuyCount}}</text>
-          <text class="stat-label">待购</text>
-        </view>
-        <view class="stat-item" bindtap="goToTravel">
-          <text class="stat-value">{{travelCount}}</text>
-          <text class="stat-label">想去</text>
-        </view>
+        <text class="cat-date">{{item.dateText}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 加载状态 -->
-  <loading-state loading="{{loading}}" />
+  <!-- 年度目标卡片 -->
+  <view class="section-card goals-card" bindtap="goToGoals" wx:if="{{goalsPig.length || goalsDonkey.length}}">
+    <view class="section-header">
+      <view class="section-title-wrap">
+        <view class="section-icon">🎯</view>
+        <text class="section-title">年度目标</text>
+      </view>
+      <text class="section-arrow">›</text>
+    </view>
+    <view class="goals-list">
+      <view class="goals-row" wx:if="{{goalsPig.length}}">
+        <text class="goals-owner">🐷</text>
+        <view class="goals-progress-bar">
+          <view class="goals-progress-fill" style="width: {{pigProgress}}%"></view>
+        </view>
+        <text class="goals-text">{{pigCompleted}}/{{goalsPig.length}}</text>
+      </view>
+      <view class="goals-row" wx:if="{{goalsDonkey.length}}">
+        <text class="goals-owner">🫏</text>
+        <view class="goals-progress-bar">
+          <view class="goals-progress-fill goals-progress-fill-donkey" style="width: {{donkeyProgress}}%"></view>
+        </view>
+        <text class="goals-text">{{donkeyCompleted}}/{{goalsDonkey.length}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计行 -->
+  <view class="stats-row" wx:if="{{!loading}}">
+    <view class="stat-item" bindtap="goToItems">
+      <text class="stat-value">{{totalItems}}</text>
+      <text class="stat-label">物品</text>
+    </view>
+    <view class="stat-item" bindtap="goToToBuyList">
+      <text class="stat-value">{{toBuyCount}}</text>
+      <text class="stat-label">待购</text>
+    </view>
+    <view class="stat-item" bindtap="goToTravel">
+      <text class="stat-value">{{travelCount}}</text>
+      <text class="stat-label">想去</text>
+    </view>
+  </view>
 
   <!-- 底部消息推送入口 -->
   <footer-link />

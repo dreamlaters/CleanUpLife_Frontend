@@ -152,6 +152,20 @@ const getPendingTravelList = (options = {}) => {
   return get('/Travel/status/Pending', { showLoading: false, ...options }).then(data => ({ data }));
 };
 
+/**
+ * 获取物品摘要（总数 + 过期 + 即将过期）
+ */
+const getProductsSummary = (options = {}) => {
+  return get('/Products/summary', { showLoading: false, ...options });
+};
+
+/**
+ * 获取每只猫最新体重记录
+ */
+const getWeightLatest = (options = {}) => {
+  return get('/Weight/latest', { showLoading: false, ...options });
+};
+
 // ==================== 姨妈记录 API ====================
 
 /**
@@ -256,6 +270,8 @@ module.exports = {
   put,
   del,
   getProductList,
+  getProductsSummary,
+  getWeightLatest,
   getToBuyList,
   getTravelList,
   getPendingTravelList,
