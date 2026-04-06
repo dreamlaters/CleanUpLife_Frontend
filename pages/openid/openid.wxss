@@ -5,10 +5,7 @@
 .container {
   min-height: 100vh;
   background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 32rpx;
+  padding-bottom: 32rpx;
   box-sizing: border-box;
 }
 
@@ -18,7 +15,7 @@
   border-radius: 28rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
   padding: 32rpx;
-  margin-top: 24rpx;
+  margin: 24rpx 24rpx 0;
 }
 
 /* ==================== 标题区域 ==================== */

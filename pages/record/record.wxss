@@ -8,10 +8,6 @@
   overflow-x: hidden;
 }
 
-.tab-content {
-  padding-bottom: 20rpx;
-}
-
 /* ==================== 宠物卡片 ==================== */
 .pet-cards {
   display: flex;
