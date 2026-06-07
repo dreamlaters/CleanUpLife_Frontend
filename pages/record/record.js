@@ -14,6 +14,16 @@ const PERSON_CONFIG = {
 
 const PERSON_LIST = ['豌豆黄', '小立夏'];
 
+// 陪玩者配置（身份由后端按 openid 识别，前端只负责展示）
+const PLAYER_CONFIG = {
+  'Pig': { emoji: '🐷', name: '猪猪', color: '#F59E0B' },
+  'Donkey': { emoji: '🫏', name: '毛驴', color: '#6366F1' },
+  'Other': { emoji: '👤', name: '其他', color: '#9CA3AF' }
+};
+
+// 单次陪玩超过该时长时，结束前提示是否误操作（秒）
+const LONG_PLAY_SECONDS = 4 * 3600;
+
 Page({
   data: {
     // 导航栏
@@ -22,11 +32,24 @@ Page({
     
     // Tab切换
     currentTab: 'weight',
-    
+    // 猫猫记录内部子切换：weight(体重) | play(陪玩)
+    catSubTab: 'weight',
+
     // ==================== 体重相关 ====================
     weightRecords: [],
     groupedRecords: {},
+    displayRecords: {},
     latestWeights: {},
+
+    // ==================== 陪玩相关 ====================
+    playerConfig: PLAYER_CONFIG,
+    playStatus: null,           // 后端返回的状态对象
+    playElapsedText: '00:00',   // 进行中实时时长展示
+    playStarting: false,        // 开始/结束请求中（防重复点击）
+    loadingPlay: false,
+    playStatsRange: 'week',     // week | month | year
+    playStatsView: null,        // 格式化后的三窗口统计
+    playRecords: [],            // 最近陪玩记录（已格式化）
     personList: PERSON_LIST,
     personConfig: PERSON_CONFIG,
     
@@ -122,6 +145,19 @@ Page({
     this.fetchWeightRecords();
     this.fetchPeriodData();
     this.fetchCheckupRecords();
+
+    // 陪玩子页可见时刷新（重新进入会以服务端时间为准重置计时）
+    if (this.data.currentTab === 'weight' && this.data.catSubTab === 'play') {
+      this.fetchPlayAll();
+    }
+  },
+
+  onHide() {
+    this.stopPlayTimer();
+  },
+
+  onUnload() {
+    this.stopPlayTimer();
   },
 
   initNavbar() {
@@ -138,14 +174,39 @@ Page({
   switchTab(e) {
     const tab = e.currentTarget.dataset.tab;
     this.setData({ currentTab: tab });
-    
+
+    // 离开猫猫记录时停止陪玩计时器
+    if (tab !== 'weight') {
+      this.stopPlayTimer();
+    }
+
     if (tab === 'weight') {
-      setTimeout(() => {
-        this.initCanvas();
-      }, 100);
+      if (this.data.catSubTab === 'weight') {
+        setTimeout(() => {
+          this.initCanvas();
+        }, 100);
+      } else {
+        this.fetchPlayAll();
+      }
     }
     if (tab === 'checkup') {
       this.fetchCheckupRecords();
+    }
+  },
+
+  // 猫猫记录子切换：体重 / 陪玩
+  switchCatSubTab(e) {
+    const sub = e.currentTarget.dataset.sub;
+    if (sub === this.data.catSubTab) return;
+    this.setData({ catSubTab: sub });
+
+    if (sub === 'weight') {
+      this.stopPlayTimer();
+      setTimeout(() => {
+        this.initCanvas();
+      }, 100);
+    } else {
+      this.fetchPlayAll();
     }
   },
 
@@ -172,17 +233,21 @@ Page({
         }
       });
       
+      // 明细列表只展示每只猫最近 6 条（图表仍用全量 groupedRecords，不受影响）
+      const display = {};
       PERSON_LIST.forEach(person => {
         const personRecords = grouped[person];
         if (personRecords.length > 0) {
           personRecords.sort((a, b) => new Date(b.recordDate) - new Date(a.recordDate));
           latest[person] = personRecords[0].weight;
         }
+        display[person] = personRecords.slice(0, 6);
       });
 
       this.setData({
         weightRecords: records,
         groupedRecords: grouped,
+        displayRecords: display,
         latestWeights: latest,
         loadingWeight: false
       });
@@ -529,6 +594,217 @@ Page({
         }
       }
     });
+  },
+
+  // ==================== 陪玩功能 ====================
+
+  async fetchPlayAll() {
+    this.setData({ loadingPlay: true });
+    try {
+      const [status, stats, records] = await Promise.all([
+        api.getPlayStatus(),
+        api.getPlayStats(),
+        api.getPlayList()
+      ]);
+
+      const playRecords = (records || []).map(r => this.formatPlayRecord(r));
+      const playStatsView = this.buildPlayStatsView(stats);
+
+      this.setData({
+        playStatus: status || null,
+        playStatsView,
+        playRecords,
+        loadingPlay: false
+      });
+
+      if (status && status.ongoing) {
+        this._playElapsed = status.elapsedSeconds || 0;
+        this.setData({ playElapsedText: this.formatElapsed(this._playElapsed) });
+        this.startPlayTimer();
+      } else {
+        this.stopPlayTimer();
+        this.setData({ playElapsedText: '00:00' });
+      }
+    } catch (err) {
+      console.error('获取陪玩数据失败', err);
+      this.setData({ loadingPlay: false });
+    }
+  },
+
+  startPlayTimer() {
+    this.stopPlayTimer();
+    this._playTimer = setInterval(() => {
+      this._playElapsed = (this._playElapsed || 0) + 1;
+      this.setData({ playElapsedText: this.formatElapsed(this._playElapsed) });
+    }, 1000);
+  },
+
+  stopPlayTimer() {
+    if (this._playTimer) {
+      clearInterval(this._playTimer);
+      this._playTimer = null;
+    }
+  },
+
+  async onStartPlay() {
+    if (this.data.playStarting) return;
+    this.setData({ playStarting: true });
+    try {
+      await api.startPlay({ loadingText: '开始中...' });
+      await this.fetchPlayAll();
+    } catch (err) {
+      console.error('开始陪玩失败', err);
+      wx.showToast({ title: '开始失败', icon: 'error' });
+    } finally {
+      this.setData({ playStarting: false });
+    }
+  },
+
+  async onEndPlay() {
+    if (this.data.playStarting) return;
+
+    const elapsed = this._playElapsed || 0;
+    if (elapsed > LONG_PLAY_SECONDS) {
+      const confirmed = await new Promise(resolve => {
+        wx.showModal({
+          title: '确认结束？',
+          content: `本次陪玩已超过 ${Math.floor(elapsed / 3600)} 小时，可能是忘记结束了。确定按这个时长记录吗？`,
+          confirmText: '确认结束',
+          cancelText: '再想想',
+          success: res => resolve(res.confirm),
+          fail: () => resolve(false)
+        });
+      });
+      if (!confirmed) return;
+    }
+
+    this.setData({ playStarting: true });
+    try {
+      await api.endPlay({ loadingText: '结束中...' });
+      wx.showToast({ title: '已记录', icon: 'success' });
+      await this.fetchPlayAll();
+    } catch (err) {
+      console.error('结束陪玩失败', err);
+      wx.showToast({ title: '结束失败', icon: 'error' });
+    } finally {
+      this.setData({ playStarting: false });
+    }
+  },
+
+  onDiscardPlay() {
+    const status = this.data.playStatus;
+    if (!status || !status.ongoing || !status.sessionId) return;
+    wx.showModal({
+      title: '放弃本次陪玩？',
+      content: '将删除这条进行中的记录，不计入统计。',
+      confirmText: '放弃',
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await api.deletePlay(status.sessionId, { loadingText: '处理中...' });
+          this.stopPlayTimer();
+          await this.fetchPlayAll();
+        } catch (err) {
+          wx.showToast({ title: '操作失败', icon: 'error' });
+        }
+      }
+    });
+  },
+
+  onPlayStatsRangeChange(e) {
+    this.setData({ playStatsRange: e.currentTarget.dataset.range });
+  },
+
+  onPlayRecordLongPress(e) {
+    const { id } = e.currentTarget.dataset;
+    if (!id) return;
+    wx.showModal({
+      title: '删除记录',
+      content: '确定删除这条陪玩记录吗？',
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await api.deletePlay(id, { loadingText: '删除中...' });
+          wx.showToast({ title: '已删除', icon: 'success' });
+          await this.fetchPlayAll();
+        } catch (err) {
+          wx.showToast({ title: '删除失败', icon: 'error' });
+        }
+      }
+    });
+  },
+
+  // 工具：补零
+  pad2(n) {
+    return n < 10 ? '0' + n : '' + n;
+  },
+
+  // 进行中计时展示 MM:SS 或 HH:MM:SS
+  formatElapsed(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds || 0));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    if (h > 0) return `${this.pad2(h)}:${this.pad2(m)}:${this.pad2(sec)}`;
+    return `${this.pad2(m)}:${this.pad2(sec)}`;
+  },
+
+  // 时长友好展示
+  formatDuration(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds || 0));
+    if (s < 60) return s <= 0 ? '0分钟' : '不到1分钟';
+    let h = Math.floor(s / 3600);
+    let m = Math.round((s % 3600) / 60);
+    if (m === 60) { h += 1; m = 0; }
+    if (h > 0 && m > 0) return `${h}小时${m}分`;
+    if (h > 0) return `${h}小时`;
+    return `${m}分钟`;
+  },
+
+  buildPlayStatsView(stats) {
+    const s = stats || {};
+    const mk = (w) => {
+      const x = w || {};
+      return {
+        pig: this.formatDuration(x.pigSeconds),
+        donkey: this.formatDuration(x.donkeySeconds),
+        other: this.formatDuration(x.otherSeconds),
+        pigSessions: x.pigSessions || 0,
+        donkeySessions: x.donkeySessions || 0,
+        otherSessions: x.otherSessions || 0,
+        otherSecondsRaw: x.otherSeconds || 0
+      };
+    };
+    return { week: mk(s.week), month: mk(s.month), year: mk(s.year) };
+  },
+
+  formatPlayRecord(r) {
+    const cfg = PLAYER_CONFIG[r.player] || PLAYER_CONFIG.Other;
+    const start = new Date(r.startTime);
+    const startStr = `${start.getMonth() + 1}/${start.getDate()} ${this.pad2(start.getHours())}:${this.pad2(start.getMinutes())}`;
+    let rangeStr = startStr;
+    if (r.endTime) {
+      const end = new Date(r.endTime);
+      const sameDay = start.getFullYear() === end.getFullYear()
+        && start.getMonth() === end.getMonth()
+        && start.getDate() === end.getDate();
+      const endStr = sameDay
+        ? `${this.pad2(end.getHours())}:${this.pad2(end.getMinutes())}`
+        : `${end.getMonth() + 1}/${end.getDate()} ${this.pad2(end.getHours())}:${this.pad2(end.getMinutes())}`;
+      rangeStr = `${startStr} – ${endStr}`;
+    }
+    return {
+      id: r.id,
+      player: r.player,
+      playerEmoji: cfg.emoji,
+      playerName: cfg.name,
+      playerColor: cfg.color,
+      rangeStr,
+      durationStr: r.endTime ? this.formatDuration(r.durationSeconds) : '进行中',
+      ongoing: !r.endTime
+    };
   },
 
   // ==================== 姨妈功能 ====================

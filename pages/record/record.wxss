@@ -1027,3 +1027,306 @@
   color: #d1d5db;
   margin-left: 4rpx;
 }
+
+/* ==================== 猫猫记录子切换 ==================== */
+.cat-subtabs {
+  display: flex;
+  gap: 8rpx;
+  margin: 16rpx 24rpx 4rpx;
+  background: #eef2f7;
+  border-radius: 16rpx;
+  padding: 6rpx;
+}
+
+.cat-subtab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #6b7280;
+  border-radius: 12rpx;
+  transition: all .2s;
+}
+
+.cat-subtab-active {
+  background: #ffffff;
+  color: #6366f1;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.cat-subtab-icon {
+  font-size: 28rpx;
+}
+
+/* 通用：列表底部提示 */
+.more-hint {
+  text-align: center;
+  font-size: 22rpx;
+  color: #9ca3af;
+  padding: 12rpx 0 4rpx;
+}
+
+/* ==================== 陪玩：当前账号 ==================== */
+.play-identity {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin: 12rpx 24rpx 0;
+  padding: 12rpx 20rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  width: fit-content;
+}
+
+.play-identity-label {
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.play-identity-emoji {
+  font-size: 30rpx;
+}
+
+.play-identity-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ==================== 陪玩：开始 / 进行中 ==================== */
+.play-action-card {
+  margin: 16rpx 24rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  padding: 36rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.play-start-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 36rpx 0;
+  border: none;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: 700;
+  box-shadow: 0 8rpx 24rpx rgba(99, 102, 241, 0.35);
+}
+
+.play-start-btn::after {
+  border: none;
+}
+
+.play-start-btn[disabled] {
+  opacity: .6;
+}
+
+.play-start-icon {
+  font-size: 40rpx;
+}
+
+.play-start-text {
+  letter-spacing: 2rpx;
+}
+
+.play-start-hint {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.play-live {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 4rpx;
+}
+
+.play-live-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: playPulse 1.2s infinite;
+}
+
+@keyframes playPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70% { box-shadow: 0 0 0 14rpx rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.play-live-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.play-live-timer {
+  font-size: 76rpx;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: 2rpx;
+  margin: 8rpx 0 24rpx;
+}
+
+.play-live-btns {
+  display: flex;
+  gap: 16rpx;
+  width: 100%;
+}
+
+.play-btn {
+  flex: 1;
+  padding: 24rpx 0;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.play-btn::after {
+  border: none;
+}
+
+.play-btn-end {
+  flex: 2;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(16, 185, 129, 0.3);
+}
+
+.play-btn-end[disabled] {
+  opacity: .6;
+}
+
+.play-btn-discard {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* ==================== 陪玩：统计 ==================== */
+.play-stats {
+  padding: 8rpx 8rpx 16rpx;
+}
+
+.play-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 16rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.play-stat-row:last-child {
+  border-bottom: none;
+}
+
+.play-stat-who {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.play-stat-emoji {
+  font-size: 36rpx;
+}
+
+.play-stat-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #374151;
+}
+
+.play-stat-val {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.play-stat-time {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #6366f1;
+}
+
+.play-stat-sessions {
+  font-size: 22rpx;
+  color: #9ca3af;
+  margin-top: 2rpx;
+}
+
+/* ==================== 陪玩：历史记录 ==================== */
+.play-record-list {
+  padding: 8rpx;
+}
+
+.play-record-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 16rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.play-record-item:last-child {
+  border-bottom: none;
+}
+
+.play-record-item:active {
+  background: #f9fafb;
+}
+
+.play-record-left {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.play-record-emoji {
+  font-size: 36rpx;
+}
+
+.play-record-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.play-record-name {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.play-record-range {
+  font-size: 24rpx;
+  color: #6b7280;
+  margin-top: 4rpx;
+}
+
+.play-record-duration {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-left: 12rpx;
+  flex-shrink: 0;
+}
+
+.play-record-duration.ongoing {
+  color: #ef4444;
+}

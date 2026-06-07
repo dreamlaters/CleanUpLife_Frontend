@@ -7,7 +7,7 @@
   <view class="top-tabs">
     <view class="top-tab {{currentTab === 'weight' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="weight">
       <text class="top-tab-icon">🐱</text>
-      <text class="top-tab-text">猫猫体重</text>
+      <text class="top-tab-text">猫猫记录</text>
     </view>
     <view class="top-tab {{currentTab === 'period' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="period">
       <text class="top-tab-icon">🌸</text>
@@ -19,8 +19,22 @@
     </view>
   </view>
 
-  <!-- ==================== 体重内容 ==================== -->
+  <!-- ==================== 猫猫记录内容（体重 / 陪玩） ==================== -->
   <view class="tab-content" wx:if="{{currentTab === 'weight'}}">
+    <!-- 子切换：体重 / 陪玩 -->
+    <view class="cat-subtabs">
+      <view class="cat-subtab {{catSubTab === 'weight' ? 'cat-subtab-active' : ''}}" bindtap="switchCatSubTab" data-sub="weight">
+        <text class="cat-subtab-icon">⚖️</text>
+        <text>体重</text>
+      </view>
+      <view class="cat-subtab {{catSubTab === 'play' ? 'cat-subtab-active' : ''}}" bindtap="switchCatSubTab" data-sub="play">
+        <text class="cat-subtab-icon">🧶</text>
+        <text>陪玩</text>
+      </view>
+    </view>
+
+  <!-- ===== 体重子页 ===== -->
+  <block wx:if="{{catSubTab === 'weight'}}">
     <!-- 宠物卡片 -->
     <view class="pet-cards">
       <view 
@@ -108,9 +122,9 @@
           </view>
           
           <view class="record-grid">
-            <view 
+            <view
               class="record-card"
-              wx:for="{{groupedRecords[person]}}" 
+              wx:for="{{displayRecords[person]}}"
               wx:key="id"
               wx:for-item="record"
               data-id="{{record.id}}"
@@ -125,6 +139,7 @@
               </view>
             </view>
           </view>
+          <view class="more-hint" wx:if="{{groupedRecords[person].length > 6}}">仅显示最近 6 条</view>
         </view>
       </view>
 
@@ -142,6 +157,128 @@
 
     <!-- 底部消息推送入口 -->
     <footer-link />
+  </block>
+
+  <!-- ===== 陪玩子页 ===== -->
+  <block wx:if="{{catSubTab === 'play'}}">
+    <!-- 当前账号身份 -->
+    <view class="play-identity" wx:if="{{playStatus}}">
+      <text class="play-identity-label">当前账号</text>
+      <text class="play-identity-emoji">{{playerConfig[playStatus.player].emoji}}</text>
+      <text class="play-identity-name">{{playerConfig[playStatus.player].name}}</text>
+    </view>
+
+    <!-- 开始 / 进行中 -->
+    <view class="play-action-card">
+      <block wx:if="{{playStatus && playStatus.ongoing}}">
+        <view class="play-live">
+          <view class="play-live-dot"></view>
+          <text class="play-live-label">正在陪玩</text>
+        </view>
+        <text class="play-live-timer">{{playElapsedText}}</text>
+        <view class="play-live-btns">
+          <button class="play-btn play-btn-end" bindtap="onEndPlay" disabled="{{playStarting}}">结束陪玩</button>
+          <button class="play-btn play-btn-discard" bindtap="onDiscardPlay">放弃</button>
+        </view>
+      </block>
+      <block wx:else>
+        <button class="play-start-btn" bindtap="onStartPlay" disabled="{{playStarting}}">
+          <text class="play-start-icon">🐾</text>
+          <text class="play-start-text">开始陪玩</text>
+        </button>
+        <text class="play-start-hint">点击开始，自动记录你的陪玩时间</text>
+      </block>
+    </view>
+
+    <!-- 统计 -->
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-icon">📊</view>
+          <text class="section-title">陪玩统计</text>
+        </view>
+      </view>
+
+      <view class="filter-tabs">
+        <view class="filter-tab {{playStatsRange === 'week' ? 'filter-tab-active' : ''}}"
+              bindtap="onPlayStatsRangeChange" data-range="week">近7天</view>
+        <view class="filter-tab {{playStatsRange === 'month' ? 'filter-tab-active' : ''}}"
+              bindtap="onPlayStatsRangeChange" data-range="month">近30天</view>
+        <view class="filter-tab {{playStatsRange === 'year' ? 'filter-tab-active' : ''}}"
+              bindtap="onPlayStatsRangeChange" data-range="year">近1年</view>
+      </view>
+
+      <view class="play-stats" wx:if="{{playStatsView}}">
+        <view class="play-stat-row">
+          <view class="play-stat-who">
+            <text class="play-stat-emoji">🐷</text>
+            <text class="play-stat-name">猪猪</text>
+          </view>
+          <view class="play-stat-val">
+            <text class="play-stat-time">{{playStatsView[playStatsRange].pig}}</text>
+            <text class="play-stat-sessions">{{playStatsView[playStatsRange].pigSessions}} 次</text>
+          </view>
+        </view>
+        <view class="play-stat-row">
+          <view class="play-stat-who">
+            <text class="play-stat-emoji">🫏</text>
+            <text class="play-stat-name">毛驴</text>
+          </view>
+          <view class="play-stat-val">
+            <text class="play-stat-time">{{playStatsView[playStatsRange].donkey}}</text>
+            <text class="play-stat-sessions">{{playStatsView[playStatsRange].donkeySessions}} 次</text>
+          </view>
+        </view>
+        <view class="play-stat-row" wx:if="{{playStatsView[playStatsRange].otherSecondsRaw > 0}}">
+          <view class="play-stat-who">
+            <text class="play-stat-emoji">👤</text>
+            <text class="play-stat-name">其他</text>
+          </view>
+          <view class="play-stat-val">
+            <text class="play-stat-time">{{playStatsView[playStatsRange].other}}</text>
+            <text class="play-stat-sessions">{{playStatsView[playStatsRange].otherSessions}} 次</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 历史记录 -->
+    <view class="section-card">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-icon">📋</view>
+          <text class="section-title">陪玩记录</text>
+        </view>
+        <view class="section-badge" wx:if="{{playRecords.length}}">{{playRecords.length}}条</view>
+      </view>
+
+      <loading-state loading="{{loadingPlay}}" />
+
+      <view class="play-record-list" wx:if="{{!loadingPlay && playRecords.length}}">
+        <view class="play-record-item" wx:for="{{playRecords}}" wx:key="id"
+              data-id="{{item.id}}" bindlongpress="onPlayRecordLongPress">
+          <view class="play-record-left">
+            <text class="play-record-emoji">{{item.playerEmoji}}</text>
+            <view class="play-record-info">
+              <text class="play-record-name" style="color: {{item.playerColor}}">{{item.playerName}}</text>
+              <text class="play-record-range">{{item.rangeStr}}</text>
+            </view>
+          </view>
+          <text class="play-record-duration {{item.ongoing ? 'ongoing' : ''}}">{{item.durationStr}}</text>
+        </view>
+        <view class="more-hint">长按记录可删除</view>
+      </view>
+
+      <view class="empty-state" wx:if="{{!loadingPlay && !playRecords.length}}">
+        <text class="empty-icon">🧶</text>
+        <text class="empty-title">还没有陪玩记录</text>
+        <text class="empty-text">点击上方「开始陪玩」记录第一次</text>
+      </view>
+    </view>
+
+    <!-- 底部消息推送入口 -->
+    <footer-link />
+  </block>
   </view>
 
   <!-- ==================== 姨妈内容 ==================== -->

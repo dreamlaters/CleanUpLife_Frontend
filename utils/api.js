@@ -262,6 +262,57 @@ const getCheckupMetadata = (options = {}) => {
   return get('/CheckupMetadata', { showLoading: false, ...options });
 };
 
+// ==================== 陪玩记录 API ====================
+
+/**
+ * 获取当前账号的陪玩状态（是否进行中 + 已进行秒数 + 身份）
+ */
+const getPlayStatus = (options = {}) => {
+  return get('/Play/status', { showLoading: false, ...options });
+};
+
+/**
+ * 开始陪玩（服务端记录当前时间，身份由 openid 自动识别）
+ */
+const startPlay = (options = {}) => {
+  return post('/Play/start', {}, options);
+};
+
+/**
+ * 结束陪玩
+ */
+const endPlay = (options = {}) => {
+  return post('/Play/end', {}, options);
+};
+
+/**
+ * 获取最近陪玩记录
+ */
+const getPlayList = (options = {}) => {
+  return get('/Play/list', { showLoading: false, ...options });
+};
+
+/**
+ * 获取陪玩统计（近 7 / 30 / 365 天，猪 / 驴 / 其他）
+ */
+const getPlayStats = (options = {}) => {
+  return get('/Play/stats', { showLoading: false, ...options });
+};
+
+/**
+ * 修正陪玩记录的开始 / 结束时间
+ */
+const updatePlay = (id, data, options = {}) => {
+  return put(`/Play/${id}`, data, options);
+};
+
+/**
+ * 删除陪玩记录（也用于"放弃"进行中的会话）
+ */
+const deletePlay = (id, options = {}) => {
+  return del(`/Play/${id}`, options);
+};
+
 module.exports = {
   BASE_URL,
   request,
@@ -289,5 +340,13 @@ module.exports = {
   createCheckup,
   updateCheckup,
   deleteCheckup,
-  getCheckupMetadata
+  getCheckupMetadata,
+  // 陪玩记录
+  getPlayStatus,
+  startPlay,
+  endPlay,
+  getPlayList,
+  getPlayStats,
+  updatePlay,
+  deletePlay
 };
