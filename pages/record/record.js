@@ -658,6 +658,8 @@ Page({
 
   async onStartPlay() {
     if (this.data.playStarting) return;
+    // 轻触觉反馈，让"开始"更有手感
+    try { wx.vibrateShort({ type: 'light' }); } catch (e) {}
     this.setData({ playStarting: true });
     try {
       await api.startPlay({ loadingText: '开始中...' });
@@ -672,6 +674,7 @@ Page({
 
   async onEndPlay() {
     if (this.data.playStarting) return;
+    try { wx.vibrateShort({ type: 'light' }); } catch (e) {}
 
     const elapsed = this._playElapsed || 0;
     if (elapsed > LONG_PLAY_SECONDS) {

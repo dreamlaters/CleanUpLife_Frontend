@@ -169,13 +169,15 @@
     </view>
 
     <!-- 开始 / 进行中 -->
-    <view class="play-action-card">
+    <view class="play-action-card {{playStatus && playStatus.ongoing ? 'play-action-card-live' : ''}}">
       <block wx:if="{{playStatus && playStatus.ongoing}}">
         <view class="play-live">
           <view class="play-live-dot"></view>
           <text class="play-live-label">正在陪玩</text>
         </view>
-        <text class="play-live-timer">{{playElapsedText}}</text>
+        <view class="play-live-timer-well">
+          <text class="play-live-timer">{{playElapsedText}}</text>
+        </view>
         <view class="play-live-btns">
           <button class="play-btn play-btn-end" bindtap="onEndPlay" disabled="{{playStarting}}">结束陪玩</button>
           <button class="play-btn play-btn-discard" bindtap="onDiscardPlay">放弃</button>
