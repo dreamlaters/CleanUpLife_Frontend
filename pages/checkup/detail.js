@@ -80,13 +80,24 @@ Page({
 
   goToEdit() {
     if (this.data.checkup) {
+      const me = getApp().globalData.player;
+      if (me && this.data.checkup.owner !== me) {
+        wx.showToast({ title: '只能编辑自己的体检记录', icon: 'none' });
+        return;
+      }
       wx.navigateTo({ url: `/pages/checkup/add?id=${this.data.checkup.id}&edit=true` });
     }
   },
 
   deleteCheckup() {
     if (!this.data.checkup) return;
-    
+
+    const me = getApp().globalData.player;
+    if (me && this.data.checkup.owner !== me) {
+      wx.showToast({ title: '只能删除自己的体检记录', icon: 'none' });
+      return;
+    }
+
     wx.showModal({
       title: '确认删除',
       content: '确定要删除这条体检记录吗？',

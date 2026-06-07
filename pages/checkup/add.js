@@ -60,17 +60,16 @@ Page({
     // 预加载 metadata
     this.loadMetadata();
 
-    if (options.owner) {
-      const idx = constants.CHECKUP_OWNERS.indexOf(options.owner);
-      this.setData({
-        owner: options.owner,
-        ownerIndex: idx >= 0 ? idx : 0
-      });
-    }
+    const me = getApp().globalData.player;
 
     if (options.edit === 'true' && options.id) {
       this.setData({ isEdit: true, checkupId: options.id });
       this.fetchCheckup(options.id);
+    } else {
+      // 新建：归属锁定为本人（猪/驴）；其他人提交时拦截
+      const owner = (me === 'Pig' || me === 'Donkey') ? me : (options.owner || 'Pig');
+      const idx = constants.CHECKUP_OWNERS.indexOf(owner);
+      this.setData({ owner, ownerIndex: idx >= 0 ? idx : 0 });
     }
   },
 
@@ -135,6 +134,15 @@ Page({
           isComputed: item.name === 'BMI'
         }))
       });
+      // 只能编辑自己的记录
+      const me = getApp().globalData.player;
+      if (me && checkup.owner !== me) {
+        wx.hideLoading();
+        wx.showToast({ title: '只能编辑自己的体检记录', icon: 'none' });
+        setTimeout(() => wx.navigateBack(), 800);
+        return;
+      }
+
       this.updateItemsMetadata();
       wx.hideLoading();
     } catch (err) {
@@ -166,10 +174,13 @@ Page({
   // ==================== 基础信息 ====================
   onOwnerChange(e) {
     const idx = e.detail.value;
-    this.setData({
-      ownerIndex: idx,
-      owner: constants.CHECKUP_OWNERS[idx]
-    });
+    const target = constants.CHECKUP_OWNERS[idx];
+    const me = getApp().globalData.player;
+    if (me && target !== me) {
+      wx.showToast({ title: '只能记录自己的体检', icon: 'none' });
+      return;
+    }
+    this.setData({ ownerIndex: idx, owner: target });
   },
 
   onDateChange(e) {
@@ -415,7 +426,13 @@ Page({
 
   async doSubmit() {
     const { isEdit, checkupId, owner, checkupDate, hospital, notes, items } = this.data;
-    
+
+    const me = getApp().globalData.player;
+    if (me && owner !== me) {
+      wx.showToast({ title: '只能保存自己的体检记录', icon: 'none' });
+      return;
+    }
+
     this.setData({ submitting: true });
 
     // 前端只提交 name + category + value + notes，后端自动填充 unit/referenceRange/status

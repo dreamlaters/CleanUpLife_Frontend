@@ -112,6 +112,22 @@ Page({
 
   stopPropagation() {},
 
+  // 当前账号身份（Pig/Donkey/Other），用于"只能写自己的"
+  _myPlayer() {
+    const app = getApp();
+    return app && app.globalData ? app.globalData.player : null;
+  },
+
+  // 身份未知时不拦截（交给后端兜底）；已知则必须与归属一致
+  _canWrite(owner) {
+    const me = this._myPlayer();
+    return !me || me === owner;
+  },
+
+  _denyWrite() {
+    wx.showToast({ title: '只能操作自己的目标', icon: 'none' });
+  },
+
   // ==================== 出行计划 ====================
   switchTravelTab(e) {
     const tab = e.currentTarget.dataset.tab;
@@ -335,6 +351,7 @@ Page({
 
   showAddGoalForm(e) {
     const owner = e.currentTarget.dataset.owner;
+    if (!this._canWrite(owner)) { this._denyWrite(); return; }
     const currentYear = new Date().getFullYear();
     const yearList = [];
     for (let y = 2020; y <= currentYear + 2; y++) {
@@ -417,6 +434,8 @@ Page({
 
   toggleGoalComplete(e) {
     const id = e.currentTarget.dataset.id;
+    const goal = [...this.data.goalsPig, ...this.data.goalsDonkey].find(g => g.id === id);
+    if (goal && !this._canWrite(goal.owner)) { this._denyWrite(); return; }
     api.request({ url: `/YearlyGoal/${id}/toggle`, method: 'PATCH', showLoading: false })
       .then(() => {
         this.fetchYearlyGoals();
@@ -428,6 +447,7 @@ Page({
     const id = e.currentTarget.dataset.id;
     const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
     const item = allGoals.find(g => g.id === id);
+    if (item && !this._canWrite(item.owner)) { this._denyWrite(); return; }
     this.setData({
       showActionSheet: true,
       actionSheetTitle: item ? item.title : '操作',
@@ -572,6 +592,7 @@ Page({
     // 获取当前目标状态，用于判断是否自动完成
     const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
     const goal = allGoals.find(g => g.id === goalId);
+    if (goal && !this._canWrite(goal.owner)) { this._denyWrite(); return; }
     const wasCompleted = goal?.completed;
     
     api.request({
@@ -590,6 +611,8 @@ Page({
   // 显示添加子目标表单
   showAddSubGoalForm(e) {
     const goalId = e.currentTarget.dataset.goalId;
+    const goal = [...this.data.goalsPig, ...this.data.goalsDonkey].find(g => g.id === goalId);
+    if (goal && !this._canWrite(goal.owner)) { this._denyWrite(); return; }
     this.setData({
       showSubGoalForm: true,
       currentGoalId: goalId,
@@ -649,6 +672,7 @@ Page({
     const { goalId, subId } = e.currentTarget.dataset;
     const allGoals = [...this.data.goalsPig, ...this.data.goalsDonkey];
     const goal = allGoals.find(g => g.id === goalId);
+    if (goal && !this._canWrite(goal.owner)) { this._denyWrite(); return; }
     const subGoal = goal?.subGoals?.find(s => s.id === subId);
     
     this.setData({

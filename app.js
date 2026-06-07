@@ -51,6 +51,9 @@ App({
               if (resp.statusCode >= 200 && resp.statusCode < 300 && resp.data?.token) {
                 this.globalData.token = resp.data.token;
                 this.globalData.openid = resp.data.openid;
+                // 缺省 null 表示身份未知（如后端尚未部署该字段）：前端不拦截，交后端兜底；
+                // 真正的"其他人"后端会显式返回 'Other'
+                this.globalData.player = resp.data.player || null;
                 console.log('登录成功，token 已获取');
                 resolve(resp.data);
               } else {
@@ -99,6 +102,7 @@ App({
     constants,
     token: null,
     openid: null,
+    player: null,        // 当前账号身份：Pig / Donkey / Other（登录时由后端返回）
     blocked: false,
     blockedInfo: null
   }

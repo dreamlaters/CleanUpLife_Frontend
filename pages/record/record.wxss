@@ -1308,9 +1308,24 @@
   min-width: 0;
 }
 
+.play-record-namerow {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
 .play-record-name {
   font-size: 26rpx;
   font-weight: 600;
+}
+
+.play-record-mine {
+  font-size: 18rpx;
+  color: #6366f1;
+  background: #eef2ff;
+  border-radius: 6rpx;
+  padding: 0 8rpx;
+  line-height: 30rpx;
 }
 
 .play-record-range {
@@ -1329,4 +1344,41 @@
 
 .play-record-duration.ongoing {
   color: #ef4444;
+}
+
+/* ==================== 陪玩编辑弹窗 ==================== */
+.datetime-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.datetime-picker {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.play-edit-player {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 16rpx 20rpx;
+  background: #f9fafb;
+  border-radius: 12rpx;
+}
+
+.play-edit-player-emoji {
+  font-size: 32rpx;
+}
+
+.play-edit-player-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #111827;
 }

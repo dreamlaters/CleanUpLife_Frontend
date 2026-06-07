@@ -256,17 +256,21 @@
 
       <view class="play-record-list" wx:if="{{!loadingPlay && playRecords.length}}">
         <view class="play-record-item" wx:for="{{playRecords}}" wx:key="id"
-              data-id="{{item.id}}" bindlongpress="onPlayRecordLongPress">
+              data-id="{{item.id}}" data-record="{{item}}"
+              bindtap="onPlayRecordTap" bindlongpress="onPlayRecordLongPress">
           <view class="play-record-left">
             <text class="play-record-emoji">{{item.playerEmoji}}</text>
             <view class="play-record-info">
-              <text class="play-record-name" style="color: {{item.playerColor}}">{{item.playerName}}</text>
+              <view class="play-record-namerow">
+                <text class="play-record-name" style="color: {{item.playerColor}}">{{item.playerName}}</text>
+                <text class="play-record-mine" wx:if="{{item.isMine}}">我</text>
+              </view>
               <text class="play-record-range">{{item.rangeStr}}</text>
             </view>
           </view>
           <text class="play-record-duration {{item.ongoing ? 'ongoing' : ''}}">{{item.durationStr}}</text>
         </view>
-        <view class="more-hint">长按记录可删除</view>
+        <view class="more-hint">仅可编辑 / 删除自己（带"我"）的记录</view>
       </view>
 
       <view class="empty-state" wx:if="{{!loadingPlay && !playRecords.length}}">
@@ -670,3 +674,63 @@
   show="{{showCheckupActionSheet}}" title="体检记录操作"
   bind:edit="onEditCheckupAction" bind:delete="onDeleteCheckupAction" bind:cancel="hideCheckupActionSheet"
 />
+
+<!-- ==================== 陪玩编辑弹窗 ==================== -->
+<view class="modal-overlay {{showPlayEditModal ? 'show' : ''}}" catchtap="hidePlayEditModal" wx:if="{{showPlayEditModal}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">编辑陪玩记录</text>
+      <view class="modal-close" bindtap="hidePlayEditModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">陪玩者</text>
+        <view class="play-edit-player">
+          <text class="play-edit-player-emoji">{{editPlayerEmoji}}</text>
+          <text class="play-edit-player-name">{{editPlayerName}}</text>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">开始时间</text>
+        <view class="datetime-row">
+          <picker class="datetime-picker" mode="date" value="{{editPlayStartDate}}" bindchange="onPlayStartDateChange">
+            <view class="date-picker">
+              <text class="date-value">{{editPlayStartDate || '选择日期'}}</text>
+              <text class="picker-arrow">›</text>
+            </view>
+          </picker>
+          <picker class="datetime-picker" mode="time" value="{{editPlayStartTime}}" bindchange="onPlayStartTimeChange">
+            <view class="date-picker">
+              <text class="date-value">{{editPlayStartTime || '时间'}}</text>
+              <text class="picker-arrow">›</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">结束时间</text>
+        <view class="datetime-row">
+          <picker class="datetime-picker" mode="date" value="{{editPlayEndDate}}" bindchange="onPlayEndDateChange">
+            <view class="date-picker">
+              <text class="date-value">{{editPlayEndDate || '选择日期'}}</text>
+              <text class="picker-arrow">›</text>
+            </view>
+          </picker>
+          <picker class="datetime-picker" mode="time" value="{{editPlayEndTime}}" bindchange="onPlayEndTimeChange">
+            <view class="date-picker">
+              <text class="date-value">{{editPlayEndTime || '时间'}}</text>
+              <text class="picker-arrow">›</text>
+            </view>
+          </picker>
+        </view>
+        <text class="form-hint" wx:if="{{!editPlayEndDate && !editPlayEndTime}}">留空将保持"进行中"；补全日期和时间即可结束它</text>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-danger" bindtap="onDeletePlayFromEdit">删除</button>
+      <button class="btn btn-primary" bindtap="submitPlayEdit">保存</button>
+    </view>
+  </view>
+</view>

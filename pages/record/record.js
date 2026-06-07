@@ -50,6 +50,16 @@ Page({
     playStatsRange: 'week',     // week | month | year
     playStatsView: null,        // 格式化后的三窗口统计
     playRecords: [],            // 最近陪玩记录（已格式化）
+
+    // 陪玩编辑弹窗
+    showPlayEditModal: false,
+    editPlayId: '',
+    editPlayerEmoji: '',
+    editPlayerName: '',
+    editPlayStartDate: '',
+    editPlayStartTime: '',
+    editPlayEndDate: '',
+    editPlayEndTime: '',
     personList: PERSON_LIST,
     personConfig: PERSON_CONFIG,
     
@@ -717,7 +727,116 @@ Page({
   },
 
   onPlayRecordLongPress(e) {
-    const { id } = e.currentTarget.dataset;
+    const r = e.currentTarget.dataset.record;
+    if (!r) return;
+    if (!r.isMine) {
+      wx.showToast({ title: '只能删除自己的记录', icon: 'none' });
+      return;
+    }
+    wx.showModal({
+      title: '删除记录',
+      content: '确定删除这条陪玩记录吗？',
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await api.deletePlay(r.id, { loadingText: '删除中...' });
+          wx.showToast({ title: '已删除', icon: 'success' });
+          await this.fetchPlayAll();
+        } catch (err) {
+          wx.showToast({ title: '删除失败', icon: 'error' });
+        }
+      }
+    });
+  },
+
+  // 点击记录 → 打开编辑弹窗（仅限本人记录；预填本地壁钟时间，与列表展示一致）
+  onPlayRecordTap(e) {
+    const r = e.currentTarget.dataset.record;
+    if (!r) return;
+    if (!r.isMine) {
+      wx.showToast({ title: '只能编辑自己的记录', icon: 'none' });
+      return;
+    }
+    const cfg = PLAYER_CONFIG[r.player] || PLAYER_CONFIG.Other;
+
+    const start = new Date(r.startTime);
+    const sd = `${start.getFullYear()}-${this.pad2(start.getMonth() + 1)}-${this.pad2(start.getDate())}`;
+    const st = `${this.pad2(start.getHours())}:${this.pad2(start.getMinutes())}`;
+
+    let ed = '', et = '';
+    if (r.endTime) {
+      const end = new Date(r.endTime);
+      ed = `${end.getFullYear()}-${this.pad2(end.getMonth() + 1)}-${this.pad2(end.getDate())}`;
+      et = `${this.pad2(end.getHours())}:${this.pad2(end.getMinutes())}`;
+    }
+
+    this.setData({
+      showPlayEditModal: true,
+      editPlayId: r.id,
+      editPlayerEmoji: cfg.emoji,
+      editPlayerName: cfg.name,
+      editPlayStartDate: sd,
+      editPlayStartTime: st,
+      editPlayEndDate: ed,
+      editPlayEndTime: et
+    });
+  },
+
+  hidePlayEditModal() {
+    this.setData({ showPlayEditModal: false });
+  },
+
+  onPlayStartDateChange(e) { this.setData({ editPlayStartDate: e.detail.value }); },
+  onPlayStartTimeChange(e) { this.setData({ editPlayStartTime: e.detail.value }); },
+  onPlayEndDateChange(e) { this.setData({ editPlayEndDate: e.detail.value }); },
+  onPlayEndTimeChange(e) { this.setData({ editPlayEndTime: e.detail.value }); },
+
+  // 本地壁钟（日期+时间）→ UTC ISO 串（带 Z），与服务端存储格式一致
+  localPartsToIso(dateStr, timeStr) {
+    const [y, mo, d] = dateStr.split('-').map(Number);
+    const [h, mi] = timeStr.split(':').map(Number);
+    return new Date(y, mo - 1, d, h, mi, 0).toISOString();
+  },
+
+  async submitPlayEdit() {
+    const { editPlayId, editPlayStartDate, editPlayStartTime, editPlayEndDate, editPlayEndTime } = this.data;
+
+    if (!editPlayStartDate || !editPlayStartTime) {
+      wx.showToast({ title: '请选择开始时间', icon: 'error' });
+      return;
+    }
+
+    const hasEndDate = !!editPlayEndDate;
+    const hasEndTime = !!editPlayEndTime;
+    if (hasEndDate !== hasEndTime) {
+      wx.showToast({ title: '结束日期和时间需一起填', icon: 'none' });
+      return;
+    }
+
+    const startTime = this.localPartsToIso(editPlayStartDate, editPlayStartTime);
+    let endTime = null;
+    if (hasEndDate && hasEndTime) {
+      endTime = this.localPartsToIso(editPlayEndDate, editPlayEndTime);
+      if (new Date(endTime).getTime() < new Date(startTime).getTime()) {
+        wx.showToast({ title: '结束不能早于开始', icon: 'none' });
+        return;
+      }
+    }
+
+    try {
+      await api.updatePlay(editPlayId, { startTime, endTime }, { loadingText: '保存中...' });
+      wx.showToast({ title: '已保存', icon: 'success' });
+      this.setData({ showPlayEditModal: false });
+      await this.fetchPlayAll();
+    } catch (err) {
+      console.error('保存陪玩记录失败', err);
+      wx.showToast({ title: '保存失败', icon: 'error' });
+    }
+  },
+
+  onDeletePlayFromEdit() {
+    const id = this.data.editPlayId;
     if (!id) return;
     wx.showModal({
       title: '删除记录',
@@ -728,6 +847,7 @@ Page({
         try {
           await api.deletePlay(id, { loadingText: '删除中...' });
           wx.showToast({ title: '已删除', icon: 'success' });
+          this.setData({ showPlayEditModal: false });
           await this.fetchPlayAll();
         } catch (err) {
           wx.showToast({ title: '删除失败', icon: 'error' });
@@ -782,6 +902,9 @@ Page({
 
   formatPlayRecord(r) {
     const cfg = PLAYER_CONFIG[r.player] || PLAYER_CONFIG.Other;
+    const app = getApp();
+    const myOpenId = (app && app.globalData) ? app.globalData.openid : '';
+    const isMine = !!myOpenId && r.openId === myOpenId;
     const start = new Date(r.startTime);
     const startStr = `${start.getMonth() + 1}/${start.getDate()} ${this.pad2(start.getHours())}:${this.pad2(start.getMinutes())}`;
     let rangeStr = startStr;
@@ -803,7 +926,10 @@ Page({
       playerColor: cfg.color,
       rangeStr,
       durationStr: r.endTime ? this.formatDuration(r.durationSeconds) : '进行中',
-      ongoing: !r.endTime
+      ongoing: !r.endTime,
+      startTime: r.startTime,
+      endTime: r.endTime,
+      isMine
     };
   },
 
@@ -1203,10 +1329,20 @@ Page({
   },
 
   goToAddCheckup() {
+    const me = getApp().globalData.player;
+    if (me && me !== this.data.checkupOwner) {
+      wx.showToast({ title: '只能添加自己的体检记录', icon: 'none' });
+      return;
+    }
     wx.navigateTo({ url: `/pages/checkup/add?owner=${this.data.checkupOwner}` });
   },
 
   onCheckupLongPress(e) {
+    const me = getApp().globalData.player;
+    if (me && me !== this.data.checkupOwner) {
+      wx.showToast({ title: '只能编辑/删除自己的体检记录', icon: 'none' });
+      return;
+    }
     const { id } = e.currentTarget.dataset;
     this.setData({
       showCheckupActionSheet: true,
