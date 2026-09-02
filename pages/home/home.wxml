@@ -14,13 +14,15 @@
 
   <view class="today-section" wx:if="{{!loading}}">
     <view class="section-heading">
-      <view>
+      <view class="section-heading-copy">
         <text class="section-kicker">TODAY</text>
-        <text class="section-title">今天要留意</text>
+        <view class="section-title-row">
+          <text class="section-title">今天要留意</text>
+          <text class="section-count" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
+            {{expiredItems.length + expiringSoonItems.length}} 件
+          </text>
+        </view>
       </view>
-      <text class="section-count" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
-        {{expiredItems.length + expiringSoonItems.length}} 件
-      </text>
     </view>
 
     <view class="attention-card" wx:if="{{expiredItems.length || expiringSoonItems.length}}">

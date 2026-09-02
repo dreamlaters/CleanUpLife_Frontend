@@ -70,6 +70,17 @@
   flex-direction: column;
 }
 
+.section-heading-copy {
+  width: 100%;
+}
+
+.section-title-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .section-title {
   margin-top: 4rpx;
   color: #3f352f;
