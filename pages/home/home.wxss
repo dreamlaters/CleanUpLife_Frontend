@@ -78,12 +78,19 @@
 }
 
 .section-count {
-  padding: 6rpx 14rpx;
+  min-width: 68rpx;
+  height: 68rpx;
+  padding: 0 14rpx;
+  box-sizing: border-box;
   border-radius: 999rpx;
   background: #f4ded7;
   color: #9f4f3d;
   font-size: 21rpx;
   font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .attention-card {
