@@ -18,9 +18,7 @@
         <text class="section-kicker">TODAY</text>
         <view class="section-title-row">
           <text class="section-title">今天要留意</text>
-          <text class="section-count" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
-            {{expiredItems.length + expiringSoonItems.length}} 件
-          </text>
+          <text class="section-count" wx:if="{{expiredItems.length + expiringSoonItems.length}}">{{expiredItems.length + expiringSoonItems.length}} 件</text>
         </view>
       </view>
     </view>
