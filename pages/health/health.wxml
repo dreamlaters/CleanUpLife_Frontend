@@ -1,0 +1,333 @@
+<!--
+  THESIS: 将经期与体检集中为独立健康页，不混入猫猫记录。
+  OWN-WORLD: 延续暖色手账底色、纸张卡片、陶土红与柔和绿。
+  STORY: 先看当前健康状态，再记录或回顾历史。
+  FIRST VIEWPORT: 健康导航、双段切换与当前状态直接出现。
+  FORM: 单层操作型页面，沿用现有记录页的组件与交互。
+-->
+<view class="container">
+  <custom-navbar title="健康" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
+  <segmented-control items="{{healthTabs}}" value="{{currentTab}}" bind:change="switchTab" />
+
+  <view class="tab-content" wx:if="{{currentTab === 'period'}}">
+    <view class="period-status-card" wx:if="{{periodStats}}">
+      <view class="period-status-icon">
+        <app-icon name="flower" size="52" label="经期状态" />
+      </view>
+      <view class="period-status-info">
+        <view class="period-status-main" wx:if="{{periodStats.status === 'none'}}">
+          <text class="period-status-text">暂无记录</text>
+          <text class="period-status-hint">点击下方按钮开始记录</text>
+        </view>
+        <view class="period-status-main" wx:elif="{{periodStats.status === 'in-period'}}">
+          <text class="period-status-text">经期第 {{periodDays}} 天</text>
+          <text class="period-status-hint">记得注意保暖，好好休息</text>
+        </view>
+        <view class="period-status-main" wx:else>
+          <text class="period-status-text" wx:if="{{periodStats.daysUntilNextPeriod > 0}}">距下次经期还有 {{periodStats.daysUntilNextPeriod}} 天</text>
+          <text class="period-status-text" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">预计今天开始</text>
+          <text class="period-status-text" wx:else>已超出预计 {{0 - periodStats.daysUntilNextPeriod}} 天</text>
+          <text class="period-status-hint">平均周期 {{periodStats.averageCycleDays}} 天</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="calendar-card">
+      <view class="calendar-header">
+        <view class="month-nav" bindtap="prevMonth">
+          <view class="nav-arrow nav-arrow-left">
+            <app-icon name="chevron-right" size="28" label="上个月" />
+          </view>
+        </view>
+        <view class="month-title">
+          <text>{{currentYear}}年{{currentMonth}}月</text>
+        </view>
+        <view class="month-nav" bindtap="nextMonth">
+          <view class="nav-arrow">
+            <app-icon name="chevron-right" size="28" label="下个月" />
+          </view>
+        </view>
+        <view class="today-btn" bindtap="goToToday">
+          <text>今天</text>
+        </view>
+      </view>
+
+      <view class="weekday-row">
+        <view class="weekday-cell" wx:for="{{weekDays}}" wx:key="*this">
+          <text class="{{index === 0 || index === 6 ? 'weekend' : ''}}">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="calendar-grid">
+        <view
+          class="day-cell {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.isPeriod ? 'period' : ''}} {{item.isPredicted ? 'predicted' : ''}} {{item.isStart ? 'period-start' : ''}} {{item.isEnd ? 'period-end' : ''}}"
+          wx:for="{{calendarDays}}"
+          wx:key="date"
+        >
+          <text class="day-num">{{item.day}}</text>
+          <view class="day-dot" wx:if="{{item.isPeriod || item.isPredicted}}"></view>
+        </view>
+      </view>
+
+      <view class="period-legend">
+        <view class="period-legend-item">
+          <view class="period-legend-dot period"></view>
+          <text>经期</text>
+        </view>
+        <view class="period-legend-item">
+          <view class="period-legend-dot predicted"></view>
+          <text>预测</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="period-action-buttons">
+      <button class="period-action-btn primary" bindtap="showRecordStart" wx:if="{{!latestPeriodRecord || latestPeriodRecord.endDate}}">
+        <app-icon name="flower" size="30" label="开始" />
+        <text>记录开始</text>
+      </button>
+      <button class="period-action-btn secondary" bindtap="showRecordEnd" wx:if="{{latestPeriodRecord && !latestPeriodRecord.endDate}}">
+        <app-icon name="check" size="30" label="结束" />
+        <text>记录结束</text>
+      </button>
+      <button class="period-action-btn outline" bindtap="showRecordStart" wx:if="{{latestPeriodRecord && !latestPeriodRecord.endDate}}">
+        <app-icon name="edit" size="30" label="新记录" />
+        <text>新记录</text>
+      </button>
+    </view>
+
+    <view class="section-card" wx:if="{{periodRecords.length > 0}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-icon">
+            <app-icon name="calendar" size="32" label="历史记录" />
+          </view>
+          <text class="section-title">历史记录</text>
+        </view>
+      </view>
+      <view class="period-record-list">
+        <view
+          class="period-record-item"
+          wx:for="{{periodRecords}}"
+          wx:key="id"
+          bindtap="onPeriodRecordTap"
+          data-record="{{item}}"
+        >
+          <view class="period-record-dates">
+            <text class="period-record-start">{{item.startDateDisplay}}</text>
+            <text class="period-record-arrow">→</text>
+            <text class="period-record-end">{{item.endDateDisplay || '进行中'}}</text>
+          </view>
+          <view class="period-record-info">
+            <text class="period-record-days" wx:if="{{item.periodDays}}">{{item.periodDays}}天</text>
+            <text class="period-record-cycle" wx:if="{{item.cycleDays}}">周期{{item.cycleDays}}天</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <empty-state
+      show="{{!loadingPeriod && periodRecords.length === 0}}"
+      iconName="calendar"
+      title="暂无经期记录"
+      text="点击“记录开始”添加第一条记录"
+    />
+    <loading-state loading="{{loadingPeriod}}" />
+  </view>
+
+  <view class="tab-content" wx:if="{{currentTab === 'checkup'}}">
+    <view class="checkup-owner-tabs">
+      <view
+        class="checkup-owner-tab {{checkupOwner === item ? 'checkup-owner-tab-active' : ''}}"
+        wx:for="{{checkupOwners}}"
+        wx:key="*this"
+        bindtap="onCheckupOwnerChange"
+        data-owner="{{item}}"
+      >
+        <text class="checkup-owner-emoji">{{checkupOwnerConfig[item].emoji}}</text>
+        <text class="checkup-owner-name">{{checkupOwnerConfig[item].name}}</text>
+      </view>
+    </view>
+
+    <loading-state loading="{{loadingCheckup}}" />
+
+    <view
+      class="checkup-summary-card"
+      wx:if="{{checkupRecords.length > 0 && !loadingCheckup}}"
+      bindtap="goToCheckupDetail"
+      data-id="{{checkupRecords[0].id}}"
+    >
+      <view class="checkup-summary-icon">
+        <app-icon name="health" size="52" label="体检" />
+      </view>
+      <view class="checkup-summary-info">
+        <text class="checkup-summary-title">最近一次体检</text>
+        <text class="checkup-summary-date">{{checkupRecords[0].checkupDateFormatted}}</text>
+        <text class="checkup-summary-hospital" wx:if="{{checkupRecords[0].hospital}}">{{checkupRecords[0].hospital}}</text>
+      </view>
+      <view class="checkup-summary-stats">
+        <view class="checkup-stat-item" wx:if="{{checkupRecords[0].abnormalCount > 0}}">
+          <text class="checkup-stat-num abnormal">{{checkupRecords[0].abnormalCount}}</text>
+          <text class="checkup-stat-label">异常</text>
+        </view>
+        <view class="checkup-stat-item">
+          <text class="checkup-stat-num normal">{{checkupRecords[0].normalCount}}</text>
+          <text class="checkup-stat-label">正常</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card" wx:if="{{checkupRecords.length > 0 && !loadingCheckup}}">
+      <view class="section-header">
+        <view class="section-title-wrap">
+          <view class="section-icon">
+            <app-icon name="calendar" size="32" label="历史记录" />
+          </view>
+          <text class="section-title">历史记录</text>
+        </view>
+        <view class="section-badge">{{checkupRecords.length}}次</view>
+      </view>
+
+      <view class="checkup-record-list">
+        <view
+          class="checkup-record-item"
+          wx:for="{{checkupRecords}}"
+          wx:key="id"
+          bindtap="goToCheckupDetail"
+          bindlongpress="onCheckupLongPress"
+          data-id="{{item.id}}"
+        >
+          <view class="checkup-record-left">
+            <text class="checkup-record-date">{{item.checkupDateFormatted}}</text>
+            <text class="checkup-record-hospital" wx:if="{{item.hospital}}">{{item.hospital}}</text>
+          </view>
+          <view class="checkup-record-right">
+            <view class="checkup-badge abnormal" wx:if="{{item.abnormalCount > 0}}">
+              <app-icon name="alert" size="24" label="异常" />
+              <text>{{item.abnormalCount}}项异常</text>
+            </view>
+            <view class="checkup-badge normal">
+              <app-icon name="check" size="24" label="正常" />
+              <text>{{item.normalCount}}项正常</text>
+            </view>
+            <view class="checkup-record-arrow">
+              <app-icon name="chevron-right" size="28" label="查看详情" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <empty-state
+      show="{{!loadingCheckup && checkupRecords.length === 0}}"
+      iconName="health"
+      title="暂无体检记录"
+      text="添加一条记录，开始整理体检结果"
+      buttonText="添加体检记录"
+      bind:buttontap="goToAddCheckup"
+    />
+
+    <view class="fab-btn" bindtap="goToAddCheckup">
+      <app-icon name="plus" size="44" label="添加体检记录" />
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>
+
+<view class="modal-overlay" catchtap="hideStartModal" wx:if="{{showStartModal}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">记录开始日期</text>
+      <view class="modal-close" bindtap="hideStartModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">开始日期</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="date-picker">
+            <text class="date-value">{{startDate}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">备注（可选）</text>
+        <input class="form-input" placeholder="添加备注..." value="{{notes}}" bindinput="onNotesInput" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideStartModal">取消</button>
+      <button class="btn btn-primary" bindtap="submitStart">确定</button>
+    </view>
+  </view>
+</view>
+
+<view class="modal-overlay" catchtap="hideEndModal" wx:if="{{showEndModal}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">记录结束日期</text>
+      <view class="modal-close" bindtap="hideEndModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">结束日期</text>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="date-picker">
+            <text class="date-value">{{endDate}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideEndModal">取消</button>
+      <button class="btn btn-primary" bindtap="submitEnd">确定</button>
+    </view>
+  </view>
+</view>
+
+<view class="modal-overlay" catchtap="hidePeriodEditModal" wx:if="{{showPeriodEditModal}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">编辑记录</text>
+      <view class="modal-close" bindtap="hidePeriodEditModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">开始日期</text>
+        <picker mode="date" value="{{editStartDate}}" bindchange="onEditStartDateChange">
+          <view class="date-picker">
+            <text class="date-value">{{editStartDate}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">结束日期</text>
+        <picker mode="date" value="{{editEndDate}}" bindchange="onEditEndDateChange">
+          <view class="date-picker">
+            <text class="date-value">{{editEndDate || '未设置'}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">备注</text>
+        <input class="form-input" placeholder="添加备注..." value="{{editNotes}}" bindinput="onEditNotesInput" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-danger" bindtap="deletePeriodRecord">删除</button>
+      <button class="btn btn-primary" bindtap="submitPeriodEdit">保存</button>
+    </view>
+  </view>
+</view>
+
+<action-sheet
+  show="{{showCheckupActionSheet}}"
+  title="体检记录操作"
+  bind:edit="onEditCheckupAction"
+  bind:delete="onDeleteCheckupAction"
+  bind:cancel="hideCheckupActionSheet"
+/>

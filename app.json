@@ -2,7 +2,9 @@
   "pages": [
     "pages/home/home",
     "pages/items/items",
+    "pages/cat/cat",
     "pages/plan/plan",
+    "pages/health/health",
     "pages/record/record",
     "pages/add/add",
     "pages/update/update",
@@ -41,16 +43,22 @@
         "selectedIconPath": "images/tab-items-active.png"
       },
       {
+        "pagePath": "pages/cat/cat",
+        "text": "猫猫",
+        "iconPath": "images/tab-cat.png",
+        "selectedIconPath": "images/tab-cat-active.png"
+      },
+      {
         "pagePath": "pages/plan/plan",
         "text": "计划",
         "iconPath": "images/tab-plan.png",
         "selectedIconPath": "images/tab-plan-active.png"
       },
       {
-        "pagePath": "pages/record/record",
-        "text": "记录",
-        "iconPath": "images/tab-record.png",
-        "selectedIconPath": "images/tab-record-active.png"
+        "pagePath": "pages/health/health",
+        "text": "健康",
+        "iconPath": "images/tab-health.png",
+        "selectedIconPath": "images/tab-health-active.png"
       }
     ]
   },

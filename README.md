@@ -26,8 +26,10 @@ WeChat Mini Program for personal life management — track products, shopping li
 pages/
   home/           # Dashboard — expiry alerts, period status, cat weights, goals progress
   items/          # Product management + to-buy list (tab view)
-  plan/           # Travel plans + yearly goals + retirement savings (tab view)
-  record/         # Cat weight + period tracking + health checkups (tab view)
+  cat/            # Cat weight + shared play tracking (tab view)
+  plan/           # Yearly goals + retirement savings + travel wishes (tab view)
+  health/         # Period tracking + health checkups (tab view)
+  record/         # Compatibility redirect for legacy links
   add/            # Add new product form
   update/         # Edit product form
   tobuy/          # Add/edit to-buy items
@@ -59,7 +61,7 @@ behaviors/
 - **Palette:** Warm ivory, terracotta, sage, and dark brown with semantic health/status colors
 - **Layout:** Clear information hierarchy, restrained cards, consistent `24rpx` page gutters, and accessible touch targets
 - **Icons:** Local line-icon component with small, purposeful journal illustrations; Emoji is reserved for people and pets
-- **Navigation:** Branded custom navbar, shared segmented controls, and native TabBar (Home, Items, Plan, Record)
+- **Navigation:** Branded custom navbar, shared segmented controls, and native TabBar (Home, Items, Cats, Plan, Health)
 
 ## Development
 

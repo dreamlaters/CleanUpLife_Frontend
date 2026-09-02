@@ -4,8 +4,8 @@
 
   <view class="page-intro">
     <text class="page-kicker">OUR LITTLE PLANS</text>
-    <text class="page-title">把想去的远方，写进共同生活</text>
-    <text class="page-subtitle">一页收藏旅途，一页记录成长</text>
+    <text class="page-title">把想要的未来，写进共同生活</text>
+    <text class="page-subtitle">记录成长、积累与想一起抵达的远方</text>
   </view>
 
   <segmented-control
@@ -248,7 +248,6 @@
     <app-icon name="plus" size="36" tone="light" />
   </view>
 
-  <footer-link />
   <view class="safe-bottom"></view>
 </view>
 

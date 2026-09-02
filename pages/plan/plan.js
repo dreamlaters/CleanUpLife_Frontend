@@ -13,11 +13,11 @@ Page({
     navbarHeight: 88,
     
     // Tab切换
-    currentTab: 'travel',
+    currentTab: 'goals',
     planTabs: [
-      { label: '出行愿望', value: 'travel', icon: 'plane' },
       { label: '年度目标', value: 'goals', icon: 'target' },
-      { label: '存钱罐', value: 'savings', icon: 'piggy-bank' }
+      { label: '退休存钱', value: 'savings', icon: 'piggy-bank' },
+      { label: '出行愿望', value: 'travel', icon: 'plane' }
     ],
     
     // 出行计划
@@ -75,9 +75,12 @@ Page({
 
   onLoad(options) {
     this.initNavbar();
-    if (options.tab) {
-      this.setData({ currentTab: options.tab });
-    }
+    const validTabs = this.data.planTabs.map(tab => tab.value);
+    const rememberedTab = wx.getStorageSync('plan:lastTab');
+    const initialTab = validTabs.includes(options.tab)
+      ? options.tab
+      : (validTabs.includes(rememberedTab) ? rememberedTab : 'goals');
+    this.setData({ currentTab: initialTab });
   },
 
   onShow() {
@@ -87,6 +90,7 @@ Page({
       const targetTab = app.globalData.targetTab;
       app.globalData.targetTab = null; // 清除
       this.setData({ currentTab: targetTab });
+      wx.setStorageSync('plan:lastTab', targetTab);
       if (targetTab === 'travel') {
         this.fetchTravelList();
       } else if (targetTab === 'goals') {
@@ -117,6 +121,7 @@ Page({
     const tab = e.detail.value;
     if (!tab) return;
     this.setData({ currentTab: tab });
+    wx.setStorageSync('plan:lastTab', tab);
     if (tab === 'travel') {
       this.fetchTravelList();
     } else if (tab === 'goals') {

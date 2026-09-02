@@ -1,5 +1,5 @@
 <view class="custom-navbar" style="padding-top: {{statusBarHeight}}px">
-  <view class="navbar-content {{greeting ? 'navbar-content-home' : ''}}">
+  <view class="navbar-content {{greeting ? 'navbar-content-home' : ''}}" style="padding-right: {{menuReserve}}px;">
     <view class="navbar-copy" wx:if="{{greeting}}">
       <text class="brand-kicker">OUR LITTLE LIFE</text>
       <text class="greeting">{{greeting}}</text>
@@ -9,7 +9,11 @@
       <text class="brand-kicker">CLEAN UP LIFE</text>
       <text class="navbar-title">{{title}}</text>
     </view>
-    <view class="brand-mark" aria-hidden="true">
+    <navigator class="brand-mark reminder-mark" url="/pages/openid/openid" wx:if="{{showReminder}}" aria-label="提醒设置">
+      <app-icon name="bell" size="34" />
+      <view class="reminder-dot" wx:if="{{showReminderDot}}"></view>
+    </navigator>
+    <view class="brand-mark" aria-hidden="true" wx:else>
       <view class="brand-mark-leaf"></view>
       <text>C</text>
     </view>

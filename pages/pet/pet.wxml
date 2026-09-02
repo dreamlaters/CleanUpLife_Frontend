@@ -123,9 +123,6 @@
     <app-icon name="plus" size="44" label="添加体重记录" />
   </view>
 
-  <!-- 底部消息推送入口 -->
-  <footer-link />
-
   <view class="safe-bottom"></view>
 </view>
 

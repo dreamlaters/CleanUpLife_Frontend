@@ -49,9 +49,11 @@ Page({
 
   onLoad(options) {
     this.initNavbar();
-    if (options.tab) {
-      this.setData({ currentTab: options.tab });
-    }
+    const rememberedTab = wx.getStorageSync('items:lastTab');
+    const initialTab = options.tab === 'tobuy' || options.tab === 'items'
+      ? options.tab
+      : (rememberedTab === 'tobuy' ? 'tobuy' : 'items');
+    this.setData({ currentTab: initialTab });
   },
 
   onShow() {
@@ -59,7 +61,12 @@ Page({
     const app = getApp();
     if (app.globalData && app.globalData.targetTab === 'tobuy') {
       this.setData({ currentTab: 'tobuy' });
+      wx.setStorageSync('items:lastTab', 'tobuy');
       app.globalData.targetTab = null; // 清除
+    }
+    if (app.globalData && app.globalData.targetAction === 'addToBuy') {
+      app.globalData.targetAction = null;
+      this.goToAddToBuy();
     }
     this.fetchProducts();
     this.fetchToBuyProducts();
@@ -78,6 +85,7 @@ Page({
   switchTab(e) {
     const tab = e.detail ? e.detail.value : e.currentTarget.dataset.tab;
     this.setData({ currentTab: tab });
+    wx.setStorageSync('items:lastTab', tab);
   },
 
   // ==================== 物品管理 ====================

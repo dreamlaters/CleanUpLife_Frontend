@@ -82,6 +82,21 @@
   transform: rotate(-18deg);
 }
 
+.reminder-mark {
+  border-radius: 20rpx;
+}
+
+.reminder-dot {
+  position: absolute;
+  top: 7rpx;
+  right: 7rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border: 3rpx solid #fffaf2;
+  border-radius: 50%;
+  background: #c96f55;
+}
+
 .navbar-placeholder {
   width: 100%;
   flex-shrink: 0;

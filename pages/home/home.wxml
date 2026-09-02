@@ -1,5 +1,5 @@
 <view class="container">
-  <custom-navbar greeting="{{greeting}}" dateText="{{dateText}}" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
+  <custom-navbar greeting="{{greeting}}" dateText="{{dateText}}" showReminder="{{true}}" showReminderDot="{{reminderPending}}" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
 
   <view class="journal-hero">
     <view class="hero-copy">
@@ -18,14 +18,14 @@
         <text class="section-kicker">TODAY</text>
         <view class="section-title-row">
           <text class="section-title">今天要留意</text>
-          <text class="section-count" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
-            {{expiredItems.length + expiringSoonItems.length}} 件
+          <text class="section-count" wx:if="{{attentionCount}}">
+            {{attentionCount}} 件
           </text>
         </view>
       </view>
     </view>
 
-    <view class="attention-card" wx:if="{{expiredItems.length || expiringSoonItems.length}}">
+    <view class="attention-card" wx:if="{{attentionCount}}">
       <view
         class="attention-item attention-danger"
         wx:for="{{expiredItems}}"
@@ -40,6 +40,26 @@
           <text class="attention-meta">已经过期 {{item.daysText}}</text>
         </view>
         <text class="attention-status">需处理</text>
+        <app-icon name="chevron-right" size="28" />
+      </view>
+
+      <view class="attention-item attention-live" bindtap="goToPlay" wx:if="{{playStatus && playStatus.ongoing}}">
+        <view class="attention-icon"><app-icon name="timer" size="34" /></view>
+        <view class="attention-copy">
+          <text class="attention-name">猫猫陪玩正在进行</text>
+          <text class="attention-meta">返回猫猫页继续计时或结束记录</text>
+        </view>
+        <text class="attention-status">进行中</text>
+        <app-icon name="chevron-right" size="28" />
+      </view>
+
+      <view class="attention-item attention-savings" bindtap="goToSavings" wx:if="{{savingsSummary && savingsSummary.hasSetup && savingsSummary.isProvisional}}">
+        <view class="attention-icon"><app-icon name="piggy-bank" size="34" /></view>
+        <view class="attention-copy">
+          <text class="attention-name">本月退休存钱还未合账</text>
+          <text class="attention-meta">{{savingsSummary.checkInText}}</text>
+        </view>
+        <text class="attention-status">去盘点</text>
         <app-icon name="chevron-right" size="28" />
       </view>
 
@@ -71,20 +91,20 @@
   </view>
 
   <view class="quick-grid" wx:if="{{!loading}}">
-    <view class="quick-item" bindtap="goToItems">
-      <view class="quick-icon quick-icon-box"><app-icon name="box" size="34" /></view>
-      <text class="quick-value">{{totalItems}}</text>
-      <text class="quick-label">家中物品</text>
+    <view class="quick-item" bindtap="goToPlay">
+      <view class="quick-icon quick-icon-cat"><app-icon name="cat" size="34" /></view>
+      <text class="quick-action-title">陪猫玩</text>
+      <text class="quick-label">开始计时</text>
     </view>
-    <view class="quick-item" bindtap="goToToBuyList">
+    <view class="quick-item" bindtap="goToSavings">
+      <view class="quick-icon quick-icon-savings"><app-icon name="piggy-bank" size="34" /></view>
+      <text class="quick-action-title">更新存钱</text>
+      <text class="quick-label">本月盘点</text>
+    </view>
+    <view class="quick-item" bindtap="goToAddToBuy">
       <view class="quick-icon quick-icon-cart"><app-icon name="cart" size="34" /></view>
-      <text class="quick-value">{{toBuyCount}}</text>
-      <text class="quick-label">待买清单</text>
-    </view>
-    <view class="quick-item" bindtap="goToTravel">
-      <view class="quick-icon quick-icon-plane"><app-icon name="plane" size="34" /></view>
-      <text class="quick-value">{{travelCount}}</text>
-      <text class="quick-label">想去的地方</text>
+      <text class="quick-action-title">添加待买</text>
+      <text class="quick-label">{{toBuyCount}} 件待完成</text>
     </view>
   </view>
 
@@ -174,6 +194,5 @@
     </view>
   </view>
 
-  <footer-link />
   <view class="safe-bottom"></view>
 </view>

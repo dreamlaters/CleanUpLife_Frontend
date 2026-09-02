@@ -13,6 +13,7 @@ Page({
     // 问候语
     greeting: '早上好',
     dateText: '',
+    reminderPending: true,
 
     // 过期物品
     expiredItems: [],
@@ -28,6 +29,8 @@ Page({
 
     // 猫猫体重
     catWeights: [],
+    playStatus: null,
+    attentionCount: 0,
 
     // 年度目标
     goalsPig: [],
@@ -50,6 +53,7 @@ Page({
   },
 
   onShow() {
+    this.setData({ reminderPending: !wx.getStorageSync('reminders:authorized') });
     this.fetchData();
   },
 
@@ -87,12 +91,13 @@ Page({
 
     try {
       const currentYear = new Date().getFullYear();
-      const [summaryResult, toBuyResult, travelResult, periodStats, catWeights, goalsResult, savingsSummary] = await Promise.all([
+      const [summaryResult, toBuyResult, travelResult, periodStats, catWeights, playStatus, goalsResult, savingsSummary] = await Promise.all([
         this._fetchSummary(),
         this._fetchToBuyData(),
         this._fetchTravelData(),
         this._fetchPeriodData(),
         this._fetchCatWeights(),
+        this._fetchPlayStatus(),
         this._fetchGoals(currentYear),
         this._fetchSavingsData()
       ]);
@@ -104,8 +109,14 @@ Page({
         ...travelResult,
         periodStats,
         catWeights,
+        playStatus,
         ...goalsResult,
-        savingsSummary
+        savingsSummary,
+        attentionCount:
+          summaryResult.expiredItems.length +
+          summaryResult.expiringSoonItems.length +
+          (playStatus && playStatus.ongoing ? 1 : 0) +
+          (savingsSummary && savingsSummary.hasSetup && savingsSummary.isProvisional ? 1 : 0)
       });
     } catch (err) {
       console.error('获取数据失败', err);
@@ -196,6 +207,15 @@ Page({
     }
   },
 
+  async _fetchPlayStatus() {
+    try {
+      return await api.getPlayStatus();
+    } catch (err) {
+      console.error('获取陪玩状态失败', err);
+      return null;
+    }
+  },
+
   // 获取年度目标
   async _fetchGoals(year) {
     try {
@@ -241,6 +261,11 @@ Page({
       }
 
       return {
+        hasSetup: Boolean(
+          (dashboard.goal && dashboard.goal.targetAmount > 0) ||
+          (Array.isArray(dashboard.accounts) && dashboard.accounts.length) ||
+          dashboard.mortgage
+        ),
         netAssets: dashboard.netAssets || 0,
         netAssetsText: this.formatCompactCurrency(dashboard.netAssets || 0),
         targetAmount: dashboard.goal ? dashboard.goal.targetAmount : 0,
@@ -291,6 +316,14 @@ Page({
     wx.switchTab({ url: '/pages/items/items' });
   },
 
+  goToAddToBuy() {
+    const app = getApp();
+    app.globalData = app.globalData || {};
+    app.globalData.targetTab = 'tobuy';
+    app.globalData.targetAction = 'addToBuy';
+    wx.switchTab({ url: '/pages/items/items' });
+  },
+
   goToTravel() {
     getApp().globalData = getApp().globalData || {};
     getApp().globalData.targetTab = 'travel';
@@ -311,13 +344,19 @@ Page({
 
   goToPeriod() {
     getApp().globalData = getApp().globalData || {};
-    getApp().globalData.targetTab = 'period';
-    wx.switchTab({ url: '/pages/record/record' });
+    getApp().globalData.targetHealthTab = 'period';
+    wx.switchTab({ url: '/pages/health/health' });
   },
 
   goToWeight() {
     getApp().globalData = getApp().globalData || {};
-    getApp().globalData.targetTab = 'weight';
-    wx.switchTab({ url: '/pages/record/record' });
+    getApp().globalData.targetCatTab = 'weight';
+    wx.switchTab({ url: '/pages/cat/cat' });
+  },
+
+  goToPlay() {
+    getApp().globalData = getApp().globalData || {};
+    getApp().globalData.targetCatTab = 'play';
+    wx.switchTab({ url: '/pages/cat/cat' });
   }
 });

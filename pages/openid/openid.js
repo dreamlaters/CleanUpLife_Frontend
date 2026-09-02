@@ -47,6 +47,9 @@ Page({
       tmplIds: templateIds,
       success: (res) => {
         const acceptCount = Object.values(res).filter(v => v === 'accept').length;
+        if (acceptCount === templateIds.length) {
+          wx.setStorageSync('reminders:authorized', true);
+        }
         const status = acceptCount > 0 
           ? `已授权 ${acceptCount} 个模板` 
           : '授权被拒绝';

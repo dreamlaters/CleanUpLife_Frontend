@@ -156,9 +156,6 @@
     <text class="fab-label">{{currentTab === 'items' ? '添加物品' : '添加待买'}}</text>
   </view>
 
-  <!-- 底部消息推送入口 -->
-  <footer-link />
-
   <!-- 底部安全区 -->
   <view class="safe-bottom"></view>
 </view>

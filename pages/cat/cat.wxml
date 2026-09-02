@@ -1,0 +1,327 @@
+<!-- 猫猫：体重与陪玩 -->
+<view class="container">
+  <custom-navbar title="猫猫" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
+
+  <view class="cat-tabs">
+    <segmented-control items="{{catTabs}}" value="{{catSubTab}}" bind:change="switchCatSubTab" />
+  </view>
+
+  <view class="tab-content">
+    <!-- 体重 -->
+    <block wx:if="{{catSubTab === 'weight'}}">
+      <view class="pet-cards">
+        <view
+          class="pet-card"
+          wx:for="{{personList}}"
+          wx:key="*this"
+          wx:for-item="person"
+          style="--accent-color: {{personConfig[person].color}}"
+        >
+          <view class="pet-card-accent"></view>
+          <view class="pet-avatar">
+            <text class="pet-emoji">{{personConfig[person].emoji}}</text>
+          </view>
+          <view class="pet-info">
+            <text class="pet-name">{{person}}</text>
+            <view class="pet-weight-wrap">
+              <text class="pet-weight">{{latestWeights[person] || '--'}}</text>
+              <text class="pet-unit">斤</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-card">
+        <view class="section-header">
+          <view class="section-title-wrap">
+            <view class="section-icon"><app-icon name="trend" size="32" label="趋势" /></view>
+            <text class="section-title">体重趋势</text>
+          </view>
+        </view>
+
+        <view class="filter-tabs">
+          <view class="filter-tab {{timeRange === 'week' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="week">近7天</view>
+          <view class="filter-tab {{timeRange === 'month' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="month">近30天</view>
+          <view class="filter-tab {{timeRange === '3month' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="3month">近3月</view>
+          <view class="filter-tab {{timeRange === 'all' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="all">全部</view>
+        </view>
+
+        <view class="chart-wrapper">
+          <view class="chart-container" wx:if="{{!showWeightForm}}">
+            <canvas type="2d" id="weight-canvas" class="weight-canvas"></canvas>
+          </view>
+          <view class="chart-container chart-placeholder" wx:else>
+            <view class="placeholder-icon"><app-icon name="trend" size="52" label="图表" /></view>
+            <text class="placeholder-text">编辑中...</text>
+          </view>
+        </view>
+
+        <view class="chart-legend">
+          <view class="legend-item" wx:for="{{personList}}" wx:key="*this" wx:for-item="person">
+            <view class="legend-dot" style="background: {{personConfig[person].color}}"></view>
+            <text class="legend-text">{{person}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-card">
+        <view class="section-header">
+          <view class="section-title-wrap">
+            <view class="section-icon"><app-icon name="calendar" size="32" label="记录" /></view>
+            <text class="section-title">记录明细</text>
+          </view>
+          <view class="section-badge" wx:if="{{weightRecords.length}}">{{weightRecords.length}}条</view>
+        </view>
+
+        <loading-state loading="{{loadingWeight}}" />
+
+        <view class="records-container" wx:if="{{!loadingWeight && weightRecords.length}}">
+          <view class="person-group" wx:for="{{personList}}" wx:key="*this" wx:for-item="person" wx:if="{{groupedRecords[person].length}}">
+            <view class="person-header">
+              <view class="person-info">
+                <text class="person-emoji">{{personConfig[person].emoji}}</text>
+                <text class="person-name" style="color: {{personConfig[person].color}}">{{person}}</text>
+              </view>
+              <view class="person-badge">{{groupedRecords[person].length}}条</view>
+            </view>
+            <view class="record-grid">
+              <view
+                class="record-card"
+                wx:for="{{displayRecords[person]}}"
+                wx:key="id"
+                wx:for-item="record"
+                data-id="{{record.id}}"
+                data-person="{{person}}"
+                bindtap="onWeightRecordTap"
+                bindlongpress="onWeightRecordLongPress"
+              >
+                <text class="record-date">{{record.recordDateFormatted}}</text>
+                <view class="record-value" style="color: {{personConfig[person].color}}">
+                  <text class="record-weight">{{record.weight}}</text>
+                  <text class="record-unit">斤</text>
+                </view>
+              </view>
+            </view>
+            <view class="more-hint" wx:if="{{groupedRecords[person].length > 6}}">仅显示最近 6 条</view>
+          </view>
+        </view>
+
+        <empty-state
+          show="{{!loadingWeight && !weightRecords.length}}"
+          iconName="trend"
+          title="还没有体重记录"
+          text="点击下方按钮，开始记录宝贝的体重"
+          buttonText="添加记录"
+          bind:buttontap="showAddWeightForm"
+        />
+      </view>
+
+      <view class="fab-btn" bindtap="showAddWeightForm" wx:if="{{!showWeightForm}}">
+        <app-icon name="plus" size="44" label="添加体重记录" />
+      </view>
+    </block>
+
+    <!-- 陪玩 -->
+    <block wx:if="{{catSubTab === 'play'}}">
+      <view class="play-identity" wx:if="{{playStatus}}">
+        <text class="play-identity-label">当前账号</text>
+        <text class="play-identity-emoji">{{playerConfig[playStatus.player].emoji}}</text>
+        <text class="play-identity-name">{{playerConfig[playStatus.player].name}}</text>
+      </view>
+
+      <view class="play-action-card {{playStatus && playStatus.ongoing ? 'play-action-card-live' : ''}}">
+        <block wx:if="{{playStatus && playStatus.ongoing}}">
+          <view class="play-live">
+            <view class="play-live-dot"></view>
+            <text class="play-live-label">正在陪玩</text>
+          </view>
+          <view class="play-live-timer-well">
+            <text class="play-live-timer">{{playElapsedText}}</text>
+          </view>
+          <view class="play-live-btns">
+            <button class="play-btn play-btn-end" bindtap="onEndPlay" disabled="{{playStarting}}">结束陪玩</button>
+            <button class="play-btn play-btn-discard" bindtap="onDiscardPlay">放弃</button>
+          </view>
+        </block>
+        <block wx:else>
+          <button class="play-start-btn" bindtap="onStartPlay" disabled="{{playStarting}}">
+            <view class="play-start-icon"><app-icon name="timer" size="42" label="计时" /></view>
+            <text class="play-start-text">开始陪玩</text>
+          </button>
+          <text class="play-start-hint">点击开始，自动记录你的陪玩时间</text>
+        </block>
+      </view>
+
+      <view class="section-card">
+        <view class="section-header">
+          <view class="section-title-wrap">
+            <view class="section-icon"><app-icon name="trend" size="32" label="统计" /></view>
+            <text class="section-title">陪玩统计</text>
+          </view>
+        </view>
+        <view class="filter-tabs">
+          <view class="filter-tab {{playStatsRange === 'week' ? 'filter-tab-active' : ''}}" bindtap="onPlayStatsRangeChange" data-range="week">近7天</view>
+          <view class="filter-tab {{playStatsRange === 'month' ? 'filter-tab-active' : ''}}" bindtap="onPlayStatsRangeChange" data-range="month">近30天</view>
+          <view class="filter-tab {{playStatsRange === 'year' ? 'filter-tab-active' : ''}}" bindtap="onPlayStatsRangeChange" data-range="year">近1年</view>
+        </view>
+        <view class="play-stats" wx:if="{{playStatsView}}">
+          <view class="play-stat-row">
+            <view class="play-stat-who"><text class="play-stat-emoji">🐷</text><text class="play-stat-name">猪猪</text></view>
+            <view class="play-stat-val"><text class="play-stat-time">{{playStatsView[playStatsRange].pig}}</text><text class="play-stat-sessions">{{playStatsView[playStatsRange].pigSessions}} 次</text></view>
+          </view>
+          <view class="play-stat-row">
+            <view class="play-stat-who"><text class="play-stat-emoji">🫏</text><text class="play-stat-name">毛驴</text></view>
+            <view class="play-stat-val"><text class="play-stat-time">{{playStatsView[playStatsRange].donkey}}</text><text class="play-stat-sessions">{{playStatsView[playStatsRange].donkeySessions}} 次</text></view>
+          </view>
+          <view class="play-stat-row" wx:if="{{playStatsView[playStatsRange].otherSecondsRaw > 0}}">
+            <view class="play-stat-who"><text class="play-stat-emoji">👤</text><text class="play-stat-name">其他</text></view>
+            <view class="play-stat-val"><text class="play-stat-time">{{playStatsView[playStatsRange].other}}</text><text class="play-stat-sessions">{{playStatsView[playStatsRange].otherSessions}} 次</text></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-card">
+        <view class="section-header">
+          <view class="section-title-wrap">
+            <view class="section-icon"><app-icon name="calendar" size="32" label="记录" /></view>
+            <text class="section-title">陪玩记录</text>
+          </view>
+          <view class="section-badge" wx:if="{{playRecords.length}}">{{playRecords.length}}条</view>
+        </view>
+        <loading-state loading="{{loadingPlay}}" />
+        <view class="play-record-list" wx:if="{{!loadingPlay && playRecords.length}}">
+          <view
+            class="play-record-item"
+            wx:for="{{playRecords}}"
+            wx:key="id"
+            data-record="{{item}}"
+            bindtap="onPlayRecordTap"
+            bindlongpress="onPlayRecordLongPress"
+          >
+            <view class="play-record-left">
+              <text class="play-record-emoji">{{item.playerEmoji}}</text>
+              <view class="play-record-info">
+                <view class="play-record-namerow">
+                  <text class="play-record-name" style="color: {{item.playerColor}}">{{item.playerName}}</text>
+                  <text class="play-record-mine" wx:if="{{item.isMine}}">我</text>
+                </view>
+                <text class="play-record-range">{{item.rangeStr}}</text>
+              </view>
+            </view>
+            <text class="play-record-duration {{item.ongoing ? 'ongoing' : ''}}">{{item.durationStr}}</text>
+          </view>
+          <view class="more-hint">仅可编辑 / 删除自己（带"我"）的记录</view>
+        </view>
+        <empty-state
+          show="{{!loadingPlay && !playRecords.length}}"
+          iconName="timer"
+          title="还没有陪玩记录"
+          text="点击上方「开始陪玩」记录第一次"
+        />
+      </view>
+    </block>
+  </view>
+  <view class="safe-bottom"></view>
+</view>
+
+<!-- 体重表单 -->
+<view class="modal-overlay" catchtap="hideWeightForm" wx:if="{{showWeightForm}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <view class="modal-title">
+        <app-icon name="{{editingWeightId ? 'edit' : 'plus'}}" size="30" />
+        <text>{{editingWeightId ? '编辑记录' : '添加记录'}}</text>
+      </view>
+      <view class="modal-close" bindtap="hideWeightForm">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <view class="form-label form-label-row"><app-icon name="cat" size="26" /><text>选择宝贝</text></view>
+        <view class="person-selector">
+          <view
+            class="person-option {{formPersonIndex === index ? 'person-option-active' : ''}}"
+            wx:for="{{personList}}"
+            wx:key="*this"
+            wx:for-item="person"
+            data-index="{{index}}"
+            bindtap="onPersonSelect"
+          >
+            <text class="option-emoji">{{personConfig[person].emoji}}</text>
+            <text class="option-name">{{person}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="form-group">
+        <view class="form-label form-label-row"><app-icon name="trend" size="26" /><text>体重（斤）</text></view>
+        <view class="input-wrapper">
+          <input class="weight-input" type="digit" placeholder="请输入体重" value="{{formWeight}}" bindinput="onWeightInput" />
+          <text class="input-suffix">斤</text>
+        </view>
+      </view>
+      <view class="form-group">
+        <view class="form-label form-label-row"><app-icon name="calendar" size="26" /><text>记录日期</text></view>
+        <picker mode="date" value="{{formDate}}" bindchange="onWeightDateChange">
+          <view class="date-picker"><text class="date-value">{{formDate}}</text><text class="picker-arrow">›</text></view>
+        </picker>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-secondary" bindtap="hideWeightForm">取消</button>
+      <button class="btn btn-primary" bindtap="submitWeightForm">确定</button>
+    </view>
+  </view>
+</view>
+
+<action-sheet
+  show="{{showWeightActionSheet}}"
+  title="{{weightActionSheetPerson}} 的记录"
+  bind:edit="onEditWeightAction"
+  bind:delete="onDeleteWeightAction"
+  bind:cancel="hideWeightActionSheet"
+/>
+
+<!-- 陪玩编辑表单 -->
+<view class="modal-overlay" catchtap="hidePlayEditModal" wx:if="{{showPlayEditModal}}">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">编辑陪玩记录</text>
+      <view class="modal-close" bindtap="hidePlayEditModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">陪玩者</text>
+        <view class="play-edit-player">
+          <text class="play-edit-player-emoji">{{editPlayerEmoji}}</text>
+          <text class="play-edit-player-name">{{editPlayerName}}</text>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">开始时间</text>
+        <view class="datetime-row">
+          <picker class="datetime-picker" mode="date" value="{{editPlayStartDate}}" bindchange="onPlayStartDateChange">
+            <view class="date-picker"><text class="date-value">{{editPlayStartDate || '选择日期'}}</text><text class="picker-arrow">›</text></view>
+          </picker>
+          <picker class="datetime-picker" mode="time" value="{{editPlayStartTime}}" bindchange="onPlayStartTimeChange">
+            <view class="date-picker"><text class="date-value">{{editPlayStartTime || '时间'}}</text><text class="picker-arrow">›</text></view>
+          </picker>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">结束时间</text>
+        <view class="datetime-row">
+          <picker class="datetime-picker" mode="date" value="{{editPlayEndDate}}" bindchange="onPlayEndDateChange">
+            <view class="date-picker"><text class="date-value">{{editPlayEndDate || '选择日期'}}</text><text class="picker-arrow">›</text></view>
+          </picker>
+          <picker class="datetime-picker" mode="time" value="{{editPlayEndTime}}" bindchange="onPlayEndTimeChange">
+            <view class="date-picker"><text class="date-value">{{editPlayEndTime || '时间'}}</text><text class="picker-arrow">›</text></view>
+          </picker>
+        </view>
+        <text class="form-hint" wx:if="{{!editPlayEndDate && !editPlayEndTime}}">留空将保持"进行中"；补全日期和时间即可结束它</text>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-danger" bindtap="onDeletePlayFromEdit">删除</button>
+      <button class="btn btn-primary" bindtap="submitPlayEdit">保存</button>
+    </view>
+  </view>
+</view>
