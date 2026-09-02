@@ -230,6 +230,7 @@ Page({
     try {
       const dashboard = await api.get('/RetirementSavings/dashboard', { showLoading: false });
       const status = dashboard.currentMonthStatus || {};
+      const progress = Math.max(0, Number(dashboard.progressPercent) || 0);
       let checkInText = '本月还未盘点';
       if (status.pigConfirmed && status.donkeyConfirmed) {
         checkInText = '本月双人盘点已完成';
@@ -244,8 +245,8 @@ Page({
         netAssetsText: this.formatCompactCurrency(dashboard.netAssets || 0),
         targetAmount: dashboard.goal ? dashboard.goal.targetAmount : 0,
         targetText: this.formatCompactCurrency(dashboard.goal ? dashboard.goal.targetAmount : 0),
-        progress: Math.max(0, Number(dashboard.progressPercent) || 0),
-        progressWidth: Math.min(100, Math.max(0, Number(dashboard.progressPercent) || 0)),
+        progress: Math.round(progress * 10) / 10,
+        progressWidth: Math.min(100, progress),
         remainingText: this.formatCompactCurrency(Math.max(0, Number(dashboard.remainingToGoal) || 0)),
         checkInText,
         isProvisional: Boolean(status.isProvisional)
