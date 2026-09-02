@@ -1,0 +1,8 @@
+<image
+  class="app-icon app-icon-{{tone}}"
+  style="width: {{size}}rpx; height: {{size}}rpx;"
+  src="/images/icons/{{name}}.svg"
+  mode="aspectFit"
+  aria-role="img"
+  aria-label="{{label || name}}"
+/>

@@ -37,6 +37,9 @@ Page({
     donkeyCompleted: 0,
     donkeyProgress: 0,
 
+    // 退休存钱罐
+    savingsSummary: null,
+
     // 加载状态
     loading: false
   },
@@ -84,13 +87,14 @@ Page({
 
     try {
       const currentYear = new Date().getFullYear();
-      const [summaryResult, toBuyResult, travelResult, periodStats, catWeights, goalsResult] = await Promise.all([
+      const [summaryResult, toBuyResult, travelResult, periodStats, catWeights, goalsResult, savingsSummary] = await Promise.all([
         this._fetchSummary(),
         this._fetchToBuyData(),
         this._fetchTravelData(),
         this._fetchPeriodData(),
         this._fetchCatWeights(),
-        this._fetchGoals(currentYear)
+        this._fetchGoals(currentYear),
+        this._fetchSavingsData()
       ]);
 
       this.setData({
@@ -100,7 +104,8 @@ Page({
         ...travelResult,
         periodStats,
         catWeights,
-        ...goalsResult
+        ...goalsResult,
+        savingsSummary
       });
     } catch (err) {
       console.error('获取数据失败', err);
@@ -221,6 +226,47 @@ Page({
     }
   },
 
+  async _fetchSavingsData() {
+    try {
+      const dashboard = await api.get('/RetirementSavings/dashboard', { showLoading: false });
+      const status = dashboard.currentMonthStatus || {};
+      let checkInText = '本月还未盘点';
+      if (status.pigConfirmed && status.donkeyConfirmed) {
+        checkInText = '本月双人盘点已完成';
+      } else if (status.pigConfirmed) {
+        checkInText = '猪猪已更新，等待毛驴';
+      } else if (status.donkeyConfirmed) {
+        checkInText = '毛驴已更新，等待猪猪';
+      }
+
+      return {
+        netAssets: dashboard.netAssets || 0,
+        netAssetsText: this.formatCompactCurrency(dashboard.netAssets || 0),
+        targetAmount: dashboard.goal ? dashboard.goal.targetAmount : 0,
+        targetText: this.formatCompactCurrency(dashboard.goal ? dashboard.goal.targetAmount : 0),
+        progress: Math.max(0, Number(dashboard.progressPercent) || 0),
+        progressWidth: Math.min(100, Math.max(0, Number(dashboard.progressPercent) || 0)),
+        remainingText: this.formatCompactCurrency(Math.max(0, Number(dashboard.remainingToGoal) || 0)),
+        checkInText,
+        isProvisional: Boolean(status.isProvisional)
+      };
+    } catch (err) {
+      console.error('获取退休存钱罐摘要失败', err);
+      return null;
+    }
+  },
+
+  formatCompactCurrency(value) {
+    const amount = Number(value) || 0;
+    const sign = amount < 0 ? '-' : '';
+    const absolute = Math.abs(amount);
+    if (absolute >= 10000) {
+      const compact = (absolute / 10000).toFixed(1).replace(/\.0$/, '');
+      return `${sign}¥${compact}万`;
+    }
+    return `${sign}¥${absolute.toLocaleString('zh-CN', { maximumFractionDigits: 0 })}`;
+  },
+
   // 获取分类 emoji
   getCategoryEmoji(category) {
     const emojiMap = { 'Food': '🥖', 'CatFood': '🐱', 'Medicine': '💊' };
@@ -253,6 +299,12 @@ Page({
   goToGoals() {
     getApp().globalData = getApp().globalData || {};
     getApp().globalData.targetTab = 'goals';
+    wx.switchTab({ url: '/pages/plan/plan' });
+  },
+
+  goToSavings() {
+    getApp().globalData = getApp().globalData || {};
+    getApp().globalData.targetTab = 'savings';
     wx.switchTab({ url: '/pages/plan/plan' });
   },
 

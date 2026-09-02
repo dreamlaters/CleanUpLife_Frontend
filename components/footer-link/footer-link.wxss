@@ -1,5 +1,5 @@
 .footer-link-wrap {
-  padding: 20rpx 24rpx;
+  padding: 18rpx 24rpx;
   width: 100%;
   box-sizing: border-box;
 }
@@ -7,10 +7,11 @@
 .footer-link {
   display: flex;
   align-items: center;
-  padding: 24rpx 28rpx;
-  background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+  min-height: 92rpx;
+  padding: 0 24rpx;
+  background: #f2e8db;
+  border: 1rpx solid #e3d3c1;
+  border-radius: 18rpx;
   transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
@@ -18,22 +19,34 @@
 
 .footer-link:active {
   transform: scale(0.98);
-  background: #f9fafb;
+  background: #ede0d0;
 }
 
 .footer-link-icon {
-  font-size: 32rpx;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 18rpx;
+  background: #fffaf2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-right: 16rpx;
 }
 
-.footer-link-text {
+.footer-link-copy {
   flex: 1;
-  font-size: 28rpx;
-  color: #4b5563;
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
 }
 
-.footer-link-arrow {
+.footer-link-text {
   font-size: 28rpx;
-  color: #d1d5db;
+  color: #3f352f;
+  font-weight: 600;
+}
+
+.footer-link-hint {
+  margin-top: 2rpx;
+  font-size: 20rpx;
+  color: #8a7b6f;
 }

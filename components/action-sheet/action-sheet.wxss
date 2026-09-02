@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(63, 53, 47, 0.42);
   z-index: 200;
   display: flex;
   align-items: flex-end;
@@ -20,8 +20,8 @@
 
 .action-sheet {
   width: 100%;
-  background: #ffffff;
-  border-radius: 28rpx 28rpx 0 0;
+  background: #fffdf8;
+  border-radius: 30rpx 30rpx 0 0;
   padding-bottom: env(safe-area-inset-bottom);
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -34,32 +34,38 @@
 .action-header {
   padding: 24rpx;
   text-align: center;
-  border-bottom: 1rpx solid #f3f4f6;
+  border-bottom: 1rpx dashed #e6d8c8;
 }
 
 .action-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: #111827;
+  color: #3f352f;
 }
 
 .action-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10rpx;
-  padding: 28rpx;
+  gap: 16rpx;
+  min-height: 96rpx;
+  padding: 0 34rpx;
   font-size: 30rpx;
-  color: #111827;
+  color: #3f352f;
   transition: background 0.15s ease;
 }
 
 .action-item:active {
-  background: #f9fafb;
+  background: #faf3e9;
 }
 
 .action-icon {
-  font-size: 26rpx;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 18rpx;
+  background: #f4e7d5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .action-text {
@@ -67,7 +73,11 @@
 }
 
 .action-danger {
-  color: #ef4444;
+  color: #b85c52;
+}
+
+.action-icon-danger {
+  background: #f6e1dd;
 }
 
 .action-cancel {
@@ -75,7 +85,7 @@
   text-align: center;
   font-size: 28rpx;
   font-weight: 500;
-  color: #6b7280;
-  background: #f9fafb;
+  color: #6a5c50;
+  background: #f2e8db;
   margin-top: 8rpx;
 }

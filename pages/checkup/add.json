@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "app-icon": "/components/app-icon/app-icon"
+  },
   "navigationBarTitleText": "体检记录",
   "navigationStyle": "default"
 }

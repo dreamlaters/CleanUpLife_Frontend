@@ -1,211 +1,175 @@
-/**
- * OpenID 页面样式 - 统一设计语言 v2.0
- */
-
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
-  padding-bottom: 32rpx;
+  padding: 24rpx 24rpx calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
-  overflow-x: hidden;
+  background: linear-gradient(180deg, #f8f2e9 0%, #f1e6d8 100%);
 }
 
-/* ==================== 卡片布局 ==================== */
-.form-card {
-  width: auto;
-  max-width: none;
-  background: #fff;
-  border-radius: 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
-  padding: 32rpx;
-  margin: 24rpx 24rpx 0;
+.notification-card {
+  padding: 38rpx 28rpx 28rpx;
+  border: 1rpx solid #e3d3c1;
+  border-radius: 28rpx 28rpx 28rpx 8rpx;
+  background: #fffdf8;
+  box-shadow: 0 8rpx 24rpx rgba(91, 71, 55, 0.07);
 }
 
-/* ==================== 标题区域 ==================== */
-.form-header {
+.notification-header {
+  padding-bottom: 30rpx;
+  border-bottom: 1rpx dashed #dfcfbd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding-bottom: 32rpx;
-  margin-bottom: 28rpx;
-  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .notification-icon-wrap {
-  width: 100rpx;
-  height: 100rpx;
-  margin: 0 auto 20rpx;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: 28rpx;
+  position: relative;
+  width: 96rpx;
+  height: 96rpx;
+  margin-bottom: 18rpx;
+  border-radius: 28rpx 28rpx 28rpx 8rpx;
+  background: #f2dfc1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-2deg);
+}
+
+.page-kicker {
+  color: #a66b56;
+  font-size: 17rpx;
+  font-weight: 800;
+  letter-spacing: 3rpx;
+}
+
+.form-title {
+  margin-top: 8rpx;
+  color: #3f352f;
+  font-size: 38rpx;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.form-subtitle {
+  max-width: 520rpx;
+  margin-top: 10rpx;
+  color: #7d6e62;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.features-section {
+  margin: 20rpx 0 26rpx;
+}
+
+.feature-item {
+  min-height: 98rpx;
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx dashed #eadfd2;
+}
+
+.feature-item:last-child {
+  border-bottom: 0;
+}
+
+.feature-icon {
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 18rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.notification-icon {
-  font-size: 48rpx;
+.feature-icon-warning { background: #f3e5c9; }
+.feature-icon-info { background: #e2ebef; }
+.feature-icon-success { background: #e1eadc; }
+
+.feature-content {
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: column;
 }
 
-.form-title {
-  font-size: 36rpx;
+.feature-title {
+  color: #3f352f;
+  font-size: 27rpx;
+  font-weight: 650;
+}
+
+.feature-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.feature-pending {
+  padding: 2rpx 9rpx;
+  border-radius: 8rpx;
+  background: #f3e5c9;
+  color: #8e642f;
+  font-size: 17rpx;
   font-weight: 700;
-  color: #1a1a2e;
-  margin-bottom: 8rpx;
 }
 
-.form-subtitle {
-  font-size: 24rpx;
-  color: #9ca3af;
-  display: block;
+.feature-desc {
+  margin-top: 3rpx;
+  color: #8a7b6f;
+  font-size: 21rpx;
 }
 
-/* ==================== OpenID 区域 ==================== */
+.subscribe-btn {
+  min-height: 88rpx;
+  border-radius: 18rpx 18rpx 18rpx 6rpx;
+  background: #c96f55;
+  color: #fff;
+  box-shadow: 0 7rpx 18rpx rgba(201, 111, 85, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  font-size: 29rpx;
+  font-weight: 650;
+}
+
+.subscribe-btn::after {
+  border: 0;
+}
+
+.subscribe-tip {
+  margin-top: 14rpx;
+  color: #9a8c7f;
+  font-size: 21rpx;
+  text-align: center;
+}
+
 .openid-section {
-  background: #fafafa;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  margin-bottom: 28rpx;
+  margin-top: 30rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx dashed #dfcfbd;
 }
 
 .openid-label {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  font-size: 24rpx;
-  color: #6b7280;
-  font-weight: 500;
-  margin-bottom: 12rpx;
-}
-
-.openid-label-icon {
-  font-size: 24rpx;
+  color: #8a7b6f;
+  font-size: 21rpx;
 }
 
 .openid-box {
-  background: #fff;
-  border-radius: 14rpx;
-  padding: 20rpx;
-  border: 1rpx solid #f0f0f0;
+  margin-top: 10rpx;
+  padding: 15rpx 16rpx;
+  border: 1rpx solid #e7dbcd;
+  border-radius: 13rpx;
+  background: #faf4eb;
 }
 
-.openid-loading {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  color: #9ca3af;
-  font-size: 24rpx;
-}
-
-.loading-spinner-small {
-  width: 28rpx;
-  height: 28rpx;
-  border: 3rpx solid #f3f4f6;
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
+.openid-loading,
 .openid-text {
-  font-size: 22rpx;
-  color: #6b7280;
-  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-  line-height: 1.6;
+  color: #9a8c7f;
+  font-size: 19rpx;
+  line-height: 1.5;
   word-break: break-all;
-}
-
-/* ==================== 功能说明 ==================== */
-.features-section {
-  margin-bottom: 32rpx;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
-}
-
-.feature-item:last-child {
-  border-bottom: none;
-}
-
-.feature-icon {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 16rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26rpx;
-  flex-shrink: 0;
-}
-
-.feature-icon-warning {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-}
-
-.feature-icon-info {
-  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
-}
-
-.feature-icon-success {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-}
-
-.feature-content {
-  flex: 1;
-  margin-left: 16rpx;
-}
-
-.feature-title {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #1a1a2e;
-  display: block;
-}
-
-.feature-desc {
-  font-size: 22rpx;
-  color: #9ca3af;
-  margin-top: 4rpx;
-  display: block;
-}
-
-/* ==================== 订阅按钮 ==================== */
-.subscribe-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10rpx;
-  width: 100%;
-  padding: 24rpx;
-  box-sizing: border-box;
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
-  border-radius: 20rpx;
-  box-shadow: 0 6rpx 20rpx rgba(16, 185, 129, 0.35);
-  font-size: 30rpx;
-  font-weight: 500;
-  color: #fff;
-  transition: all 0.2s ease;
-}
-
-.subscribe-btn-icon {
-  font-size: 28rpx;
-}
-
-.subscribe-btn:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
-
-.subscribe-tip {
-  text-align: center;
-  margin-top: 20rpx;
-}
-
-.subscribe-tip text {
-  font-size: 22rpx;
-  color: #9ca3af;
 }

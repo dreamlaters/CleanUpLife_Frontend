@@ -307,3 +307,207 @@
   background: #fef2f2;
   color: #ef4444;
 }
+
+/* ==================== Warm journal redesign ==================== */
+.container {
+  min-height: 100vh;
+  padding: 24rpx 24rpx calc(52rpx + env(safe-area-inset-bottom));
+  color: #3f352f;
+  background: #f8f2e9;
+}
+
+.detail-header-card,
+.category-section,
+.detail-notes {
+  background: #fffdf8;
+  border: 1rpx solid #e6d8c8;
+  box-shadow: 0 6rpx 18rpx rgba(91, 71, 55, 0.06);
+}
+
+.detail-header-card {
+  padding: 30rpx;
+  border-radius: 20rpx;
+  border-top: 5rpx solid #c96f55;
+}
+
+.detail-header-top {
+  margin-bottom: 16rpx;
+}
+
+.detail-owner-name,
+.category-title,
+.item-name,
+.item-value,
+.notes-label {
+  color: #3f352f;
+}
+
+.detail-owner-name {
+  font-size: 34rpx;
+}
+
+.detail-date {
+  min-height: 54rpx;
+  padding: 0 16rpx;
+  display: flex;
+  align-items: center;
+  color: #9f4f3d;
+  background: #f6e4dc;
+  border: 1rpx solid #dfb9aa;
+  border-radius: 14rpx;
+}
+
+.detail-hospital {
+  color: #6a5c50;
+}
+
+.hospital-icon,
+.label-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.detail-stats-row {
+  gap: 12rpx;
+}
+
+.detail-stat {
+  flex: 1;
+  min-width: 0;
+  padding: 14rpx 10rpx;
+  background: #faf3e9;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 14rpx;
+}
+
+.detail-stat-num.total {
+  color: #3f352f;
+}
+
+.detail-stat-num.abnormal {
+  color: #9f4f3d;
+}
+
+.detail-stat-num.normal {
+  color: #6f8a65;
+}
+
+.detail-stat-label {
+  color: #806d60;
+}
+
+.category-section {
+  margin-bottom: 18rpx;
+  border-radius: 18rpx;
+}
+
+.category-header {
+  min-height: 92rpx;
+  padding: 0 26rpx;
+  background: #fffaf2;
+  border-bottom-color: #efe4d7;
+}
+
+.category-abnormal-badge {
+  color: #8b4b38;
+  background: #f6e4dc;
+  border: 1rpx solid #dfb9aa;
+}
+
+.category-normal-tag {
+  color: #486041;
+  background: #e8f0e4;
+  border: 1rpx solid #b9cbb2;
+}
+
+.category-arrow {
+  display: flex;
+  transform: rotate(0deg);
+}
+
+.category-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.category-items {
+  padding: 0 18rpx;
+}
+
+.checkup-item-row {
+  min-height: 92rpx;
+  padding: 12rpx 10rpx;
+  border-bottom-color: #efe4d7;
+}
+
+.checkup-item-row.item-abnormal {
+  background: #fff8f4;
+}
+
+.item-reference,
+.item-unit {
+  color: #8c7b6d;
+}
+
+.item-value.value-abnormal {
+  color: #9f4f3d;
+}
+
+.item-status-badge {
+  padding: 5rpx 12rpx;
+  border-radius: 9rpx;
+}
+
+.item-status-badge.status-Normal {
+  color: #486041;
+  background: #e8f0e4;
+}
+
+.item-status-badge.status-High,
+.item-status-badge.status-Abnormal {
+  color: #8b4b38;
+  background: #f6e4dc;
+}
+
+.item-status-badge.status-Low {
+  color: #5d5147;
+  background: #eee3d5;
+}
+
+.detail-notes {
+  padding: 26rpx;
+  border-radius: 18rpx;
+}
+
+.notes-label {
+  gap: 10rpx;
+}
+
+.notes-content {
+  color: #6a5c50;
+}
+
+.detail-actions {
+  gap: 14rpx;
+}
+
+.action-btn {
+  min-height: 88rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  border-radius: 16rpx;
+}
+
+.edit-btn {
+  color: #3f352f;
+  background: #f6e4dc;
+  border: 1rpx solid #dfb9aa;
+}
+
+.delete-btn {
+  color: #8e3f34;
+  background: #fffdf8;
+  border: 1rpx solid #dfb9aa;
+}

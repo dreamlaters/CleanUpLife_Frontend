@@ -30,7 +30,7 @@
   <view class="section-card">
     <view class="section-header">
       <view class="section-title-wrap">
-        <view class="section-icon">📈</view>
+        <view class="section-icon"><app-icon name="trend" size="32" label="趋势" /></view>
         <text class="section-title">体重趋势</text>
       </view>
     </view>
@@ -53,7 +53,7 @@
         <canvas type="2d" id="weight-canvas" class="weight-canvas"></canvas>
       </view>
       <view class="chart-container chart-placeholder" wx:else>
-        <text class="placeholder-icon">📊</text>
+        <view class="placeholder-icon"><app-icon name="trend" size="52" label="图表" /></view>
         <text class="placeholder-text">编辑中...</text>
       </view>
     </view>
@@ -71,7 +71,7 @@
   <view class="section-card">
     <view class="section-header">
       <view class="section-title-wrap">
-        <view class="section-icon">📋</view>
+        <view class="section-icon"><app-icon name="calendar" size="32" label="记录" /></view>
         <text class="section-title">记录明细</text>
       </view>
       <view class="section-badge" wx:if="{{weightRecords.length}}">{{weightRecords.length}}条</view>
@@ -110,16 +110,17 @@
       </view>
     </view>
 
-    <empty-state
-      show="{{!loading && !weightRecords.length}}"
-      icon="⚖️" title="还没有体重记录" text="点击下方按钮，开始记录宝贝的体重"
-      buttonText="+ 添加记录" bind:buttontap="showAddForm"
-    />
+    <view class="empty-state" wx:if="{{!loading && !weightRecords.length}}">
+      <view class="empty-icon"><app-icon name="trend" size="56" label="体重" /></view>
+      <text class="empty-title">还没有体重记录</text>
+      <text class="empty-text">点击下方按钮，开始记录宝贝的体重</text>
+      <button class="empty-action" bindtap="showAddForm">添加记录</button>
+    </view>
   </view>
 
   <!-- 悬浮添加按钮 -->
   <view class="fab-btn" bindtap="showAddForm" wx:if="{{!showForm}}">
-    <text class="fab-icon">+</text>
+    <app-icon name="plus" size="44" label="添加体重记录" />
   </view>
 
   <!-- 底部消息推送入口 -->
@@ -132,14 +133,17 @@
 <view class="modal-overlay {{showForm ? 'show' : ''}}" catchtap="hideForm" wx:if="{{showForm}}">
   <view class="modal-content" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">{{editingId ? '✏️ 编辑记录' : '➕ 添加记录'}}</text>
+      <view class="modal-title">
+        <app-icon name="{{editingId ? 'edit' : 'plus'}}" size="30" />
+        <text>{{editingId ? '编辑记录' : '添加记录'}}</text>
+      </view>
       <view class="modal-close" bindtap="hideForm">×</view>
     </view>
 
     <view class="modal-body" catchtap="stopPropagation">
       <!-- 选择宠物 -->
       <view class="form-group">
-        <text class="form-label">🐾 选择宝贝</text>
+        <view class="form-label form-label-row"><app-icon name="cat" size="26" /><text>选择宝贝</text></view>
         <view class="person-selector">
           <view 
             class="person-option {{formPersonIndex === index ? 'person-option-active' : ''}}"
@@ -158,7 +162,7 @@
 
       <!-- 输入体重 -->
       <view class="form-group">
-        <text class="form-label">⚖️ 体重（斤）</text>
+        <view class="form-label form-label-row"><app-icon name="trend" size="26" /><text>体重（斤）</text></view>
         <view class="input-wrapper">
           <input 
             class="weight-input" 
@@ -173,7 +177,7 @@
 
       <!-- 选择日期 -->
       <view class="form-group">
-        <text class="form-label">📅 记录日期</text>
+        <view class="form-label form-label-row"><app-icon name="calendar" size="26" /><text>记录日期</text></view>
         <picker mode="date" value="{{formDate}}" bindchange="onDateChange">
           <view class="date-picker">
             <text class="date-value">{{formDate}}</text>

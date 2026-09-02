@@ -1,0 +1,15 @@
+<view class="segmented-control" role="tablist">
+  <view
+    class="segment {{value === item.value ? 'segment-active' : ''}}"
+    wx:for="{{items}}"
+    wx:key="value"
+    data-value="{{item.value}}"
+    bindtap="onChange"
+    role="tab"
+    aria-selected="{{value === item.value}}"
+  >
+    <app-icon name="{{item.icon}}" size="28" />
+    <text class="segment-label">{{item.label}}</text>
+    <text class="segment-badge" wx:if="{{item.badge}}">{{item.badge}}</text>
+  </view>
+</view>

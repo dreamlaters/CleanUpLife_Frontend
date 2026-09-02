@@ -4,11 +4,11 @@
       <text class="action-title">{{title}}</text>
     </view>
     <view class="action-item" bindtap="onEdit">
-      <text class="action-icon">✏️</text>
+      <view class="action-icon"><app-icon name="edit" size="34" /></view>
       <text class="action-text">编辑</text>
     </view>
     <view class="action-item action-danger" bindtap="onDelete">
-      <text class="action-icon">🗑️</text>
+      <view class="action-icon action-icon-danger"><app-icon name="trash" size="34" /></view>
       <text class="action-text">删除</text>
     </view>
     <view class="action-cancel" bindtap="onCancel">取消</view>

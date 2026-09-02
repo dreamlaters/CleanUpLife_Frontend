@@ -2,11 +2,14 @@
 <view class="container">
   <!-- 基础信息 -->
   <view class="form-card">
-    <view class="form-card-title">{{isEdit ? '✏️ 编辑体检记录' : '📋 新增体检记录'}}</view>
+    <view class="form-card-title title-with-icon">
+      <app-icon name="{{isEdit ? 'edit' : 'health'}}" size="34" />
+      <text>{{isEdit ? '编辑体检记录' : '新增体检记录'}}</text>
+    </view>
 
     <!-- 体检人 -->
     <view class="form-group">
-      <text class="form-label">👤 体检人</text>
+      <view class="form-label label-with-icon"><app-icon name="user" size="26" /><text>体检人</text></view>
       <picker mode="selector" range="{{owners}}" value="{{ownerIndex}}" bindchange="onOwnerChange">
         <view class="picker-display">
           <text class="picker-emoji">{{ownerConfig[owner].emoji}}</text>
@@ -18,7 +21,7 @@
 
     <!-- 日期 -->
     <view class="form-group">
-      <text class="form-label">📅 体检日期</text>
+      <view class="form-label label-with-icon"><app-icon name="calendar" size="26" /><text>体检日期</text></view>
       <picker mode="date" value="{{checkupDate}}" bindchange="onDateChange">
         <view class="picker-display">
           <text class="picker-text">{{checkupDate}}</text>
@@ -29,7 +32,7 @@
 
     <!-- 机构 -->
     <view class="form-group">
-      <text class="form-label">🏥 体检机构</text>
+      <view class="form-label label-with-icon"><app-icon name="health" size="26" /><text>体检机构</text></view>
       <input class="form-input" placeholder="请输入体检机构（选填）" value="{{hospital}}" bindinput="onHospitalInput" />
     </view>
   </view>
@@ -37,10 +40,10 @@
   <!-- 检查项列表 -->
   <view class="form-card">
     <view class="items-header">
-      <text class="form-card-title">🔬 检查项目</text>
+      <view class="form-card-title title-with-icon"><app-icon name="health" size="32" /><text>检查项目</text></view>
       <view class="items-header-actions">
         <view class="template-btn" bindtap="showTemplates">
-          <text class="template-btn-icon">📑</text>
+          <view class="template-btn-icon"><app-icon name="plus" size="24" label="快速添加" /></view>
           <text>快速添加</text>
         </view>
       </view>
@@ -77,8 +80,8 @@
                 <text class="computed-tag">自动</text>
               </view>
               <view class="quick-item-actions">
-                <text class="quick-edit-btn" bindtap="showEditItem" data-index="{{idx}}">✏️</text>
-                <text class="quick-delete-btn" bindtap="deleteItem" data-index="{{idx}}">✕</text>
+                <view class="quick-edit-btn" bindtap="showEditItem" data-index="{{idx}}"><app-icon name="edit" size="26" label="编辑检查项" /></view>
+                <view class="quick-delete-btn" bindtap="deleteItem" data-index="{{idx}}"><app-icon name="trash" size="26" label="删除检查项" /></view>
               </view>
             </view>
           </view>
@@ -114,8 +117,8 @@
               <text class="computed-tag">自动</text>
             </view>
             <view class="quick-item-actions">
-              <text class="quick-edit-btn" bindtap="showEditItem" data-index="{{idx}}">✏️</text>
-              <text class="quick-delete-btn" bindtap="deleteItem" data-index="{{idx}}">✕</text>
+              <view class="quick-edit-btn" bindtap="showEditItem" data-index="{{idx}}"><app-icon name="edit" size="26" label="编辑检查项" /></view>
+              <view class="quick-delete-btn" bindtap="deleteItem" data-index="{{idx}}"><app-icon name="trash" size="26" label="删除检查项" /></view>
             </view>
           </view>
         </view>
@@ -124,14 +127,14 @@
 
     <!-- 空状态 -->
     <view class="items-empty" wx:if="{{items.length === 0}}">
-      <text class="items-empty-icon">📭</text>
+      <view class="items-empty-icon"><app-icon name="health" size="52" label="检查项目" /></view>
       <text class="items-empty-text">还没有添加检查项</text>
       <text class="items-empty-hint">点击「快速添加」从模板导入，或手动添加</text>
     </view>
 
     <!-- 添加按钮 -->
     <view class="add-item-btn" bindtap="showAddItem">
-      <text class="add-item-icon">+</text>
+      <view class="add-item-icon"><app-icon name="plus" size="30" label="添加" /></view>
       <text>手动添加检查项</text>
     </view>
   </view>
@@ -139,7 +142,7 @@
   <!-- 备注 -->
   <view class="form-card">
     <view class="form-group">
-      <text class="form-label">📝 备注</text>
+      <view class="form-label label-with-icon"><app-icon name="edit" size="26" /><text>备注</text></view>
       <textarea 
         class="form-textarea"
         placeholder="体检总结备注（选填）"
@@ -153,14 +156,15 @@
 
   <!-- 提交按钮 -->
   <button class="submit-button {{submitting ? 'submitting' : ''}}" bindtap="submitForm" disabled="{{submitting}}">
-    <text class="submit-icon">✓</text>
+    <view class="submit-icon"><app-icon name="check" size="30" label="保存" /></view>
     <text>{{isEdit ? '更新记录' : '保存记录'}}</text>
   </button>
   <view class="items-count" wx:if="{{items.length > 0}}">
     共 {{items.length}} 项检查
   </view>
   <view class="auto-judge-hint">
-    <text>💡 提交后系统将自动判定各项指标状态</text>
+    <app-icon name="health" size="24" label="提示" />
+    <text>提交后系统将自动判定各项指标状态</text>
   </view>
 </view>
 
@@ -168,7 +172,7 @@
 <view class="modal-overlay {{showTemplateModal ? 'show' : ''}}" catchtap="hideTemplateModal" wx:if="{{showTemplateModal}}">
   <view class="modal-content modal-tall" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">📑 快速添加检查项</text>
+      <view class="modal-title title-with-icon"><app-icon name="plus" size="30" /><text>快速添加检查项</text></view>
       <view class="modal-close" bindtap="hideTemplateModal">×</view>
     </view>
 
@@ -236,7 +240,8 @@
       </view>
 
       <view class="auto-judge-note">
-        <text>💡 单位、参考范围和状态由系统自动判定</text>
+        <app-icon name="health" size="24" label="提示" />
+        <text>单位、参考范围和状态由系统自动判定</text>
       </view>
     </scroll-view>
 

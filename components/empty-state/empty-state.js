@@ -2,6 +2,7 @@ Component({
   properties: {
     show: { type: Boolean, value: false },
     icon: { type: String, value: '📭' },
+    iconName: { type: String, value: 'box' },
     title: { type: String, value: '' },
     text: { type: String, value: '' },
     buttonText: { type: String, value: '' }

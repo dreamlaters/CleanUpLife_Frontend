@@ -14,10 +14,11 @@ WeChat Mini Program for personal life management — track products, shopping li
 - **Product Management** — Track pantry items, cat food, and medicine with expiry date alerts
 - **To-Buy List** — Shopping checklist with priority levels
 - **Travel Plans** — Domestic/international destination wishlist with visited tracking
-- **Cat Weight Tracking** — Monitor weight trends for two cats (豌豆黄 & 小立夏) with line charts
+- **Cat Care Tracking** — Monitor weight trends and shared play sessions for two cats (豌豆黄 & 小立夏)
 - **Period Tracking** — Menstrual cycle calendar, predictions, and statistics
 - **Health Checkups** — Medical record tracking with standardized checkup items and normal ranges
 - **Yearly Goals** — Goal management with sub-goals and progress tracking for two people (🐷 & 🫏)
+- **Retirement Savings** — Shared net-worth goal with personal accounts, mortgage tracking, monthly check-ins, and trends
 
 ## Project Structure
 
@@ -25,7 +26,7 @@ WeChat Mini Program for personal life management — track products, shopping li
 pages/
   home/           # Dashboard — expiry alerts, period status, cat weights, goals progress
   items/          # Product management + to-buy list (tab view)
-  plan/           # Travel plans + yearly goals (tab view)
+  plan/           # Travel plans + yearly goals + retirement savings (tab view)
   record/         # Cat weight + period tracking + health checkups (tab view)
   add/            # Add new product form
   update/         # Edit product form
@@ -54,10 +55,11 @@ behaviors/
 
 ## Design System
 
-- **Primary Color:** Indigo → Violet gradient (`#6366f1` → `#8b5cf6`)
-- **Layout:** Card-based with consistent spacing (`24rpx` margins)
-- **Components:** CSS variables for colors, shadows, spacing, border-radius, and transitions
-- **Navigation:** Custom navbar + native TabBar (4 tabs: Home, Items, Plan, Record)
+- **Direction:** Warm dual-person life journal with lightweight paper and handwritten-note details
+- **Palette:** Warm ivory, terracotta, sage, and dark brown with semantic health/status colors
+- **Layout:** Clear information hierarchy, restrained cards, consistent `24rpx` page gutters, and accessible touch targets
+- **Icons:** Local line-icon component with small, purposeful journal illustrations; Emoji is reserved for people and pets
+- **Navigation:** Branded custom navbar, shared segmented controls, and native TabBar (Home, Items, Plan, Record)
 
 ## Development
 

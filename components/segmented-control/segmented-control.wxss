@@ -1,0 +1,60 @@
+.segmented-control {
+  display: flex;
+  gap: 4rpx;
+  margin: 18rpx 24rpx;
+  padding: 6rpx;
+  border: 1rpx solid #e3d3c1;
+  border-radius: 18rpx;
+  background: #eee3d5;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 74rpx;
+  padding: 0 10rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7rpx;
+  color: #6a5c50;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.segment:active {
+  transform: scale(0.97);
+}
+
+.segment-active {
+  color: #9f4f3d;
+  background: #fffdf8;
+  box-shadow: 0 2rpx 8rpx rgba(91, 71, 55, 0.06);
+}
+
+.segment-label {
+  overflow: hidden;
+  color: inherit;
+  font-size: 24rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.segment-badge {
+  position: absolute;
+  top: -9rpx;
+  right: 8rpx;
+  min-width: 26rpx;
+  height: 26rpx;
+  padding: 0 6rpx;
+  border: 3rpx solid #eee3d5;
+  border-radius: 16rpx;
+  background: #b85c52;
+  color: #fff;
+  font-size: 16rpx;
+  font-weight: 700;
+  line-height: 26rpx;
+  text-align: center;
+}

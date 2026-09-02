@@ -14,7 +14,7 @@
         <view class="detail-date">{{checkup.checkupDateFormatted}}</view>
       </view>
       <view class="detail-hospital" wx:if="{{checkup.hospital}}">
-        <text class="hospital-icon">🏥</text>
+        <view class="hospital-icon"><app-icon name="health" size="24" label="体检机构" /></view>
         <text>{{checkup.hospital}}</text>
       </view>
       <view class="detail-stats-row">
@@ -45,7 +45,9 @@
             <text>正常</text>
           </view>
         </view>
-        <text class="category-arrow {{expandedCategories[item.category] ? 'expanded' : ''}}">›</text>
+        <view class="category-arrow {{expandedCategories[item.category] ? 'expanded' : ''}}">
+          <app-icon name="chevron-right" size="28" label="展开或收起" />
+        </view>
       </view>
 
       <view class="category-items" wx:if="{{expandedCategories[item.category]}}">
@@ -74,14 +76,14 @@
 
     <!-- 备注 -->
     <view class="detail-notes" wx:if="{{checkup.notes}}">
-      <text class="notes-label">📝 备注</text>
+      <view class="notes-label label-with-icon"><app-icon name="edit" size="26" /><text>备注</text></view>
       <text class="notes-content">{{checkup.notes}}</text>
     </view>
 
     <!-- 操作按钮 -->
     <view class="detail-actions">
-      <button class="action-btn edit-btn" bindtap="goToEdit">✏️ 编辑</button>
-      <button class="action-btn delete-btn" bindtap="deleteCheckup">🗑️ 删除</button>
+      <button class="action-btn edit-btn" bindtap="goToEdit"><app-icon name="edit" size="28" label="编辑" /><text>编辑</text></button>
+      <button class="action-btn delete-btn" bindtap="deleteCheckup"><app-icon name="trash" size="28" label="删除" /><text>删除</text></button>
     </view>
   </block>
 </view>

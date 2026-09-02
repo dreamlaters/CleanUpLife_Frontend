@@ -1,6 +1,12 @@
 <view class="empty-state" wx:if="{{show}}">
-  <text class="empty-icon">{{icon}}</text>
+  <view class="empty-illustration">
+    <view class="empty-tape"></view>
+    <app-icon name="{{iconName}}" size="56" label="{{title}}" />
+  </view>
   <text class="empty-title">{{title}}</text>
   <text class="empty-text">{{text}}</text>
-  <view class="empty-btn" wx:if="{{buttonText}}" bindtap="onButtonTap">{{buttonText}}</view>
+  <view class="empty-btn" wx:if="{{buttonText}}" bindtap="onButtonTap">
+    <app-icon name="plus" size="28" />
+    <text>{{buttonText}}</text>
+  </view>
 </view>

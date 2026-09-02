@@ -13,6 +13,10 @@ Page({
     
     // Tab切换
     currentTab: 'items',
+    pageTabs: [
+      { value: 'items', label: '家中物品', icon: 'box' },
+      { value: 'tobuy', label: '待买清单', icon: 'cart' }
+    ],
     
     // 物品列表
     products: [],
@@ -72,7 +76,7 @@ Page({
 
   // Tab切换
   switchTab(e) {
-    const tab = e.currentTarget.dataset.tab;
+    const tab = e.detail ? e.detail.value : e.currentTarget.dataset.tab;
     this.setData({ currentTab: tab });
   },
 
@@ -91,17 +95,21 @@ Page({
           const diffDays = Math.ceil((bestByDate - now) / (1000 * 60 * 60 * 24));
           
           let dateClass = 'date-normal';
+          let expiryText = `到期 ${util.formatDate(item.bestBy)}`;
           if (diffDays < 0) {
             dateClass = 'date-expired';
+            expiryText = `已过期 ${Math.abs(diffDays)} 天`;
             expiredCount++;
           } else if (diffDays <= 30) {
             dateClass = 'date-soon';
+            expiryText = diffDays === 0 ? '今天到期' : `${diffDays} 天后到期`;
             expiringSoonCount++;
           }
           
           return {
             ...item,
             bestByFormatted: util.formatDate(item.bestBy),
+            expiryText,
             dateClass,
             emoji: constants.CATEGORY_EMOJI[item.category] || '📦'
           };
@@ -162,6 +170,7 @@ Page({
           .map(item => ({
             ...item,
             priority: item.priority ?? 0,
+            priorityLabel: (item.priority ?? 0) <= 3 ? '优先买' : (item.priority ?? 0) <= 7 ? '顺手买' : '不着急',
             name: item.name ?? '',
             completed: item.completed ?? false
           }))

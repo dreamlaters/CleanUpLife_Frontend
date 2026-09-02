@@ -7,8 +7,8 @@ const util = require('../../utils/util');
 
 // 宠物配置
 const PERSON_CONFIG = {
-  '豌豆黄': { color: '#F4D03F', emoji: '🟡', lineColor: '#F4D03F' },
-  '小立夏': { color: '#27AE60', emoji: '🌱', lineColor: '#27AE60' }
+  '豌豆黄': { color: '#B98232', emoji: '🟡', lineColor: '#B98232' },
+  '小立夏': { color: '#6F8A65', emoji: '🌱', lineColor: '#6F8A65' }
 };
 
 const PERSON_LIST = ['豌豆黄', '小立夏'];
@@ -158,7 +158,7 @@ Page({
     const { groupedRecords, timeRange } = this.data;
     
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#f9fafb';
+    ctx.fillStyle = '#fffaf2';
     ctx.fillRect(0, 0, width, height);
     
     const padding = { left: 35, right: 10, top: 15, bottom: 45 };
@@ -227,7 +227,7 @@ Page({
     maxWeight = Math.ceil(maxWeight + yRange * 0.1);
     
     // 网格线
-    ctx.strokeStyle = '#e5e7eb';
+    ctx.strokeStyle = '#e6d8c8';
     ctx.lineWidth = 1;
     const ySteps = 5;
     for (let i = 0; i <= ySteps; i++) {
@@ -239,7 +239,7 @@ Page({
     }
     
     // Y轴标签
-    ctx.fillStyle = '#6b7280';
+    ctx.fillStyle = '#6a5c50';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'right';
     for (let i = 0; i <= ySteps; i++) {

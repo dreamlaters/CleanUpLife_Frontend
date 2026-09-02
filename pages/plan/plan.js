@@ -1,6 +1,6 @@
 /**
  * 计划页面逻辑
- * 出行计划 + 年度目标
+ * 出行计划 + 年度目标 + 退休存钱罐
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
@@ -14,6 +14,11 @@ Page({
     
     // Tab切换
     currentTab: 'travel',
+    planTabs: [
+      { label: '出行愿望', value: 'travel', icon: 'plane' },
+      { label: '年度目标', value: 'goals', icon: 'target' },
+      { label: '存钱罐', value: 'savings', icon: 'piggy-bank' }
+    ],
     
     // 出行计划
     travelTab: 'pending',
@@ -39,6 +44,10 @@ Page({
     goalYearIndex: 0,
     goalsPig: [],
     goalsDonkey: [],
+    activeGoalOwner: 'Pig',
+    activeGoals: [],
+    activeGoalCompletedCount: 0,
+    activeGoalProgress: 0,
     loadingGoals: false,
     
     // 目标表单
@@ -82,13 +91,17 @@ Page({
         this.fetchTravelList();
       } else if (targetTab === 'goals') {
         this.fetchYearlyGoals();
+      } else if (targetTab === 'savings') {
+        this.refreshSavings();
       }
       return;
     }
     if (this.data.currentTab === 'travel') {
       this.fetchTravelList();
-    } else {
+    } else if (this.data.currentTab === 'goals') {
       this.fetchYearlyGoals();
+    } else if (this.data.currentTab === 'savings') {
+      this.refreshSavings();
     }
   },
 
@@ -101,16 +114,26 @@ Page({
   },
 
   switchTab(e) {
-    const tab = e.currentTarget.dataset.tab;
+    const tab = e.detail.value;
+    if (!tab) return;
     this.setData({ currentTab: tab });
     if (tab === 'travel') {
       this.fetchTravelList();
-    } else {
+    } else if (tab === 'goals') {
       this.fetchYearlyGoals();
     }
   },
 
   stopPropagation() {},
+
+  refreshSavings() {
+    wx.nextTick(() => {
+      const savings = this.selectComponent('#retirementSavings');
+      if (savings && typeof savings.refresh === 'function') {
+        savings.refresh();
+      }
+    });
+  },
 
   // 当前账号身份（Pig/Donkey/Other），用于"只能写自己的"
   _myPlayer() {
@@ -319,6 +342,11 @@ Page({
         if (a.completed !== b.completed) return a.completed ? 1 : -1;
         return a.priority - b.priority;
       });
+      const activeGoals = this.data.activeGoalOwner === 'Pig' ? goalsPig : goalsDonkey;
+      const activeGoalCompletedCount = activeGoals.filter(goal => goal.completed).length;
+      const activeGoalProgress = activeGoals.length
+        ? Math.round(activeGoalCompletedCount / activeGoals.length * 100)
+        : 0;
       
       const currentYear = new Date().getFullYear();
       let yearList = years || [];
@@ -330,6 +358,9 @@ Page({
       this.setData({
         goalsPig,
         goalsDonkey,
+        activeGoals,
+        activeGoalCompletedCount,
+        activeGoalProgress,
         goalYearList: yearList,
         goalYearIndex: yearList.indexOf(goalCurrentYear),
         loadingGoals: false
@@ -347,6 +378,22 @@ Page({
         this.fetchYearlyGoals();
       });
     }
+  },
+
+  switchGoalOwner(e) {
+    const owner = e.currentTarget.dataset.owner;
+    if (!owner || owner === this.data.activeGoalOwner) return;
+    const activeGoals = owner === 'Pig' ? this.data.goalsPig : this.data.goalsDonkey;
+    const activeGoalCompletedCount = activeGoals.filter(goal => goal.completed).length;
+    const activeGoalProgress = activeGoals.length
+      ? Math.round(activeGoalCompletedCount / activeGoals.length * 100)
+      : 0;
+    this.setData({
+      activeGoalOwner: owner,
+      activeGoals,
+      activeGoalCompletedCount,
+      activeGoalProgress
+    });
   },
 
   showAddGoalForm(e) {

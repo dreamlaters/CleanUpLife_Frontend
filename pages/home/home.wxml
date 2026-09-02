@@ -1,178 +1,177 @@
-<!-- 首页 - 生活状态仪表盘 -->
 <view class="container">
-  <!-- 自定义导航栏 -->
   <custom-navbar greeting="{{greeting}}" dateText="{{dateText}}" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
 
-  <!-- 加载状态 -->
+  <view class="journal-hero">
+    <view class="hero-copy">
+      <text class="hero-eyebrow">猪猪 · 毛驴 · 豌豆黄 · 小立夏</text>
+      <text class="hero-title">把琐碎日常，收进一本小手账</text>
+      <text class="hero-note">今天也一起把生活照顾好。</text>
+    </view>
+    <image class="hero-illustration" src="/images/illustrations/home-journal.svg" mode="aspectFit" />
+  </view>
+
   <loading-state loading="{{loading}}" />
 
-  <!-- 过期提醒区域 -->
-  <view class="section-card alert-card" wx:if="{{expiredItems.length || expiringSoonItems.length}}">
-    <view class="section-header">
-      <view class="section-title-wrap">
-        <view class="section-icon">⚠️</view>
-        <text class="section-title">过期提醒</text>
+  <view class="today-section" wx:if="{{!loading}}">
+    <view class="section-heading">
+      <view>
+        <text class="section-kicker">TODAY</text>
+        <text class="section-title">今天要留意</text>
       </view>
-      <view class="alert-badge" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
-        {{expiredItems.length + expiringSoonItems.length}}件
+      <text class="section-count" wx:if="{{expiredItems.length + expiringSoonItems.length}}">
+        {{expiredItems.length + expiringSoonItems.length}} 件
+      </text>
+    </view>
+
+    <view class="attention-card" wx:if="{{expiredItems.length || expiringSoonItems.length}}">
+      <view
+        class="attention-item attention-danger"
+        wx:for="{{expiredItems}}"
+        wx:key="id"
+        bindtap="goToUpdateItem"
+        data-id="{{item.id}}"
+        data-category="{{item.category}}"
+      >
+        <view class="attention-icon"><app-icon name="alert" size="34" /></view>
+        <view class="attention-copy">
+          <text class="attention-name">{{item.name}}</text>
+          <text class="attention-meta">已经过期 {{item.daysText}}</text>
+        </view>
+        <text class="attention-status">需处理</text>
+        <app-icon name="chevron-right" size="28" />
+      </view>
+
+      <view
+        class="attention-item attention-warning"
+        wx:for="{{expiringSoonItems}}"
+        wx:key="id"
+        bindtap="goToUpdateItem"
+        data-id="{{item.id}}"
+        data-category="{{item.category}}"
+      >
+        <view class="attention-icon"><app-icon name="calendar" size="34" /></view>
+        <view class="attention-copy">
+          <text class="attention-name">{{item.name}}</text>
+          <text class="attention-meta">{{item.daysText}}后过期</text>
+        </view>
+        <text class="attention-status">快到期</text>
+        <app-icon name="chevron-right" size="28" />
       </view>
     </view>
 
-    <!-- 已过期物品 -->
-    <view class="alert-group" wx:if="{{expiredItems.length}}">
-      <view class="alert-group-header alert-danger">
-        <text class="alert-dot"></text>
-        <text class="alert-group-title">已过期 ({{expiredItems.length}})</text>
+    <view class="all-clear-card" wx:else>
+      <view class="all-clear-icon"><app-icon name="check" size="38" /></view>
+      <view class="all-clear-copy">
+        <text class="all-clear-title">今天没有待处理提醒</text>
+        <text class="all-clear-text">物品状态都很安心，继续享受生活吧。</text>
       </view>
-      <view class="alert-list">
-        <view
-          class="alert-item"
-          wx:for="{{expiredItems}}"
-          wx:key="id"
-          bindtap="goToUpdateItem"
-          data-id="{{item.id}}"
-          data-category="{{item.category}}"
-        >
-          <text class="alert-item-emoji">{{item.emoji || '📦'}}</text>
-          <view class="alert-item-info">
-            <text class="alert-item-name">{{item.name}}</text>
-            <text class="alert-item-date danger">过期{{item.daysText}}</text>
+    </view>
+  </view>
+
+  <view class="quick-grid" wx:if="{{!loading}}">
+    <view class="quick-item" bindtap="goToItems">
+      <view class="quick-icon quick-icon-box"><app-icon name="box" size="34" /></view>
+      <text class="quick-value">{{totalItems}}</text>
+      <text class="quick-label">家中物品</text>
+    </view>
+    <view class="quick-item" bindtap="goToToBuyList">
+      <view class="quick-icon quick-icon-cart"><app-icon name="cart" size="34" /></view>
+      <text class="quick-value">{{toBuyCount}}</text>
+      <text class="quick-label">待买清单</text>
+    </view>
+    <view class="quick-item" bindtap="goToTravel">
+      <view class="quick-icon quick-icon-plane"><app-icon name="plane" size="34" /></view>
+      <text class="quick-value">{{travelCount}}</text>
+      <text class="quick-label">想去的地方</text>
+    </view>
+  </view>
+
+  <view class="life-section" wx:if="{{!loading}}">
+    <view class="section-heading">
+      <view>
+        <text class="section-kicker">LIFE NOTES</text>
+        <text class="section-title">最近的生活</text>
+      </view>
+    </view>
+
+    <view class="savings-note" bindtap="goToSavings" wx:if="{{savingsSummary}}">
+      <view class="savings-note-header">
+        <view class="savings-title-wrap">
+          <view class="life-card-icon savings-icon"><app-icon name="piggy-bank" size="40" /></view>
+          <view>
+            <text class="life-card-label">退休存钱罐</text>
+            <text class="life-card-title">{{savingsSummary.netAssetsText}} 净资产</text>
           </view>
-          <text class="alert-item-arrow">›</text>
         </view>
+        <app-icon name="chevron-right" size="30" />
+      </view>
+      <view class="savings-progress-copy">
+        <text wx:if="{{savingsSummary.targetAmount > 0}}">目标 {{savingsSummary.targetText}} · {{savingsSummary.progress}}%</text>
+        <text wx:else>先一起定下退休目标</text>
+        <text class="savings-remaining" wx:if="{{savingsSummary.targetAmount > 0}}">还差 {{savingsSummary.remainingText}}</text>
+      </view>
+      <view class="savings-progress-track" wx:if="{{savingsSummary.targetAmount > 0}}">
+        <view class="savings-progress-fill" style="width: {{savingsSummary.progressWidth}}%"></view>
+      </view>
+      <view class="savings-checkin {{savingsSummary.isProvisional ? 'savings-checkin-pending' : ''}}">
+        <view class="savings-checkin-dot"></view>
+        <text>{{savingsSummary.checkInText}}</text>
       </view>
     </view>
 
-    <!-- 即将过期物品 -->
-    <view class="alert-group" wx:if="{{expiringSoonItems.length}}">
-      <view class="alert-group-header alert-warning">
-        <text class="alert-dot"></text>
-        <text class="alert-group-title">即将过期 ({{expiringSoonItems.length}})</text>
+    <view class="life-card period-card" bindtap="goToPeriod" wx:if="{{periodStats}}">
+      <view class="life-card-icon period-icon"><app-icon name="flower" size="38" /></view>
+      <view class="life-card-copy">
+        <text class="life-card-label">周期记录</text>
+        <text class="life-card-title" wx:if="{{periodStats.status === 'none'}}">还没有开始记录</text>
+        <text class="life-card-title" wx:elif="{{periodStats.status === 'in-period'}}">经期中，记得照顾好自己</text>
+        <text class="life-card-title" wx:elif="{{periodStats.daysUntilNextPeriod > 0}}">距下次预计还有 {{periodStats.daysUntilNextPeriod}} 天</text>
+        <text class="life-card-title" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">预计今天开始</text>
+        <text class="life-card-title" wx:else>已超出预计 {{-periodStats.daysUntilNextPeriod}} 天</text>
+        <text class="life-card-meta" wx:if="{{periodStats.averageCycleDays}}">平均周期 {{periodStats.averageCycleDays}} 天</text>
       </view>
-      <view class="alert-list">
-        <view
-          class="alert-item"
-          wx:for="{{expiringSoonItems}}"
-          wx:key="id"
-          bindtap="goToUpdateItem"
-          data-id="{{item.id}}"
-          data-category="{{item.category}}"
-        >
-          <text class="alert-item-emoji">{{item.emoji || '📦'}}</text>
-          <view class="alert-item-info">
-            <text class="alert-item-name">{{item.name}}</text>
-            <text class="alert-item-date warning">{{item.daysText}}后过期</text>
+      <app-icon name="chevron-right" size="30" />
+    </view>
+
+    <view class="life-card cat-card" bindtap="goToWeight" wx:if="{{catWeights.length}}">
+      <view class="life-card-icon cat-icon"><app-icon name="cat" size="40" /></view>
+      <view class="life-card-copy">
+        <text class="life-card-label">猫猫体重</text>
+        <view class="cat-summary">
+          <view class="cat-summary-item" wx:for="{{catWeights}}" wx:key="personName">
+            <text class="cat-name">{{item.personName}}</text>
+            <text class="cat-weight">{{item.weight}} 斤</text>
+            <text class="cat-date">{{item.dateText}}</text>
           </view>
-          <text class="alert-item-arrow">›</text>
         </view>
+      </view>
+      <app-icon name="chevron-right" size="30" />
+    </view>
+
+    <view class="goals-note" bindtap="goToGoals" wx:if="{{goalsPig.length || goalsDonkey.length}}">
+      <view class="goals-note-header">
+        <view class="goals-note-title">
+          <view class="life-card-icon goal-icon"><app-icon name="target" size="38" /></view>
+          <view>
+            <text class="life-card-label">年度目标</text>
+            <text class="life-card-title">一起靠近想要的生活</text>
+          </view>
+        </view>
+        <app-icon name="chevron-right" size="30" />
+      </view>
+      <view class="goal-progress-row" wx:if="{{goalsPig.length}}">
+        <text class="goal-owner">🐷 猪猪</text>
+        <view class="goal-progress-track"><view class="goal-progress-fill pig" style="width: {{pigProgress}}%"></view></view>
+        <text class="goal-progress-text">{{pigCompleted}}/{{goalsPig.length}}</text>
+      </view>
+      <view class="goal-progress-row" wx:if="{{goalsDonkey.length}}">
+        <text class="goal-owner">🫏 毛驴</text>
+        <view class="goal-progress-track"><view class="goal-progress-fill donkey" style="width: {{donkeyProgress}}%"></view></view>
+        <text class="goal-progress-text">{{donkeyCompleted}}/{{goalsDonkey.length}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 无提醒时的空状态 -->
-  <view class="section-card empty-alert-card" wx:if="{{!loading && !expiredItems.length && !expiringSoonItems.length}}">
-    <view class="period-card-content">
-      <view class="empty-alert-icon-wrap">✨</view>
-      <view class="period-info">
-        <view class="period-status">
-          <text class="empty-alert-title">太棒了！</text>
-          <text class="period-sub-text">没有即将过期的物品</text>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 姨妈记录状态卡片 -->
-  <view class="section-card period-card" bindtap="goToPeriod" wx:if="{{periodStats}}">
-    <view class="period-card-content">
-      <view class="period-icon">🌸</view>
-      <view class="period-info">
-        <view class="period-status" wx:if="{{periodStats.status === 'none'}}">
-          <text class="period-main-text">暂无记录</text>
-          <text class="period-sub-text">点击开始记录</text>
-        </view>
-        <view class="period-status" wx:elif="{{periodStats.status === 'in-period'}}">
-          <text class="period-main-text">经期中</text>
-          <text class="period-sub-text">注意保暖 💕</text>
-        </view>
-        <view class="period-status" wx:else>
-          <text class="period-main-text" wx:if="{{periodStats.daysUntilNextPeriod > 0}}">距下次姨妈还有 {{periodStats.daysUntilNextPeriod}} 天</text>
-          <text class="period-main-text" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">预计今天开始</text>
-          <text class="period-main-text" wx:else>已超出预计 {{-periodStats.daysUntilNextPeriod}} 天</text>
-          <text class="period-sub-text">平均周期 {{periodStats.averageCycleDays}} 天</text>
-        </view>
-      </view>
-      <view class="period-arrow">›</view>
-    </view>
-  </view>
-
-  <!-- 猫猫体重卡片 -->
-  <view class="section-card cat-card" bindtap="goToWeight" wx:if="{{catWeights.length}}">
-    <view class="section-header">
-      <view class="section-title-wrap">
-        <view class="section-icon">🐱</view>
-        <text class="section-title">猫猫体重</text>
-      </view>
-      <text class="section-arrow">›</text>
-    </view>
-    <view class="cat-grid">
-      <view class="cat-item" wx:for="{{catWeights}}" wx:key="personName">
-        <text class="cat-name">{{item.personName}}</text>
-        <view class="cat-weight-row">
-          <text class="cat-weight">{{item.weight}}</text>
-          <text class="cat-unit">斤</text>
-        </view>
-        <text class="cat-date">{{item.dateText}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 年度目标卡片 -->
-  <view class="section-card goals-card" bindtap="goToGoals" wx:if="{{goalsPig.length || goalsDonkey.length}}">
-    <view class="section-header">
-      <view class="section-title-wrap">
-        <view class="section-icon">🎯</view>
-        <text class="section-title">年度目标</text>
-      </view>
-      <text class="section-arrow">›</text>
-    </view>
-    <view class="goals-list">
-      <view class="goals-row" wx:if="{{goalsPig.length}}">
-        <text class="goals-owner">🐷</text>
-        <view class="goals-progress-bar">
-          <view class="goals-progress-fill" style="width: {{pigProgress}}%"></view>
-        </view>
-        <text class="goals-text">{{pigCompleted}}/{{goalsPig.length}}</text>
-      </view>
-      <view class="goals-row" wx:if="{{goalsDonkey.length}}">
-        <text class="goals-owner">🫏</text>
-        <view class="goals-progress-bar">
-          <view class="goals-progress-fill goals-progress-fill-donkey" style="width: {{donkeyProgress}}%"></view>
-        </view>
-        <text class="goals-text">{{donkeyCompleted}}/{{goalsDonkey.length}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 统计行 -->
-  <view class="stats-row" wx:if="{{!loading}}">
-    <view class="stat-item" bindtap="goToItems">
-      <text class="stat-value">{{totalItems}}</text>
-      <text class="stat-label">物品</text>
-    </view>
-    <view class="stat-item" bindtap="goToToBuyList">
-      <text class="stat-value">{{toBuyCount}}</text>
-      <text class="stat-label">待购</text>
-    </view>
-    <view class="stat-item" bindtap="goToTravel">
-      <text class="stat-value">{{travelCount}}</text>
-      <text class="stat-label">想去</text>
-    </view>
-  </view>
-
-  <!-- 底部消息推送入口 -->
   <footer-link />
-
-  <!-- 底部安全区 -->
   <view class="safe-bottom"></view>
 </view>

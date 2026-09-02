@@ -13,19 +13,19 @@
     "pages/checkup/detail"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#6366f1",
-    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#f7f1e8",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "CleanUpLife",
-    "backgroundColor": "#f8fafc",
+    "backgroundColor": "#f7f1e8",
     "backgroundTextStyle": "dark",
-    "backgroundColorTop": "#f8fafc",
-    "backgroundColorBottom": "#eef2f7",
+    "backgroundColorTop": "#f7f1e8",
+    "backgroundColorBottom": "#f1e6d8",
     "navigationStyle": "custom"
   },
   "tabBar": {
-    "color": "#9ca3af",
-    "selectedColor": "#6366f1",
-    "backgroundColor": "#ffffff",
+    "color": "#9a8c7f",
+    "selectedColor": "#c96f55",
+    "backgroundColor": "#fffdf8",
     "borderStyle": "white",
     "list": [
       {

@@ -1,4 +1,8 @@
 <view class="loading-container" wx:if="{{loading}}">
-  <view class="loading-spinner"></view>
-  <text class="loading-text">加载中...</text>
+  <view class="loading-dots">
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+  </view>
+  <text class="loading-text">正在整理生活片段</text>
 </view>

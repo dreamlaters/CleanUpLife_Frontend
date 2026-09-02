@@ -1,381 +1,475 @@
-/**
- * 首页样式 - 生活状态仪表盘
- * CleanUpLife - 清新简约风格
- */
+.container {
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
 
-/* ==================== 通用区块卡片 ==================== */
-.section-card {
-  margin: 20rpx 24rpx;
-  background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+.journal-hero {
+  position: relative;
+  min-height: 262rpx;
+  margin: 18rpx 24rpx 26rpx;
   overflow: hidden;
+  border: 1rpx solid #dfcdb8;
+  border-radius: 26rpx 26rpx 26rpx 8rpx;
+  background: #f5ebdd;
+  box-shadow: 0 8rpx 24rpx rgba(91, 71, 55, 0.07);
 }
 
-.section-header {
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  width: 57%;
+  padding: 34rpx 0 28rpx 30rpx;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.hero-eyebrow,
+.section-kicker {
+  color: #a66b56;
+  font-size: 17rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.hero-title {
+  margin-top: 12rpx;
+  color: #3f352f;
+  font-size: 38rpx;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.hero-note {
+  margin-top: 14rpx;
+  color: #7d6e62;
+  font-size: 23rpx;
+}
+
+.hero-illustration {
+  position: absolute;
+  right: -30rpx;
+  bottom: -2rpx;
+  width: 380rpx;
+  height: 216rpx;
+  opacity: 0.86;
+}
+
+.today-section,
+.life-section {
+  margin: 0 24rpx 26rpx;
+}
+
+.section-heading {
+  margin: 0 2rpx 14rpx;
+  display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  padding: 24rpx 28rpx;
-  border-bottom: 1rpx solid #f3f4f6;
 }
 
-.section-title-wrap {
+.section-heading > view:first-child {
   display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
-.section-icon {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 12rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22rpx;
-  background: rgba(99, 102, 241, 0.1);
+  flex-direction: column;
 }
 
 .section-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #111827;
+  margin-top: 4rpx;
+  color: #3f352f;
+  font-size: 34rpx;
+  font-weight: 700;
 }
 
-.section-arrow {
-  font-size: 28rpx;
-  color: #d1d5db;
+.section-count {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #f4ded7;
+  color: #9f4f3d;
+  font-size: 21rpx;
+  font-weight: 700;
 }
 
-/* ==================== 过期提醒 ==================== */
-.alert-card {
-  border-left: 5rpx solid #f59e0b;
-  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 30%);
+.attention-card {
+  overflow: hidden;
+  border: 1rpx solid #e2d1bd;
+  border-radius: 22rpx;
+  background: #fffdf8;
+  box-shadow: 0 4rpx 14rpx rgba(91, 71, 55, 0.05);
 }
 
-.alert-badge {
-  font-size: 22rpx;
-  color: #fff;
-  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-  padding: 6rpx 16rpx;
-  border-radius: 16rpx;
-  font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(239, 68, 68, 0.25);
-}
-
-.alert-group {
-  padding: 12rpx 28rpx 16rpx;
-}
-
-.alert-group:not(:last-child) {
-  border-bottom: 1rpx solid #f3f4f6;
-}
-
-.alert-group-header {
+.attention-item {
+  min-height: 96rpx;
+  padding: 0 20rpx;
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin-bottom: 8rpx;
+  gap: 12rpx;
+  border-bottom: 1rpx dashed #eadfD2;
 }
 
-.alert-dot {
-  width: 8rpx;
-  height: 8rpx;
-  border-radius: 50%;
+.attention-item:last-child {
+  border-bottom: 0;
 }
 
-.alert-danger .alert-dot {
-  background: #ef4444;
-  box-shadow: 0 0 6rpx rgba(239, 68, 68, 0.5);
+.attention-item:active {
+  background: #faf3e9;
 }
 
-.alert-warning .alert-dot {
-  background: #f59e0b;
-  box-shadow: 0 0 6rpx rgba(245, 158, 11, 0.5);
+.attention-icon,
+.all-clear-icon,
+.life-card-icon,
+.quick-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.alert-group-title {
-  font-size: 24rpx;
-  font-weight: 500;
-  color: #6b7280;
+.attention-icon {
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 18rpx;
 }
 
-.alert-list {
+.attention-danger .attention-icon {
+  background: #f6e1dd;
+}
+
+.attention-warning .attention-icon {
+  background: #f6ead2;
+}
+
+.attention-copy {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
 }
 
-.alert-item {
-  display: flex;
-  align-items: center;
-  padding: 12rpx 14rpx;
-  background: #ffffff;
-  border-radius: 12rpx;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1rpx solid #f3f4f6;
-}
-
-.alert-item:active {
-  transform: scale(0.98);
-  background: #f9fafb;
-  border-color: #e5e7eb;
-}
-
-.alert-item-emoji {
-  font-size: 24rpx;
-  width: 40rpx;
-  height: 40rpx;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 10rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.alert-item-info {
-  flex: 1;
-  margin-left: 12rpx;
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-}
-
-.alert-item-name {
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #111827;
-}
-
-.alert-item-date {
-  font-size: 20rpx;
-  font-weight: 500;
-}
-
-.alert-item-date.danger {
-  color: #ef4444;
-}
-
-.alert-item-date.warning {
-  color: #d97706;
-}
-
-.alert-item-arrow {
-  font-size: 24rpx;
-  color: #d1d5db;
-}
-
-/* ==================== 空提醒状态 ==================== */
-.empty-alert-card {
-  border-left: 5rpx solid #22c55e;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 30%);
-}
-
-.empty-alert-icon-wrap {
-  font-size: 44rpx;
-  width: 72rpx;
-  height: 72rpx;
-  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-  border-radius: 18rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.empty-alert-title {
-  font-size: 30rpx;
+.attention-name {
+  overflow: hidden;
+  color: #3f352f;
+  font-size: 27rpx;
   font-weight: 600;
-  color: #22c55e;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ==================== 姨妈记录卡片 ==================== */
-.period-card {
-  border-left: 5rpx solid #ec4899;
-  background: linear-gradient(135deg, #fdf2f8 0%, #ffffff 30%);
+.attention-meta {
+  margin-top: 3rpx;
+  color: #8a7b6f;
+  font-size: 21rpx;
 }
 
-.period-card-content {
+.attention-status {
+  padding: 5rpx 11rpx;
+  border-radius: 8rpx;
+  font-size: 19rpx;
+  font-weight: 700;
+}
+
+.attention-danger .attention-status {
+  background: #f6e1dd;
+  color: #a54f47;
+}
+
+.attention-warning .attention-status {
+  background: #f6ead2;
+  color: #9c6d31;
+}
+
+.all-clear-card {
+  min-height: 104rpx;
+  padding: 0 22rpx;
+  border: 1rpx solid #ccd9c6;
+  border-radius: 22rpx 22rpx 22rpx 7rpx;
+  background: #f1f5ed;
   display: flex;
   align-items: center;
-  padding: 28rpx;
+  gap: 16rpx;
+}
+
+.all-clear-icon {
+  width: 62rpx;
+  height: 62rpx;
+  border-radius: 20rpx;
+  background: #dfe9d9;
+}
+
+.all-clear-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+.all-clear-title {
+  color: #4d6947;
+  font-size: 27rpx;
+  font-weight: 700;
+}
+
+.all-clear-text {
+  margin-top: 4rpx;
+  color: #788572;
+  font-size: 21rpx;
+}
+
+.quick-grid {
+  margin: 0 24rpx 30rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+}
+
+.quick-item {
+  min-width: 0;
+  padding: 20rpx 12rpx;
+  border: 1rpx solid #e4d5c4;
+  border-radius: 20rpx 20rpx 20rpx 7rpx;
+  background: #fffdf8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.18s ease;
+}
+
+.quick-item:active {
+  transform: scale(0.96);
+}
+
+.quick-icon {
+  width: 56rpx;
+  height: 56rpx;
+  margin-bottom: 9rpx;
+  border-radius: 17rpx;
+}
+
+.quick-icon-box { background: #f1e5d5; }
+.quick-icon-cart { background: #e4ede0; }
+.quick-icon-plane { background: #e2ebef; }
+
+.quick-value {
+  color: #3f352f;
+  font-size: 35rpx;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.quick-label {
+  margin-top: 4rpx;
+  color: #8a7b6f;
+  font-size: 20rpx;
+  white-space: nowrap;
+}
+
+.life-card,
+.goals-note,
+.savings-note {
+  margin-bottom: 14rpx;
+  border: 1rpx solid #e3d3c1;
+  border-radius: 22rpx 22rpx 22rpx 7rpx;
+  background: #fffdf8;
+  box-shadow: 0 3rpx 12rpx rgba(91, 71, 55, 0.04);
+}
+
+.life-card {
+  min-height: 116rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.life-card:active,
+.goals-note:active,
+.savings-note:active {
+  background: #faf3e9;
+}
+
+.life-card-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+}
+
+.period-icon { background: #f6e4e7; }
+.cat-icon { background: #f2e6cf; }
+.goal-icon { background: #e5ecdf; }
+.savings-icon { background: #f2dfc1; }
+
+.life-card-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.life-card-label {
+  color: #9b7565;
+  font-size: 19rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.life-card-title {
+  margin-top: 3rpx;
+  color: #3f352f;
+  font-size: 27rpx;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.life-card-meta {
+  margin-top: 3rpx;
+  color: #8a7b6f;
+  font-size: 20rpx;
+}
+
+.cat-summary {
+  margin-top: 5rpx;
+  display: flex;
   gap: 20rpx;
 }
 
-.period-icon {
-  font-size: 44rpx;
-  width: 72rpx;
-  height: 72rpx;
-  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-  border-radius: 18rpx;
+.cat-summary-item {
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.period-info {
-  flex: 1;
-}
-
-.period-status {
-  display: flex;
-  flex-direction: column;
-  gap: 6rpx;
-}
-
-.period-main-text {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #be185d;
-}
-
-.period-sub-text {
-  font-size: 24rpx;
-  color: #9ca3af;
-}
-
-.period-arrow {
-  font-size: 32rpx;
-  color: #f9a8d4;
-}
-
-/* ==================== 猫猫体重卡片 ==================== */
-.cat-card {
-  border-left: 5rpx solid #f59e0b;
-  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 30%);
-}
-
-.cat-grid {
-  display: flex;
-  gap: 1rpx;
-  background: #f3f4f6;
-}
-
-.cat-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24rpx 16rpx;
-  background: #ffffff;
+  align-items: baseline;
+  gap: 5rpx;
 }
 
 .cat-name {
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #6b7280;
-  margin-bottom: 8rpx;
-}
-
-.cat-weight-row {
-  display: flex;
-  align-items: baseline;
-  gap: 4rpx;
+  color: #6a5c50;
+  font-size: 21rpx;
 }
 
 .cat-weight {
-  font-size: 44rpx;
-  font-weight: 700;
-  color: #d97706;
-}
-
-.cat-unit {
-  font-size: 22rpx;
-  color: #9ca3af;
+  color: #3f352f;
+  font-size: 26rpx;
+  font-weight: 750;
 }
 
 .cat-date {
-  font-size: 22rpx;
-  color: #9ca3af;
-  margin-top: 6rpx;
+  color: #a3978b;
+  font-size: 18rpx;
 }
 
-/* ==================== 年度目标卡片 ==================== */
-.goals-card {
-  border-left: 5rpx solid #6366f1;
-  background: linear-gradient(135deg, #eef2ff 0%, #ffffff 30%);
+.goals-note {
+  padding: 20rpx;
 }
 
-.goals-list {
-  padding: 20rpx 28rpx 24rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-}
-
-.goals-row {
+.goals-note-header,
+.goals-note-title,
+.goal-progress-row {
   display: flex;
   align-items: center;
+}
+
+.goals-note-header {
+  justify-content: space-between;
+}
+
+.goals-note-title {
   gap: 14rpx;
 }
 
-.goals-owner {
-  font-size: 28rpx;
-  width: 40rpx;
-  text-align: center;
-  flex-shrink: 0;
+.goal-progress-row {
+  gap: 12rpx;
+  margin-top: 16rpx;
 }
 
-.goals-progress-bar {
+.goal-owner {
+  width: 92rpx;
+  color: #6a5c50;
+  font-size: 21rpx;
+}
+
+.goal-progress-track {
   flex: 1;
-  height: 16rpx;
-  background: #f3f4f6;
-  border-radius: 8rpx;
+  height: 12rpx;
   overflow: hidden;
+  border-radius: 999rpx;
+  background: #eee4d8;
 }
 
-.goals-progress-fill {
+.goal-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
-  border-radius: 8rpx;
-  transition: width 0.3s ease;
+  border-radius: inherit;
 }
 
-.goals-progress-fill-donkey {
-  background: linear-gradient(90deg, #ec4899 0%, #f472b6 100%);
+.goal-progress-fill.pig {
+  background: #d58d9c;
 }
 
-.goals-text {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #6b7280;
-  width: 60rpx;
+.goal-progress-fill.donkey {
+  background: #718999;
+}
+
+.goal-progress-text {
+  width: 56rpx;
+  color: #8a7b6f;
+  font-size: 20rpx;
   text-align: right;
-  flex-shrink: 0;
 }
 
-/* ==================== 统计行 ==================== */
-.stats-row {
-  display: flex;
-  gap: 16rpx;
-  margin: 20rpx 24rpx;
+.savings-note {
+  padding: 20rpx;
 }
 
-.stat-item {
-  flex: 1;
-  background: #ffffff;
-  border-radius: 16rpx;
-  padding: 24rpx 12rpx;
+.savings-note-header,
+.savings-title-wrap,
+.savings-progress-copy,
+.savings-checkin {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.03);
 }
 
-.stat-item:active {
-  transform: scale(0.96);
-  background: #f9fafb;
+.savings-note-header,
+.savings-progress-copy {
+  justify-content: space-between;
 }
 
-.stat-value {
-  font-size: 44rpx;
-  font-weight: 700;
-  color: #6366f1;
+.savings-title-wrap {
+  gap: 14rpx;
 }
 
-.stat-label {
-  font-size: 24rpx;
-  color: #6b7280;
-  margin-top: 6rpx;
-  font-weight: 500;
+.savings-progress-copy {
+  margin-top: 18rpx;
+  color: #6a5c50;
+  font-size: 21rpx;
+}
+
+.savings-remaining {
+  color: #9f4f3d;
+  font-weight: 650;
+}
+
+.savings-progress-track {
+  height: 13rpx;
+  margin-top: 9rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: #eee4d8;
+}
+
+.savings-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #c96f55;
+}
+
+.savings-checkin {
+  gap: 8rpx;
+  margin-top: 14rpx;
+  color: #63755c;
+  font-size: 20rpx;
+}
+
+.savings-checkin-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #6f8a65;
+}
+
+.savings-checkin-pending {
+  color: #9c6d31;
+}
+
+.savings-checkin-pending .savings-checkin-dot {
+  background: #c58a3f;
 }

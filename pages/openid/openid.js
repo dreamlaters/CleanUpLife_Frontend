@@ -4,11 +4,13 @@
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
+const { SUBSCRIPTION_TEMPLATE_IDS } = require('../../utils/constants');
 
 Page({
   data: {
     openid: '',
-    loading: true
+    loading: true,
+    savingsReminderAvailable: Boolean(SUBSCRIPTION_TEMPLATE_IDS.RETIREMENT_SAVINGS)
   },
 
   onLoad() {
@@ -35,11 +37,14 @@ Page({
 
   // ==================== 消息订阅 ====================
   onRequestSubscribe() {
+    const templateIds = Object.values(SUBSCRIPTION_TEMPLATE_IDS).filter(Boolean);
+    if (!templateIds.length) {
+      util.showError('暂无可订阅的提醒模板');
+      return;
+    }
+
     wx.requestSubscribeMessage({
-      tmplIds: [
-        'UxALkgoVSieSCdFhfkeX50yu_ORs6zMdpgmMkVMWiJY', // 物品过期提醒
-        'dP6v-vSLEDMqM_mMEk3YZgCE5P7cP0NnxEJS42KfGZE'  // 经期提醒
-      ],
+      tmplIds: templateIds,
       success: (res) => {
         const acceptCount = Object.values(res).filter(v => v === 'accept').length;
         const status = acceptCount > 0 

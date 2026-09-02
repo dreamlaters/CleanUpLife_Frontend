@@ -4,7 +4,7 @@
     <!-- 标题 -->
     <view class="form-header">
       <view class="form-title">
-        <text class="title-icon">📦</text>
+        <view class="title-icon"><app-icon name="box" size="38" /></view>
         <text>添加新物品</text>
       </view>
       <text class="form-subtitle">记录物品信息，追踪保质期</text>
@@ -33,7 +33,7 @@
       </text>
       <picker mode="date" value="{{formData.bestBy}}" start="{{today}}" bindchange="onDateChange">
         <view class="picker-view {{formData.bestBy ? 'picker-selected' : ''}}">
-          <text class="picker-icon">📅</text>
+          <view class="picker-icon"><app-icon name="calendar" size="28" /></view>
           <text class="picker-text">{{formData.bestBy || '请选择日期'}}</text>
           <text class="picker-arrow">▼</text>
         </view>
@@ -48,14 +48,14 @@
       <view class="location-selector">
         <picker bindchange="onLocationRoomChange" value="{{locationRoomIndex}}" range="{{locationRooms}}">
           <view class="picker-view location-picker {{locationRoomIndex !== null ? 'picker-selected' : ''}}">
-            <text class="picker-icon">🏠</text>
+            <view class="picker-icon"><app-icon name="box" size="28" /></view>
             <text class="picker-text">{{locationRooms[locationRoomIndex] || '选择房间'}}</text>
             <text class="picker-arrow">▼</text>
           </view>
         </picker>
         <picker bindchange="onLocationSiteChange" value="{{locationSiteIndex}}" range="{{locationSites}}">
           <view class="picker-view location-picker {{locationSiteIndex !== null ? 'picker-selected' : ''}}">
-            <text class="picker-icon">📍</text>
+            <view class="picker-icon"><app-icon name="map-pin" size="28" /></view>
             <text class="picker-text">{{locationSites[locationSiteIndex] || '具体位置'}}</text>
             <text class="picker-arrow">▼</text>
           </view>
@@ -70,7 +70,7 @@
       </text>
       <picker bindchange="onCategoryChange" value="{{categoryIndex}}" range="{{categories}}">
         <view class="picker-view {{categoryIndex !== null ? 'picker-selected' : ''}}">
-          <text class="picker-icon">📋</text>
+          <view class="picker-icon"><app-icon name="box" size="28" /></view>
           <text class="picker-text">{{categories[categoryIndex] || '请选择种类'}}</text>
           <text class="picker-arrow">▼</text>
         </view>
@@ -80,7 +80,7 @@
     <!-- 食物特有字段 -->
     <view class="category-fields {{categories[categoryIndex] === '食物' ? 'show' : ''}}" wx:if="{{categories[categoryIndex] === '食物'}}">
       <view class="category-divider">
-        <text class="divider-text">🥖 食物专属</text>
+        <text class="divider-text">食物信息</text>
       </view>
       <view class="form-item">
         <text class="form-label">
@@ -88,7 +88,7 @@
         </text>
         <picker bindchange="onStorageChange" value="{{storageIndex}}" range="{{storages}}">
           <view class="picker-view {{storageIndex !== null ? 'picker-selected' : ''}}">
-            <text class="picker-icon">❄️</text>
+            <view class="picker-icon"><app-icon name="box" size="28" /></view>
             <text class="picker-text">{{storages[storageIndex] || '请选择存储条件'}}</text>
             <text class="picker-arrow">▼</text>
           </view>
@@ -99,7 +99,7 @@
     <!-- 猫粮特有字段 -->
     <view class="category-fields {{categories[categoryIndex] === '猫粮' ? 'show' : ''}}" wx:if="{{categories[categoryIndex] === '猫粮'}}">
       <view class="category-divider">
-        <text class="divider-text">🐱 猫粮专属</text>
+        <text class="divider-text">猫粮信息</text>
       </view>
       <view class="form-item">
         <text class="form-label">
@@ -161,7 +161,7 @@
     <!-- 药品特有字段 -->
     <view class="category-fields {{categories[categoryIndex] === '药品' ? 'show' : ''}}" wx:if="{{categories[categoryIndex] === '药品'}}">
       <view class="category-divider">
-        <text class="divider-text">💊 药品专属</text>
+        <text class="divider-text">药品信息</text>
       </view>
       <view class="form-item">
         <text class="form-label">
@@ -181,7 +181,7 @@
 
     <!-- 描述 -->
     <view class="form-item">
-      <text class="form-label">📝 描述 <text class="label-optional">(可选)</text></text>
+      <text class="form-label">描述 <text class="label-optional">(可选)</text></text>
       <textarea 
         class="form-textarea" 
         placeholder="添加一些备注信息..." 
@@ -193,7 +193,7 @@
 
     <!-- 提交按钮 -->
     <button class="submit-button" bindtap="submitForm">
-      <text class="submit-icon">✓</text>
+      <app-icon name="check" size="30" tone="light" />
       <text>添加物品</text>
     </button>
   </view>

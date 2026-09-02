@@ -1,341 +1,433 @@
-/**
- * 计划页面样式 - 统一设计语言 v3.0
- * CleanUpLife - 清新简约风格
- */
-
 .container {
+  min-height: 100vh;
   padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
   overflow-x: hidden;
+  color: #3f352f;
+  background: #f8f2e9;
 }
 
-/* ==================== 子Tab ==================== */
-.sub-tabs {
+.page-intro {
+  padding: 28rpx 32rpx 8rpx;
+}
+
+.page-kicker,
+.section-kicker,
+.modal-kicker {
+  display: block;
+  color: #9f4f3d;
+  font-size: 18rpx;
+  font-weight: 700;
+  letter-spacing: 3rpx;
+}
+
+.page-title {
+  display: block;
+  margin-top: 8rpx;
+  color: #3f352f;
+  font-family: serif;
+  font-size: 38rpx;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.page-subtitle {
+  display: block;
+  margin-top: 8rpx;
+  color: #8d7c70;
+  font-size: 23rpx;
+}
+
+.tab-content {
+  padding-top: 8rpx;
+}
+
+.travel-heading,
+.goals-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 20rpx 28rpx 18rpx;
+}
+
+.section-title {
+  display: block;
+  margin-top: 6rpx;
+  color: #3f352f;
+  font-family: serif;
+  font-size: 31rpx;
+  font-weight: 700;
+}
+
+.travel-count,
+.year-picker {
+  display: flex;
+  align-items: center;
+  gap: 7rpx;
+  flex-shrink: 0;
+  padding: 10rpx 14rpx;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 18rpx;
+  color: #75665c;
+  background: #fffdf8;
+  font-size: 21rpx;
+}
+
+.status-switch {
   display: flex;
   gap: 12rpx;
-  padding: 0 24rpx;
-  margin-bottom: 16rpx;
+  padding: 0 28rpx 18rpx;
 }
 
-.sub-tab {
+.status-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6rpx;
-  padding: 16rpx 14rpx;
-  background: #ffffff;
-  border-radius: 16rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  color: #6b7280;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
-  position: relative;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1rpx solid #f3f4f6;
-}
-
-.sub-tab-active {
-  background: rgba(99, 102, 241, 0.08);
-  color: #6366f1;
-  border-color: #6366f1;
-}
-
-.sub-tab-badge {
-  position: absolute;
-  top: -6rpx;
-  right: 18rpx;
-  min-width: 28rpx;
-  height: 28rpx;
-  padding: 0 8rpx;
-  background: #ef4444;
-  color: #fff;
-  font-size: 16rpx;
-  font-weight: 600;
-  border-radius: 14rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ==================== 区块卡片 ==================== */
-.section-card {
-  margin: 0 24rpx;
-  background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-}
-
-/* ==================== 物品列表 ==================== */
-.item-list {
-  padding: 12rpx 16rpx;
-}
-
-.item-card {
-  display: flex;
-  align-items: center;
-  padding: 18rpx 16rpx;
-  background: #f9fafb;
+  min-height: 64rpx;
+  border: 1rpx solid #e6d8c8;
   border-radius: 18rpx;
-  margin-bottom: 10rpx;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1rpx solid transparent;
+  color: #796b61;
+  background: rgba(255, 253, 248, 0.64);
+  font-size: 23rpx;
+  font-weight: 600;
+  transition: transform 0.18s ease;
 }
 
-.item-card:last-child {
-  margin-bottom: 0;
-}
-
-.item-card:active {
+.status-option:active,
+.owner-option:active,
+.wish-item:active {
   transform: scale(0.98);
-  background: #f3f4f6;
-  border-color: #e5e7eb;
 }
 
-.item-emoji {
-  font-size: 28rpx;
-  width: 56rpx;
-  height: 56rpx;
-  background: #ffffff;
+.status-option-active {
+  border-color: #c96f55;
+  color: #9f4f3d;
+  background: #fffdf8;
+  box-shadow: 0 5rpx 16rpx rgba(115, 83, 62, 0.07);
+}
+
+.status-count {
+  min-width: 27rpx;
+  height: 27rpx;
+  padding: 0 5rpx;
   border-radius: 14rpx;
+  color: #fffdf8;
+  background: #c96f55;
+  font-size: 17rpx;
+  line-height: 27rpx;
+  text-align: center;
+}
+
+.paper-card {
+  position: relative;
+  margin: 0 24rpx;
+  overflow: hidden;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 24rpx;
+  background: #fffdf8;
+  box-shadow: 0 10rpx 30rpx rgba(95, 71, 53, 0.07);
+}
+
+.paper-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 70rpx;
+  width: 1rpx;
+  background: rgba(201, 111, 85, 0.2);
+}
+
+.wish-list {
+  padding: 12rpx 18rpx;
+}
+
+.wish-item {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.04);
+  min-height: 110rpx;
+  padding: 13rpx 6rpx;
+  border-bottom: 1rpx solid #eee2d5;
+  transition: transform 0.18s ease;
 }
 
-.item-content {
+.wish-item:last-child {
+  border-bottom: 0;
+}
+
+.wish-index {
+  z-index: 1;
+  width: 48rpx;
+  margin-right: 17rpx;
+  color: #b89582;
+  font-family: serif;
+  font-size: 24rpx;
+  font-style: italic;
+  text-align: center;
+}
+
+.wish-content {
   flex: 1;
-  margin-left: 14rpx;
   min-width: 0;
 }
 
-.item-name {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #111827;
-  display: block;
-}
-
-.item-info {
+.wish-title-row,
+.wish-meta {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin-top: 6rpx;
-  flex-wrap: wrap;
 }
 
-.type-badge {
-  font-size: 20rpx;
-  font-weight: 500;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  line-height: 1.4;
-  display: inline-flex;
-  align-items: center;
+.wish-title-row {
+  gap: 12rpx;
+}
+
+.wish-name {
+  overflow: hidden;
+  flex: 1;
+  color: #3f352f;
+  font-size: 28rpx;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-type {
+  flex-shrink: 0;
+  padding: 4rpx 10rpx;
+  border-radius: 10rpx;
+  font-size: 18rpx;
+  font-weight: 600;
 }
 
 .type-domestic {
-  background: rgba(20, 184, 166, 0.1);
-  color: #14b8a6;
+  color: #5f7958;
+  background: #e7eee2;
 }
 
 .type-international {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  color: #9f4f3d;
+  background: #f5e4dc;
 }
 
-.priority-text {
-  font-size: 22rpx;
-  color: #9ca3af;
-  line-height: 1.4;
-  display: inline-flex;
+.wish-meta {
+  gap: 14rpx;
+  margin-top: 10rpx;
+}
+
+.meta-item {
+  display: flex;
   align-items: center;
+  gap: 5rpx;
+  color: #7c6e63;
+  font-size: 21rpx;
 }
 
-.date-text {
-  font-size: 22rpx;
-  color: #9ca3af;
-  line-height: 1.4;
-  display: inline-flex;
-  align-items: center;
+.longpress-hint {
+  color: #b7a89d;
+  font-size: 19rpx;
 }
 
-.date-badge {
-  font-size: 20rpx;
-  font-weight: 500;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  line-height: 1.4;
-  display: inline-flex;
-  align-items: center;
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
-}
-
-.mark-btn {
-  width: 44rpx;
-  height: 44rpx;
-  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
-  border-radius: 12rpx;
+.mark-btn,
+.visited-stamp {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 10rpx;
-  box-shadow: 0 2rpx 8rpx rgba(34, 197, 94, 0.3);
-  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  width: 52rpx;
+  height: 52rpx;
+  margin-left: 12rpx;
+  border-radius: 50%;
+}
+
+.mark-btn {
+  background: #dfe9da;
+  box-shadow: inset 0 0 0 1rpx #c4d3bd;
 }
 
 .mark-btn:active {
   transform: scale(0.9);
 }
 
-.mark-btn text {
-  font-size: 22rpx;
-  color: #fff;
-  font-weight: 600;
+.visited-stamp {
+  width: 44rpx;
+  height: 44rpx;
+  border: 2rpx solid #6f8a65;
+  opacity: 0.78;
 }
 
-/* ==================== 年度目标 ==================== */
-.year-selector {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16rpx;
-}
-
-.year-picker {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 12rpx 24rpx;
-  background: #ffffff;
-  border-radius: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
-  border: 1rpx solid #f3f4f6;
-}
-
-.year-text {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #111827;
-}
-
-.year-arrow {
-  font-size: 16rpx;
-  color: #9ca3af;
-}
-
-/* ==================== 双栏布局 ==================== */
-.goal-columns {
+.owner-switch {
   display: flex;
   gap: 12rpx;
-  padding: 0 24rpx;
-}
-
-.goal-column {
-  flex: 1;
-  background: #ffffff;
+  margin: 0 24rpx 16rpx;
+  padding: 6rpx;
+  border: 1rpx solid #e6d8c8;
   border-radius: 22rpx;
-  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+  background: #eee3d5;
 }
 
-.goal-column-header {
+.owner-option {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 20rpx 14rpx;
-  position: relative;
+  gap: 12rpx;
+  flex: 1;
+  min-width: 0;
+  padding: 14rpx 18rpx;
+  border-radius: 17rpx;
+  color: #827267;
+  transition: transform 0.18s ease;
 }
 
-.goal-column-header::before {
-  content: '';
+.owner-option-active {
+  color: #3f352f;
+  background: #fffdf8;
+  box-shadow: 0 3rpx 10rpx rgba(86, 62, 47, 0.07);
+}
+
+.owner-pig-active {
+  box-shadow: inset 0 -4rpx 0 #c96f55, 0 3rpx 10rpx rgba(86, 62, 47, 0.07);
+}
+
+.owner-donkey-active {
+  box-shadow: inset 0 -4rpx 0 #6f8a65, 0 3rpx 10rpx rgba(86, 62, 47, 0.07);
+}
+
+.owner-emoji {
+  font-size: 36rpx;
+}
+
+.owner-name,
+.owner-count {
+  display: block;
+}
+
+.owner-name {
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.owner-count {
+  margin-top: 2rpx;
+  color: #9a8a7f;
+  font-size: 18rpx;
+}
+
+.progress-summary {
+  margin: 0 24rpx 16rpx;
+  padding: 20rpx 22rpx;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 22rpx;
+  background: #fffdf8;
+}
+
+.summary-copy,
+.summary-owner {
+  display: flex;
+  align-items: center;
+}
+
+.summary-copy {
+  justify-content: space-between;
+  color: #594b43;
+  font-size: 23rpx;
+  font-weight: 600;
+}
+
+.summary-owner {
+  gap: 8rpx;
+}
+
+.summary-emoji {
+  font-size: 27rpx;
+}
+
+.summary-number {
+  color: #9f4f3d;
+  font-family: serif;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.summary-track,
+.progress-bar {
+  overflow: hidden;
+  border-radius: 6rpx;
+  background: #eee4d8;
+}
+
+.summary-track {
+  height: 10rpx;
+  margin-top: 12rpx;
+}
+
+.summary-fill,
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #6f8a65;
+  transition: width 0.3s ease;
+}
+
+.summary-caption {
+  display: block;
+  margin-top: 9rpx;
+  color: #95857a;
+  font-size: 19rpx;
+}
+
+.goal-paper {
+  padding: 8rpx 16rpx 18rpx 62rpx;
+}
+
+.notebook-margin {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 3rpx;
+  bottom: 0;
+  left: 48rpx;
+  width: 1rpx;
+  background: rgba(201, 111, 85, 0.25);
 }
 
-.goal-header-pig::before {
-  background: linear-gradient(90deg, #ec4899 0%, #f472b6 100%);
-}
-
-.goal-header-donkey::before {
-  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
-}
-
-.goal-owner-emoji {
-  font-size: 36rpx;
-  margin-bottom: 6rpx;
-}
-
-.goal-owner-name {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #111827;
-}
-
-/* ==================== 目标列表 ==================== */
 .goal-list {
-  padding: 10rpx 14rpx 18rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .goal-item-wrap {
-  margin-bottom: 8rpx;
+  border-bottom: 1rpx solid #eee2d5;
 }
 
 .goal-item-wrap:last-child {
-  margin-bottom: 0;
+  border-bottom: 0;
 }
 
-.goal-item-wrap.goal-item-completed {
-  opacity: 0.7;
+.goal-item-completed {
+  opacity: 0.68;
 }
 
 .goal-item {
   display: flex;
   align-items: flex-start;
-  padding: 12rpx 10rpx;
-  background: #f9fafb;
-  border-radius: 12rpx;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1rpx solid transparent;
-}
-
-.goal-item:active {
-  background: #f3f4f6;
-  border-color: #e5e7eb;
-}
-
-.goal-item-completed {
-  opacity: 0.7;
+  padding: 20rpx 8rpx;
 }
 
 .goal-checkbox {
-  width: 32rpx;
-  height: 32rpx;
-  border: 2rpx solid #d1d5db;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10rpx;
-  margin-top: 2rpx;
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  width: 34rpx;
+  height: 34rpx;
+  margin: 3rpx 14rpx 0 0;
+  border: 2rpx solid #b7aa9f;
+  border-radius: 50%;
 }
 
-.goal-checkbox-checked {
-  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
-  border-color: transparent;
-  box-shadow: 0 2rpx 6rpx rgba(34, 197, 94, 0.3);
-}
-
-.goal-checkbox-checked text {
-  font-size: 16rpx;
-  color: #fff;
-  font-weight: 600;
+.goal-checkbox-checked,
+.sub-goal-checkbox-checked {
+  border-color: #6f8a65;
+  background: #dfe9da;
 }
 
 .goal-content {
@@ -344,219 +436,183 @@
 }
 
 .goal-title {
-  font-size: 23rpx;
-  color: #111827;
+  display: block;
+  color: #3f352f;
+  font-size: 27rpx;
   line-height: 1.5;
   word-break: break-all;
-  display: block;
 }
 
-.goal-title-completed {
-  color: #9ca3af;
+.goal-title-completed,
+.sub-goal-title-completed {
+  color: #94877e;
   text-decoration: line-through;
 }
 
-.goal-expand-icon {
-  width: 32rpx;
-  height: 32rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16rpx;
-  color: #9ca3af;
-  margin-left: 8rpx;
-}
-
-/* ==================== 进度条 ==================== */
 .goal-progress {
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  margin-top: 6rpx;
+  gap: 10rpx;
+  margin-top: 10rpx;
 }
 
 .progress-bar {
   flex: 1;
-  height: 6rpx;
-  background: #e5e7eb;
-  border-radius: 3rpx;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #60a5fa, #22c55e);
-  border-radius: 3rpx;
-  transition: width 0.3s ease;
+  height: 7rpx;
 }
 
 .progress-text {
+  min-width: 44rpx;
+  color: #9b8c81;
   font-size: 18rpx;
-  color: #9ca3af;
-  min-width: 40rpx;
   text-align: right;
 }
 
-/* ==================== 子目标样式 ==================== */
-.sub-goals {
-  padding: 8rpx 10rpx 0 42rpx;
-  animation: slideDown 0.2s ease;
+.goal-expand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36rpx;
+  height: 36rpx;
+  margin-left: 8rpx;
+  transition: transform 0.2s ease;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.sub-goals {
+  padding: 0 8rpx 16rpx 48rpx;
 }
 
 .sub-goal-item {
   display: flex;
   align-items: center;
-  padding: 10rpx 12rpx;
-  background: #ffffff;
-  border-radius: 10rpx;
+  min-height: 56rpx;
   margin-bottom: 6rpx;
-  border-left: 4rpx solid #e5e7eb;
-  transition: all 0.2s ease;
-}
-
-.sub-goal-item:active {
-  background: #f9fafb;
+  padding: 6rpx 10rpx;
+  border-left: 3rpx solid #ddcbbb;
+  border-radius: 0 10rpx 10rpx 0;
+  background: #fbf6ee;
 }
 
 .sub-goal-completed {
-  border-left-color: #22c55e;
-  opacity: 0.6;
+  border-left-color: #6f8a65;
 }
 
 .sub-goal-checkbox {
-  width: 26rpx;
-  height: 26rpx;
-  border-radius: 6rpx;
-  border: 2rpx solid #d1d5db;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10rpx;
-  transition: all 0.2s ease;
   flex-shrink: 0;
-}
-
-.sub-goal-checkbox-checked {
-  background: #22c55e;
-  border-color: #22c55e;
-}
-
-.sub-goal-checkbox-checked text {
-  font-size: 12rpx;
-  color: #fff;
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 10rpx;
+  border: 2rpx solid #bbae9f;
+  border-radius: 7rpx;
 }
 
 .sub-goal-title {
   flex: 1;
-  font-size: 21rpx;
-  color: #374151;
-  line-height: 1.4;
+  color: #5b4f48;
+  font-size: 22rpx;
+  line-height: 1.45;
   word-break: break-all;
 }
 
-.sub-goal-title-completed {
-  color: #9ca3af;
-  text-decoration: line-through;
-}
-
-/* 添加子目标按钮 */
-.add-sub-goal-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8rpx 12rpx;
-  border: 2rpx dashed #e5e7eb;
-  border-radius: 8rpx;
-  font-size: 20rpx;
-  color: #9ca3af;
-  margin-top: 4rpx;
-  transition: all 0.2s ease;
-}
-
-.add-sub-goal-btn:active {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-}
-
-/* ==================== 添加目标按钮 ==================== */
+.add-sub-goal-btn,
 .goal-add-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4rpx;
-  padding: 14rpx;
-  margin: 0 14rpx 18rpx;
-  background: #f9fafb;
-  border-radius: 12rpx;
+  gap: 7rpx;
+  color: #9f4f3d;
   font-size: 22rpx;
-  color: #9ca3af;
-  border: 2rpx dashed #e5e7eb;
-  transition: all 0.2s ease;
+  font-weight: 600;
 }
 
+.add-sub-goal-btn {
+  min-height: 52rpx;
+  border: 1rpx dashed #d9c5b3;
+  border-radius: 12rpx;
+}
+
+.goal-add-btn {
+  min-height: 72rpx;
+  margin-top: 12rpx;
+  border: 1rpx dashed #cfb8a4;
+  border-radius: 16rpx;
+  background: #fbf4e9;
+}
+
+.add-sub-goal-btn:active,
 .goal-add-btn:active {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #6b7280;
-}
-
-.goal-add-icon {
-  font-size: 24rpx;
+  background: #f3e7da;
 }
 
 .goal-empty {
-  padding: 24rpx 14rpx;
-  text-align: center;
-  font-size: 22rpx;
-  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 52rpx 20rpx 38rpx;
+  color: #9a897e;
+  font-size: 21rpx;
 }
 
-/* ==================== 弹窗样式 ==================== */
+.goal-empty-title {
+  color: #594b43;
+  font-size: 27rpx;
+  font-weight: 650;
+}
+
+.fab-btn {
+  position: fixed;
+  right: 28rpx;
+  bottom: calc(130rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92rpx;
+  height: 92rpx;
+  border: 4rpx solid #f8f2e9;
+  border-radius: 50%;
+  background: #c96f55;
+  box-shadow: 0 10rpx 25rpx rgba(125, 70, 52, 0.28);
+}
+
+.fab-btn:active {
+  transform: scale(0.93);
+}
+
+.savings-tab-content {
+  padding-bottom: 0;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
-  left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
+  left: 0;
   z-index: 200;
   display: flex;
   align-items: flex-end;
-  opacity: 1;
-  visibility: visible;
-}
-
-.modal-overlay.show {
-  opacity: 1;
-  visibility: visible;
+  background: rgba(63, 53, 47, 0.46);
 }
 
 .modal-content {
   width: 100%;
-  max-height: 85vh;
-  background: #ffffff;
-  border-radius: 28rpx 28rpx 0 0;
-  transform: translateY(0);
+  max-height: 86vh;
   overflow: hidden;
-  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 30rpx 30rpx 0 0;
+  background: #fffdf8;
+  animation: slide-up 0.28s ease-out;
 }
 
 .modal-content-small {
-  max-height: 50vh;
+  max-height: 54vh;
 }
 
-@keyframes slideUp {
+@keyframes slide-up {
   from {
     transform: translateY(100%);
   }
@@ -565,275 +621,46 @@
   }
 }
 
-.modal-overlay.show .modal-content {
-  transform: translateY(0);
+.modal-handle {
+  width: 72rpx;
+  height: 7rpx;
+  margin: 14rpx auto 2rpx;
+  border-radius: 4rpx;
+  background: #ddcfc0;
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx;
-  border-bottom: 1rpx solid #f3f4f6;
+  padding: 22rpx 30rpx;
+  border-bottom: 1rpx solid #eadfd2;
 }
 
 .modal-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #111827;
+  display: block;
+  margin-top: 5rpx;
+  color: #3f352f;
+  font-family: serif;
+  font-size: 31rpx;
+  font-weight: 700;
 }
 
 .modal-close {
-  width: 48rpx;
-  height: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
-  color: #9ca3af;
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 50%;
-  background: #f9fafb;
+  color: #88776b;
+  background: #f3e9dd;
+  font-size: 34rpx;
 }
 
 .modal-body {
-  padding: 24rpx;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.modal-footer {
-  padding: 16rpx 24rpx 24rpx;
-  display: flex;
-  gap: 12rpx;
-}
-
-/* ==================== 表单元素 ==================== */
-.form-group {
-  margin-bottom: 20rpx;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-.form-label {
-  font-size: 24rpx;
-  font-weight: 500;
-  color: #6b7280;
-  margin-bottom: 10rpx;
-  display: block;
-}
-
-.form-input {
-  width: 100%;
-  padding: 18rpx 20rpx;
-  background: #f9fafb;
-  border: 2rpx solid transparent;
-  border-radius: 14rpx;
-  font-size: 28rpx;
-  color: #111827;
-  box-sizing: border-box;
-  transition: all 0.15s;
-}
-
-.form-input:focus {
-  background: #ffffff;
-  border-color: #6366f1;
-}
-
-.form-input-placeholder {
-  color: #9ca3af;
-}
-
-.form-picker {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 18rpx 20rpx;
-  background: #f9fafb;
-  border: 2rpx solid transparent;
-  border-radius: 14rpx;
-  font-size: 28rpx;
-  box-sizing: border-box;
-  transition: all 0.15s;
-  color: #9ca3af;
-}
-
-.form-picker-selected {
-  color: #111827;
-  background: #ffffff;
-  border-color: #6366f1;
-}
-
-/* ==================== 按钮 ==================== */
-.btn {
-  flex: 1;
-  padding: 18rpx;
-  border-radius: 16rpx;
-  font-size: 28rpx;
-  font-weight: 500;
-  text-align: center;
-  transition: all 0.15s;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-.btn-cancel {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: #fff;
-  box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
-}
-
-.goal-owner-emoji {
-  font-size: 40rpx;
-  margin-bottom: 8rpx;
-}
-
-.goal-owner-name {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.goal-progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  margin-top: 8rpx;
-}
-
-.goal-progress-bar {
-  width: 80rpx;
-  height: 6rpx;
-  background: #f3f4f6;
-  border-radius: 3rpx;
-  overflow: hidden;
-}
-
-.goal-progress-fill {
-  height: 100%;
-  border-radius: 3rpx;
-  transition: width 0.3s ease;
-}
-
-.goal-header-pig .goal-progress-fill {
-  background: linear-gradient(90deg, #f472b6 0%, #ec4899 100%);
-}
-
-.goal-header-donkey .goal-progress-fill {
-  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
-}
-
-.goal-progress-text {
-  font-size: 20rpx;
-  color: #9ca3af;
-}
-
-/* ==================== 目标列表 ==================== */
-.goal-list {
-  padding: 12rpx 16rpx 20rpx;
-}
-
-.goal-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 14rpx 12rpx;
-  background: #fafafa;
-  border-radius: 14rpx;
-  margin-bottom: 10rpx;
-  transition: all 0.2s ease;
-}
-
-.goal-item:last-child {
-  margin-bottom: 0;
-}
-
-.goal-item:active {
-  background: #f0f0f0;
-}
-
-.goal-check {
-  width: 36rpx;
-  height: 36rpx;
-  border: 2rpx solid #d1d5db;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12rpx;
-  margin-top: 4rpx;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.goal-check-done {
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  border-color: transparent;
-}
-
-.goal-check-icon {
-  font-size: 18rpx;
-  color: #fff;
-}
-
-.goal-text {
-  flex: 1;
-  font-size: 24rpx;
-  color: #1a1a2e;
-  line-height: 1.5;
-  word-break: break-all;
-}
-
-.goal-item-done .goal-text {
-  color: #9ca3af;
-  text-decoration: line-through;
-}
-
-/* ==================== 添加目标按钮 ==================== */
-.add-goal-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6rpx;
-  padding: 16rpx;
-  margin: 0 16rpx 20rpx;
-  background: #fafafa;
-  border-radius: 14rpx;
-  font-size: 24rpx;
-  color: #9ca3af;
-  border: 2rpx dashed #e5e7eb;
-  transition: all 0.2s ease;
-}
-
-.add-goal-btn:active {
-  background: #f0f0f0;
-  border-color: #d1d5db;
-}
-
-
-.modal-header {
-  padding: 28rpx 32rpx;
-  text-align: center;
-  border-bottom: 1rpx solid #f5f5f5;
-}
-
-.modal-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.modal-body {
-  padding: 32rpx;
-  max-height: 50vh;
+  max-height: 58vh;
+  padding: 26rpx 30rpx 8rpx;
   overflow-y: auto;
 }
 
@@ -841,85 +668,91 @@
   margin-bottom: 24rpx;
 }
 
-.form-group:last-child {
-  margin-bottom: 0;
+.form-label {
+  display: block;
+  margin-bottom: 10rpx;
+  color: #665950;
+  font-size: 23rpx;
+  font-weight: 600;
 }
 
-.form-label {
-  font-size: 24rpx;
-  font-weight: 500;
-  color: #6b7280;
-  margin-bottom: 12rpx;
-  display: block;
+.form-input,
+.form-picker {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 16rpx;
+  color: #3f352f;
+  background: #fbf6ee;
+  font-size: 27rpx;
 }
 
 .form-input {
-  width: 100%;
-  padding: 20rpx 24rpx;
-  background: #fafafa;
-  border-radius: 16rpx;
-  font-size: 28rpx;
-  color: #1a1a2e;
-  box-sizing: border-box;
+  height: 82rpx;
+  padding: 0 20rpx;
+}
+
+.form-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 82rpx;
+  padding: 0 20rpx;
+  color: #a08f83;
+}
+
+.form-picker-selected {
+  color: #3f352f;
 }
 
 .form-input-placeholder {
-  color: #9ca3af;
+  color: #ad9d91;
 }
 
-.form-radio-group {
-  display: flex;
-  gap: 16rpx;
-}
-
-.form-radio-item {
-  flex: 1;
+.slider-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  padding: 18rpx;
-  background: #fafafa;
-  border-radius: 14rpx;
-  font-size: 26rpx;
-  color: #6b7280;
-  transition: all 0.2s ease;
+  justify-content: space-between;
 }
 
-.form-radio-active {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-  color: #6366f1;
+.slider-value {
+  color: #9f4f3d;
+  font-size: 21rpx;
+  font-weight: 600;
 }
 
 .modal-footer {
   display: flex;
-  gap: 16rpx;
-  padding: 24rpx 32rpx;
-  border-top: 1rpx solid #f5f5f5;
+  gap: 14rpx;
+  padding: 18rpx 30rpx calc(26rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #eadfd2;
 }
 
-.modal-btn {
+.btn {
   flex: 1;
-  padding: 22rpx;
-  border-radius: 18rpx;
-  font-size: 28rpx;
-  font-weight: 500;
-  text-align: center;
-  transition: all 0.2s ease;
+  height: 78rpx;
+  margin: 0;
+  border-radius: 16rpx;
+  font-size: 27rpx;
+  font-weight: 600;
+  line-height: 78rpx;
 }
 
-.modal-btn:active {
-  transform: scale(0.98);
+.btn::after {
+  border: 0;
 }
 
-.modal-btn-cancel {
-  background: #f5f5f5;
-  color: #6b7280;
+.btn-secondary {
+  color: #6f6157;
+  background: #eee4d8;
 }
 
-.modal-btn-confirm {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: #fff;
-  box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
+.btn-primary {
+  color: #fffdf8;
+  background: #c96f55;
+  box-shadow: 0 6rpx 15rpx rgba(159, 79, 61, 0.2);
 }
 
+.safe-bottom {
+  height: env(safe-area-inset-bottom);
+}

@@ -482,3 +482,276 @@
   color: #6366f1;
   text-align: center;
 }
+
+/* ==================== Warm journal redesign ==================== */
+.container {
+  background: #f8f2e9;
+  color: #3f352f;
+  padding: 24rpx 24rpx calc(52rpx + env(safe-area-inset-bottom));
+}
+
+.form-card {
+  padding: 28rpx 26rpx;
+  margin-bottom: 20rpx;
+  background: #fffdf8;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 20rpx;
+  box-shadow: 0 6rpx 18rpx rgba(91, 71, 55, 0.06);
+}
+
+.form-card-title {
+  color: #3f352f;
+  font-size: 31rpx;
+  font-weight: 650;
+}
+
+.title-with-icon,
+.label-with-icon,
+.auto-judge-hint,
+.auto-judge-note {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.form-label {
+  color: #5d5147;
+  font-weight: 600;
+}
+
+.form-input,
+.form-textarea,
+.picker-display,
+.quick-value-input {
+  color: #3f352f;
+  background: #faf3e9;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 14rpx;
+}
+
+.form-input,
+.picker-display {
+  min-height: 84rpx;
+  padding: 0 22rpx;
+}
+
+.form-textarea {
+  min-height: 150rpx;
+}
+
+.picker-text,
+.quick-item-name text:first-child,
+.template-name,
+.modal-title {
+  color: #3f352f;
+}
+
+.picker-arrow,
+.template-count,
+.items-empty-hint,
+.template-hint,
+.items-count {
+  color: #8c7b6d;
+}
+
+.items-header {
+  min-height: 72rpx;
+}
+
+.template-btn {
+  min-height: 68rpx;
+  padding: 0 18rpx;
+  color: #3f352f;
+  background: #f6e4dc;
+  border: 1rpx solid #dfb9aa;
+  border-radius: 14rpx;
+}
+
+.items-category-title {
+  padding: 18rpx 0 10rpx;
+  color: #9f4f3d;
+  border-bottom-color: #e6d8c8;
+}
+
+.quick-item-row {
+  min-height: 88rpx;
+  padding: 10rpx 0;
+  border-bottom-color: #efe4d7;
+}
+
+.quick-value-input {
+  width: 126rpx;
+  min-height: 64rpx;
+  padding: 0 12rpx;
+}
+
+.quick-value-computed {
+  min-height: 62rpx;
+  padding: 0 12rpx;
+  color: #486041;
+  background: #e8f0e4;
+  border: 1rpx solid #b9cbb2;
+}
+
+.computed-value {
+  color: #486041;
+}
+
+.computed-tag {
+  color: #33442e;
+  background: #cbdcc4;
+}
+
+.quick-item-actions {
+  gap: 4rpx;
+}
+
+.quick-edit-btn,
+.quick-delete-btn {
+  width: 64rpx;
+  height: 64rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 14rpx;
+  background: #faf3e9;
+}
+
+.quick-delete-btn {
+  background: #f9e9e4;
+  border-color: #e8c5ba;
+}
+
+.items-empty {
+  padding: 44rpx 0 38rpx;
+}
+
+.items-empty-icon {
+  width: 88rpx;
+  height: 88rpx;
+  margin-bottom: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f3e9dc;
+}
+
+.items-empty-text {
+  color: #5d5147;
+}
+
+.add-item-btn {
+  min-height: 84rpx;
+  padding: 0 20rpx;
+  color: #6a5c50;
+  border-color: #cdbca9;
+  border-radius: 16rpx;
+  background: #fffaf2;
+}
+
+.submit-button {
+  min-height: 94rpx;
+  margin-top: 28rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  color: #3f352f;
+  background: #e8c0b3;
+  border: 1rpx solid #d69a87;
+  border-radius: 18rpx;
+  box-shadow: 0 8rpx 20rpx rgba(159, 79, 61, 0.2);
+}
+
+.submit-button[disabled] {
+  opacity: 0.55;
+}
+
+.auto-judge-hint {
+  justify-content: center;
+  margin-top: 10rpx;
+  padding-bottom: 18rpx;
+  color: #806d60;
+}
+
+.modal-overlay {
+  background: rgba(63, 53, 47, 0.46);
+}
+
+.modal-content {
+  background: #fffdf8;
+  border-radius: 26rpx 26rpx 0 0;
+}
+
+.modal-header {
+  min-height: 92rpx;
+  padding: 0 32rpx;
+  border-bottom-color: #e6d8c8;
+}
+
+.modal-close {
+  width: 64rpx;
+  height: 64rpx;
+  color: #6a5c50;
+  background: #f3e9dc;
+}
+
+.modal-body {
+  padding: 28rpx 32rpx;
+}
+
+.modal-footer {
+  padding: 18rpx 32rpx calc(18rpx + env(safe-area-inset-bottom));
+  border-top-color: #e6d8c8;
+}
+
+.btn {
+  min-height: 84rpx;
+  padding: 0 20rpx;
+  border-radius: 14rpx;
+}
+
+.btn-secondary {
+  color: #6a5c50;
+  background: #f3e9dc;
+}
+
+.btn-primary {
+  color: #fffdf8;
+  background: #9f4f3d;
+}
+
+.template-option {
+  min-height: 86rpx;
+  padding: 8rpx 12rpx;
+  border-bottom-color: #efe4d7;
+}
+
+.template-option:active,
+.template-selected {
+  background: #f6e4dc;
+}
+
+.template-checkbox {
+  width: 48rpx;
+  height: 48rpx;
+  border-color: #cdbca9;
+}
+
+.template-checkbox.checked {
+  color: #fffdf8;
+  background: #9f4f3d;
+  border-color: #9f4f3d;
+}
+
+.auto-judge-note {
+  justify-content: center;
+  color: #486041;
+  background: #e8f0e4;
+  border: 1rpx solid #cbdcc4;
+  border-radius: 14rpx;
+}

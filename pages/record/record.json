@@ -4,7 +4,9 @@
     "loading-state": "/components/loading-state/loading-state",
     "empty-state": "/components/empty-state/empty-state",
     "footer-link": "/components/footer-link/footer-link",
-    "action-sheet": "/components/action-sheet/action-sheet"
+    "action-sheet": "/components/action-sheet/action-sheet",
+    "app-icon": "/components/app-icon/app-icon",
+    "segmented-control": "/components/segmented-control/segmented-control"
   },
   "navigationStyle": "custom"
 }

@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "app-icon": "/components/app-icon/app-icon"
+  },
   "navigationBarTitleText": "访问受限",
   "navigationStyle": "default"
 }

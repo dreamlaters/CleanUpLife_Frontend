@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "app-icon": "/components/app-icon/app-icon"
+  },
   "navigationBarTitleText": "编辑物品",
   "navigationStyle": "default"
 }

@@ -1,58 +1,89 @@
-/**
- * 访问受限页面样式
- */
-
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf5 100%);
-  padding-top: 350rpx;
-  padding-bottom: 32rpx;
+  padding: 240rpx 24rpx 40rpx;
   box-sizing: border-box;
+  background: linear-gradient(180deg, #f8f2e9 0%, #f1e6d8 100%);
 }
 
-.blocked-card {
-  background: #fff;
-  border-radius: 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
-  padding: 48rpx 32rpx;
-  margin: 0 24rpx;
+.blocked-note {
+  position: relative;
+  padding: 54rpx 34rpx 34rpx;
+  border: 1rpx solid #decbb4;
+  border-radius: 26rpx 26rpx 26rpx 8rpx;
+  background: #fffaf2;
+  box-shadow: 0 10rpx 30rpx rgba(91, 71, 55, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  transform: rotate(-0.5deg);
+}
+
+.note-tape {
+  position: absolute;
+  top: -18rpx;
+  width: 112rpx;
+  height: 34rpx;
+  background: rgba(220, 180, 109, 0.42);
+  transform: rotate(2deg);
 }
 
 .blocked-icon-wrap {
-  margin-bottom: 24rpx;
+  width: 106rpx;
+  height: 106rpx;
+  margin-bottom: 20rpx;
+  border-radius: 32rpx 32rpx 32rpx 10rpx;
+  background: #f0dfca;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.blocked-icon {
-  font-size: 80rpx;
+.blocked-kicker {
+  color: #a66b56;
+  font-size: 17rpx;
+  font-weight: 800;
+  letter-spacing: 3rpx;
 }
 
 .blocked-title {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 12rpx;
+  max-width: 520rpx;
+  margin-top: 10rpx;
+  color: #3f352f;
+  font-size: 38rpx;
+  font-weight: 750;
+  line-height: 1.45;
 }
 
 .blocked-subtitle {
-  font-size: 28rpx;
-  color: #64748b;
-  margin-bottom: 40rpx;
-  line-height: 1.6;
-  padding: 0 16rpx;
+  margin-top: 14rpx;
+  color: #7d6e62;
+  font-size: 25rpx;
+  line-height: 1.65;
 }
 
-/* ==================== 提示区域 ==================== */
 .hint-section {
-  background: #fef3c7;
-  border: 1rpx solid #fbbf24;
+  width: 100%;
+  margin-top: 34rpx;
+  padding: 22rpx;
+  box-sizing: border-box;
+  border: 1rpx dashed #d8c3aa;
   border-radius: 16rpx;
-  padding: 20rpx 24rpx;
+  background: #f5eadc;
+  display: flex;
+  flex-direction: column;
   text-align: left;
 }
 
+.hint-title {
+  color: #6a5c50;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
 .hint-text {
-  font-size: 24rpx;
-  color: #92400e;
+  margin-top: 5rpx;
+  color: #8a7b6f;
+  font-size: 22rpx;
   line-height: 1.6;
 }

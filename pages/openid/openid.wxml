@@ -1,63 +1,57 @@
-<!-- OpenID 页面 - 现代化设计 -->
 <view class="container">
-  <view class="form-card openid-card">
-    <!-- 标题 -->
-    <view class="form-header">
-      <view class="notification-icon-wrap">
-        <text class="notification-icon">🔔</text>
-      </view>
-      <view class="form-title">消息推送设置</view>
-      <text class="form-subtitle">订阅过期提醒，不再错过任何物品</text>
+  <view class="notification-card">
+    <view class="notification-header">
+      <view class="notification-icon-wrap"><app-icon name="bell" size="48" /></view>
+      <text class="page-kicker">GENTLE REMINDERS</text>
+      <text class="form-title">别让重要的小事被忘记</text>
+      <text class="form-subtitle">开启微信消息提醒，物品快到期时会轻轻告诉你。</text>
     </view>
 
-    <!-- OpenID 显示 -->
-    <view class="openid-section">
-      <view class="openid-label">
-        <text class="openid-label-icon">👤</text>
-        <text>当前用户标识</text>
-      </view>
-      <view class="openid-box">
-        <view class="openid-loading" wx:if="{{loading}}">
-          <view class="loading-spinner-small"></view>
-          <text>加载中...</text>
-        </view>
-        <text class="openid-text" selectable="true" wx:else>{{openid || '未获取'}}</text>
-      </view>
-    </view>
-
-    <!-- 功能说明 -->
     <view class="features-section">
       <view class="feature-item">
-        <view class="feature-icon feature-icon-warning">⏰</view>
+        <view class="feature-icon feature-icon-warning"><app-icon name="calendar" size="32" /></view>
         <view class="feature-content">
-          <text class="feature-title">过期提醒</text>
-          <text class="feature-desc">物品即将过期时收到通知</text>
+          <text class="feature-title">提前留意保质期</text>
+          <text class="feature-desc">即将过期时收到提醒，减少浪费</text>
         </view>
       </view>
       <view class="feature-item">
-        <view class="feature-icon feature-icon-info">📱</view>
+        <view class="feature-icon feature-icon-info"><app-icon name="bell" size="32" /></view>
         <view class="feature-content">
-          <text class="feature-title">微信推送</text>
-          <text class="feature-desc">消息直达微信服务通知</text>
+          <view class="feature-title-row">
+            <text class="feature-title">每月存钱盘点</text>
+            <text class="feature-pending" wx:if="{{!savingsReminderAvailable}}">待配置</text>
+          </view>
+          <text class="feature-desc">每月 2 日 09:00 提醒更新退休存钱罐</text>
         </view>
       </view>
       <view class="feature-item">
-        <view class="feature-icon feature-icon-success">🔒</view>
+        <view class="feature-icon feature-icon-success"><app-icon name="lock" size="32" /></view>
         <view class="feature-content">
-          <text class="feature-title">隐私安全</text>
-          <text class="feature-desc">仅用于发送过期提醒</text>
+          <text class="feature-title">只用于生活提醒</text>
+          <text class="feature-desc">你的标识不会用于其他用途</text>
         </view>
       </view>
     </view>
 
-    <!-- 订阅按钮 -->
-    <button class="submit-button subscribe-btn" bindtap="onRequestSubscribe">
-      <text class="subscribe-btn-icon">🔔</text>
-      <text>开启消息推送</text>
+    <button class="subscribe-btn" bindtap="onRequestSubscribe">
+      <app-icon name="bell" size="30" tone="light" />
+      <text>开启生活提醒</text>
     </button>
-    
     <view class="subscribe-tip">
-      <text>点击后请在弹窗中选择"允许"</text>
+      点击后请在微信弹窗中选择“允许”
+      <text wx:if="{{!savingsReminderAvailable}}"> · 存钱提醒模板获批后可订阅</text>
+    </view>
+
+    <view class="openid-section">
+      <view class="openid-label">
+        <app-icon name="user" size="26" />
+        <text>当前用户标识（技术信息）</text>
+      </view>
+      <view class="openid-box">
+        <view class="openid-loading" wx:if="{{loading}}"><text>正在读取...</text></view>
+        <text class="openid-text" selectable="true" wx:else>{{openid || '未获取'}}</text>
+      </view>
     </view>
   </view>
 </view>

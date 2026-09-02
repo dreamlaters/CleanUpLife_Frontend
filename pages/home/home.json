@@ -2,7 +2,8 @@
   "usingComponents": {
     "custom-navbar": "/components/custom-navbar/custom-navbar",
     "loading-state": "/components/loading-state/loading-state",
-    "footer-link": "/components/footer-link/footer-link"
+    "footer-link": "/components/footer-link/footer-link",
+    "app-icon": "/components/app-icon/app-icon"
   },
   "navigationStyle": "custom"
 }

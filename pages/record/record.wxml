@@ -3,34 +3,14 @@
   <!-- 自定义导航栏 -->
   <custom-navbar title="我的记录" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
 
-  <!-- 顶部Tab切换 -->
-  <view class="top-tabs">
-    <view class="top-tab {{currentTab === 'weight' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="weight">
-      <text class="top-tab-icon">🐱</text>
-      <text class="top-tab-text">猫猫记录</text>
-    </view>
-    <view class="top-tab {{currentTab === 'period' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="period">
-      <text class="top-tab-icon">🌸</text>
-      <text class="top-tab-text">姨妈记录</text>
-    </view>
-    <view class="top-tab {{currentTab === 'checkup' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="checkup">
-      <text class="top-tab-icon">🏥</text>
-      <text class="top-tab-text">体检记录</text>
-    </view>
-  </view>
+  <!-- 顶部记录分类 -->
+  <segmented-control items="{{recordTabs}}" value="{{currentTab}}" bind:change="switchTab" />
 
   <!-- ==================== 猫猫记录内容（体重 / 陪玩） ==================== -->
   <view class="tab-content" wx:if="{{currentTab === 'weight'}}">
     <!-- 子切换：体重 / 陪玩 -->
     <view class="cat-subtabs">
-      <view class="cat-subtab {{catSubTab === 'weight' ? 'cat-subtab-active' : ''}}" bindtap="switchCatSubTab" data-sub="weight">
-        <text class="cat-subtab-icon">⚖️</text>
-        <text>体重</text>
-      </view>
-      <view class="cat-subtab {{catSubTab === 'play' ? 'cat-subtab-active' : ''}}" bindtap="switchCatSubTab" data-sub="play">
-        <text class="cat-subtab-icon">🧶</text>
-        <text>陪玩</text>
-      </view>
+      <segmented-control items="{{catTabs}}" value="{{catSubTab}}" bind:change="switchCatSubTab" />
     </view>
 
   <!-- ===== 体重子页 ===== -->
@@ -62,7 +42,7 @@
     <view class="section-card">
       <view class="section-header">
         <view class="section-title-wrap">
-          <view class="section-icon">📈</view>
+          <view class="section-icon"><app-icon name="trend" size="32" label="趋势" /></view>
           <text class="section-title">体重趋势</text>
         </view>
       </view>
@@ -85,7 +65,7 @@
           <canvas type="2d" id="weight-canvas" class="weight-canvas"></canvas>
         </view>
         <view class="chart-container chart-placeholder" wx:else>
-          <text class="placeholder-icon">📊</text>
+          <view class="placeholder-icon"><app-icon name="trend" size="52" label="图表" /></view>
           <text class="placeholder-text">编辑中...</text>
         </view>
       </view>
@@ -103,7 +83,7 @@
     <view class="section-card">
       <view class="section-header">
         <view class="section-title-wrap">
-          <view class="section-icon">📋</view>
+          <view class="section-icon"><app-icon name="calendar" size="32" label="记录" /></view>
           <text class="section-title">记录明细</text>
         </view>
         <view class="section-badge" wx:if="{{weightRecords.length}}">{{weightRecords.length}}条</view>
@@ -143,16 +123,17 @@
         </view>
       </view>
 
-      <empty-state
-        show="{{!loadingWeight && !weightRecords.length}}"
-        icon="⚖️" title="还没有体重记录" text="点击下方按钮，开始记录宝贝的体重"
-        buttonText="+ 添加记录" bind:buttontap="showAddWeightForm"
-      />
+      <view class="empty-state" wx:if="{{!loadingWeight && !weightRecords.length}}">
+        <view class="empty-icon"><app-icon name="trend" size="56" label="体重" /></view>
+        <text class="empty-title">还没有体重记录</text>
+        <text class="empty-text">点击下方按钮，开始记录宝贝的体重</text>
+        <button class="empty-action" bindtap="showAddWeightForm">添加记录</button>
+      </view>
     </view>
 
     <!-- 悬浮添加按钮 -->
     <view class="fab-btn" bindtap="showAddWeightForm" wx:if="{{!showWeightForm}}">
-      <text class="fab-icon">+</text>
+      <app-icon name="plus" size="44" label="添加体重记录" />
     </view>
 
     <!-- 底部消息推送入口 -->
@@ -185,7 +166,7 @@
       </block>
       <block wx:else>
         <button class="play-start-btn" bindtap="onStartPlay" disabled="{{playStarting}}">
-          <text class="play-start-icon">🐾</text>
+          <view class="play-start-icon"><app-icon name="timer" size="42" label="计时" /></view>
           <text class="play-start-text">开始陪玩</text>
         </button>
         <text class="play-start-hint">点击开始，自动记录你的陪玩时间</text>
@@ -196,7 +177,7 @@
     <view class="section-card">
       <view class="section-header">
         <view class="section-title-wrap">
-          <view class="section-icon">📊</view>
+          <view class="section-icon"><app-icon name="trend" size="32" label="统计" /></view>
           <text class="section-title">陪玩统计</text>
         </view>
       </view>
@@ -248,7 +229,7 @@
     <view class="section-card">
       <view class="section-header">
         <view class="section-title-wrap">
-          <view class="section-icon">📋</view>
+          <view class="section-icon"><app-icon name="calendar" size="32" label="记录" /></view>
           <text class="section-title">陪玩记录</text>
         </view>
         <view class="section-badge" wx:if="{{playRecords.length}}">{{playRecords.length}}条</view>
@@ -276,7 +257,7 @@
       </view>
 
       <view class="empty-state" wx:if="{{!loadingPlay && !playRecords.length}}">
-        <text class="empty-icon">🧶</text>
+        <view class="empty-icon"><app-icon name="timer" size="56" label="陪玩" /></view>
         <text class="empty-title">还没有陪玩记录</text>
         <text class="empty-text">点击上方「开始陪玩」记录第一次</text>
       </view>
@@ -291,7 +272,7 @@
   <view class="tab-content" wx:if="{{currentTab === 'period'}}">
     <!-- 状态卡片 -->
     <view class="period-status-card" wx:if="{{periodStats}}">
-      <view class="period-status-icon">🌸</view>
+      <view class="period-status-icon"><app-icon name="flower" size="52" label="经期状态" /></view>
       <view class="period-status-info">
         <view class="period-status-main" wx:if="{{periodStats.status === 'none'}}">
           <text class="period-status-text">暂无记录</text>
@@ -299,7 +280,7 @@
         </view>
         <view class="period-status-main" wx:elif="{{periodStats.status === 'in-period'}}">
           <text class="period-status-text">经期第 {{periodDays}} 天</text>
-          <text class="period-status-hint">记得注意保暖哦 💕</text>
+          <text class="period-status-hint">记得注意保暖，好好休息</text>
         </view>
         <view class="period-status-main" wx:else>
           <text class="period-status-text" wx:if="{{periodStats.daysUntilNextPeriod > 0}}">距下次姨妈还有 {{periodStats.daysUntilNextPeriod}} 天
@@ -316,13 +297,13 @@
       <!-- 月份导航 -->
       <view class="calendar-header">
         <view class="month-nav" bindtap="prevMonth">
-          <text class="nav-arrow">‹</text>
+          <view class="nav-arrow nav-arrow-left"><app-icon name="chevron-right" size="28" label="上个月" /></view>
         </view>
         <view class="month-title">
           <text>{{currentYear}}年{{currentMonth}}月</text>
         </view>
         <view class="month-nav" bindtap="nextMonth">
-          <text class="nav-arrow">›</text>
+          <view class="nav-arrow"><app-icon name="chevron-right" size="28" label="下个月" /></view>
         </view>
         <view class="today-btn" bindtap="goToToday">
           <text>今天</text>
@@ -364,15 +345,15 @@
     <!-- 操作按钮 -->
     <view class="period-action-buttons">
       <button class="period-action-btn primary" bindtap="showRecordStart" wx:if="{{!latestPeriodRecord || latestPeriodRecord.endDate}}">
-        <text class="period-btn-icon">🩸</text>
+        <view class="period-btn-icon"><app-icon name="flower" size="30" label="开始" /></view>
         <text>记录开始</text>
       </button>
       <button class="period-action-btn secondary" bindtap="showRecordEnd" wx:if="{{latestPeriodRecord && !latestPeriodRecord.endDate}}">
-        <text class="period-btn-icon">✓</text>
+        <view class="period-btn-icon"><app-icon name="check" size="30" label="结束" /></view>
         <text>记录结束</text>
       </button>
       <button class="period-action-btn outline" bindtap="showRecordStart" wx:if="{{latestPeriodRecord && !latestPeriodRecord.endDate}}">
-        <text class="period-btn-icon">📝</text>
+        <view class="period-btn-icon"><app-icon name="edit" size="30" label="新记录" /></view>
         <text>新记录</text>
       </button>
     </view>
@@ -381,7 +362,7 @@
     <view class="section-card" wx:if="{{periodRecords.length > 0}}">
       <view class="section-header">
         <view class="section-title-wrap">
-          <view class="section-icon">📋</view>
+          <view class="section-icon"><app-icon name="calendar" size="32" label="历史记录" /></view>
           <text class="section-title">历史记录</text>
         </view>
       </view>
@@ -411,7 +392,7 @@
 
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{!loadingPeriod && periodRecords.length === 0}}">
-      <text class="empty-icon">📅</text>
+      <view class="empty-icon"><app-icon name="calendar" size="56" label="日历" /></view>
       <text class="empty-title">暂无记录</text>
       <text class="empty-text">点击"记录开始"添加第一条记录</text>
     </view>
@@ -441,7 +422,7 @@
 
     <!-- 最近体检概览卡片 -->
     <view class="checkup-summary-card" wx:if="{{checkupRecords.length > 0 && !loadingCheckup}}">
-      <view class="checkup-summary-icon">📋</view>
+      <view class="checkup-summary-icon"><app-icon name="health" size="52" label="体检" /></view>
       <view class="checkup-summary-info">
         <text class="checkup-summary-title">最近一次体检</text>
         <text class="checkup-summary-date">{{checkupRecords[0].checkupDateFormatted}}</text>
@@ -463,7 +444,7 @@
     <view class="section-card" wx:if="{{checkupRecords.length > 0 && !loadingCheckup}}">
       <view class="section-header">
         <view class="section-title-wrap">
-          <view class="section-icon">📅</view>
+          <view class="section-icon"><app-icon name="calendar" size="32" label="历史记录" /></view>
           <text class="section-title">历史记录</text>
         </view>
         <view class="section-badge">{{checkupRecords.length}}次</view>
@@ -484,12 +465,14 @@
           </view>
           <view class="checkup-record-right">
             <view class="checkup-badge abnormal" wx:if="{{item.abnormalCount > 0}}">
-              <text>⚠️ {{item.abnormalCount}}项异常</text>
+              <app-icon name="alert" size="24" label="异常" />
+              <text>{{item.abnormalCount}}项异常</text>
             </view>
             <view class="checkup-badge normal">
-              <text>✅ {{item.normalCount}}项正常</text>
+              <app-icon name="check" size="24" label="正常" />
+              <text>{{item.normalCount}}项正常</text>
             </view>
-            <text class="checkup-record-arrow">›</text>
+            <view class="checkup-record-arrow"><app-icon name="chevron-right" size="28" label="查看详情" /></view>
           </view>
         </view>
       </view>
@@ -497,14 +480,14 @@
 
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{!loadingCheckup && checkupRecords.length === 0}}">
-      <text class="empty-icon">🏥</text>
+      <view class="empty-icon"><app-icon name="health" size="56" label="体检" /></view>
       <text class="empty-title">暂无体检记录</text>
       <text class="empty-text">点击下方按钮，开始记录体检结果</text>
     </view>
 
     <!-- 悬浮添加按钮 -->
     <view class="fab-btn" bindtap="goToAddCheckup">
-      <text class="fab-icon">+</text>
+      <app-icon name="plus" size="44" label="添加体检记录" />
     </view>
 
     <!-- 底部消息推送入口 -->
@@ -517,13 +500,16 @@
 <view class="modal-overlay {{showWeightForm ? 'show' : ''}}" catchtap="hideWeightForm" wx:if="{{showWeightForm}}">
   <view class="modal-content" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">{{editingWeightId ? '✏️ 编辑记录' : '➕ 添加记录'}}</text>
+      <view class="modal-title">
+        <app-icon name="{{editingWeightId ? 'edit' : 'plus'}}" size="30" />
+        <text>{{editingWeightId ? '编辑记录' : '添加记录'}}</text>
+      </view>
       <view class="modal-close" bindtap="hideWeightForm">×</view>
     </view>
 
     <view class="modal-body" catchtap="stopPropagation">
       <view class="form-group">
-        <text class="form-label">🐾 选择宝贝</text>
+        <view class="form-label form-label-row"><app-icon name="cat" size="26" /><text>选择宝贝</text></view>
         <view class="person-selector">
           <view 
             class="person-option {{formPersonIndex === index ? 'person-option-active' : ''}}"
@@ -541,7 +527,7 @@
       </view>
 
       <view class="form-group">
-        <text class="form-label">⚖️ 体重（斤）</text>
+        <view class="form-label form-label-row"><app-icon name="trend" size="26" /><text>体重（斤）</text></view>
         <view class="input-wrapper">
           <input 
             class="weight-input" 
@@ -555,7 +541,7 @@
       </view>
 
       <view class="form-group">
-        <text class="form-label">📅 记录日期</text>
+        <view class="form-label form-label-row"><app-icon name="calendar" size="26" /><text>记录日期</text></view>
         <picker mode="date" value="{{formDate}}" bindchange="onWeightDateChange">
           <view class="date-picker">
             <text class="date-value">{{formDate}}</text>

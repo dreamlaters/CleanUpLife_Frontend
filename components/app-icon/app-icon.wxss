@@ -1,0 +1,12 @@
+.app-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.app-icon-light {
+  filter: brightness(0) invert(1);
+}
+
+.app-icon-muted {
+  opacity: 0.58;
+}

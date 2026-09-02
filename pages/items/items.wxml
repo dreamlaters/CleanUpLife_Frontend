@@ -4,33 +4,24 @@
   <!-- 自定义导航栏 -->
   <custom-navbar title="我的物品" statusBarHeight="{{statusBarHeight}}" navbarHeight="{{navbarHeight}}" />
 
-  <!-- 顶部Tab切换 -->
-  <view class="top-tabs">
-    <view class="top-tab {{currentTab === 'items' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="items">
-      <text class="top-tab-icon">📦</text>
-      <text class="top-tab-text">物品管理</text>
-      <view class="top-tab-badge" wx:if="{{products.length}}">{{products.length}}</view>
-    </view>
-    <view class="top-tab {{currentTab === 'tobuy' ? 'top-tab-active' : ''}}" bindtap="switchTab" data-tab="tobuy">
-      <text class="top-tab-icon">🛒</text>
-      <text class="top-tab-text">待购清单</text>
-      <view class="top-tab-badge" wx:if="{{toBuyPending.length}}">{{toBuyPending.length}}</view>
-    </view>
-  </view>
+  <segmented-control items="{{pageTabs}}" value="{{currentTab}}" bind:change="switchTab" />
 
   <!-- 物品管理内容 -->
   <view class="tab-content" wx:if="{{currentTab === 'items'}}">
     <!-- 统计概览 -->
     <view class="stats-row">
       <view class="stat-mini stat-primary">
+        <text class="stat-mini-kicker">ALL</text>
         <text class="stat-mini-value">{{products.length}}</text>
-        <text class="stat-mini-label">总数</text>
+        <text class="stat-mini-label">家中物品</text>
       </view>
       <view class="stat-mini stat-warning">
+        <text class="stat-mini-kicker">SOON</text>
         <text class="stat-mini-value">{{expiringSoonCount}}</text>
-        <text class="stat-mini-label">即将过期</text>
+        <text class="stat-mini-label">快到期</text>
       </view>
       <view class="stat-mini stat-danger">
+        <text class="stat-mini-kicker">PAST</text>
         <text class="stat-mini-value">{{expiredCount}}</text>
         <text class="stat-mini-label">已过期</text>
       </view>
@@ -42,11 +33,11 @@
         <view class="filter-tab {{currentFilter === 'all' ? 'filter-tab-active' : ''}}" 
               bindtap="onFilterChange" data-filter="all">全部</view>
         <view class="filter-tab {{currentFilter === 'Food' ? 'filter-tab-active' : ''}}" 
-              bindtap="onFilterChange" data-filter="Food">🥖 食物</view>
+              bindtap="onFilterChange" data-filter="Food">食物</view>
         <view class="filter-tab {{currentFilter === 'CatFood' ? 'filter-tab-active' : ''}}" 
-              bindtap="onFilterChange" data-filter="CatFood">🐱 猫粮</view>
+              bindtap="onFilterChange" data-filter="CatFood">猫粮</view>
         <view class="filter-tab {{currentFilter === 'Medicine' ? 'filter-tab-active' : ''}}" 
-              bindtap="onFilterChange" data-filter="Medicine">💊 药品</view>
+              bindtap="onFilterChange" data-filter="Medicine">药品</view>
       </view>
     </scroll-view>
 
@@ -64,12 +55,12 @@
           bindtap="onUpdate"
           bindlongpress="showItemActions"
         >
-          <view class="item-emoji">{{item.emoji || '📦'}}</view>
+          <view class="item-emoji"><app-icon name="box" size="34" /></view>
           <view class="item-content">
             <text class="item-name">{{item.name}}</text>
             <view class="item-info">
-              <text class="item-location">📍 {{item.location.roomPlacement}}</text>
-              <text class="item-date-badge {{item.dateClass}}">{{item.bestByFormatted}}</text>
+              <text class="item-location">{{item.location.roomPlacement}}</text>
+              <text class="item-date-badge {{item.dateClass}}">{{item.expiryText}}</text>
             </view>
           </view>
           <text class="item-arrow">›</text>
@@ -79,7 +70,7 @@
       <!-- 空状态 -->
       <empty-state
         show="{{!loadingProducts && !products.length}}"
-        icon="📭" title="还没有添加物品" text="点击下方按钮，开始记录你的物品"
+        iconName="box" title="还没有添加物品" text="从第一件物品开始，慢慢整理家的日常"
         buttonText="+ 添加物品" bind:buttontap="goToAddItem"
       />
     </view>
@@ -108,7 +99,7 @@
             <text class="item-name">{{item.name}}</text>
             <view class="item-info">
               <view class="priority-badge priority-{{item.priority <= 3 ? 'high' : item.priority <= 7 ? 'medium' : 'low'}}">
-                P{{item.priority}}
+                {{item.priorityLabel}} · P{{item.priority}}
               </view>
             </view>
           </view>
@@ -119,7 +110,7 @@
       <!-- 空状态 -->
       <empty-state
         show="{{!loadingToBuy && !toBuyProducts.length}}"
-        icon="🛒" title="购物清单是空的" text="记录需要购买的物品"
+        iconName="cart" title="待买清单是空的" text="想到要买的东西，就先记在这里"
         buttonText="+ 添加待购" bind:buttontap="goToAddToBuy"
       />
     </view>
@@ -160,8 +151,9 @@
   </view>
 
   <!-- 悬浮添加按钮 -->
-  <view class="fab-btn" bindtap="{{currentTab === 'items' ? 'goToAddItem' : 'goToAddToBuy'}}">
-    <text class="fab-icon">+</text>
+  <view class="fab-btn fab-btn-labeled" bindtap="{{currentTab === 'items' ? 'goToAddItem' : 'goToAddToBuy'}}">
+    <app-icon name="plus" size="32" tone="light" />
+    <text class="fab-label">{{currentTab === 'items' ? '添加物品' : '添加待买'}}</text>
   </view>
 
   <!-- 底部消息推送入口 -->
@@ -181,7 +173,7 @@
 <view class="modal-overlay" catchtap="hideToBuyForm" wx:if="{{showToBuyForm}}">
   <view class="modal-content" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">{{editingToBuyId ? '✏️ 编辑待购' : '🛒 新增待购'}}</text>
+      <text class="modal-title">{{editingToBuyId ? '编辑待买物品' : '新增待买物品'}}</text>
       <view class="modal-close" bindtap="hideToBuyForm">×</view>
     </view>
 
@@ -194,7 +186,7 @@
       <view class="form-group">
         <text class="form-label">优先级 ({{toBuyFormPriority <= 3 ? '紧急' : toBuyFormPriority <= 7 ? '一般' : '不急'}})</text>
         <slider min="1" max="10" value="{{toBuyFormPriority}}" show-value="true"
-                activeColor="#6366f1" block-color="#6366f1" bindchange="onToBuyPriorityChange" />
+                activeColor="#c96f55" block-color="#c96f55" bindchange="onToBuyPriorityChange" />
       </view>
 
       <view class="form-group">

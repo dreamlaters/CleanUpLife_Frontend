@@ -672,3 +672,292 @@
   box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.35);
 }
 
+/* ==================== Warm journal legacy alignment ==================== */
+.container {
+  background: #f8f2e9;
+  color: #3f352f;
+}
+
+.pet-cards {
+  gap: 16rpx;
+  padding: 18rpx 24rpx 20rpx;
+}
+
+.pet-card,
+.section-card {
+  background: #fffdf8;
+  border: 1rpx solid #e6d8c8;
+  box-shadow: 0 6rpx 18rpx rgba(91, 71, 55, 0.06);
+}
+
+.pet-card {
+  min-height: 164rpx;
+  padding: 24rpx 16rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.pet-card-accent {
+  height: 4rpx;
+}
+
+.pet-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  margin-bottom: 10rpx;
+  background: #f3e9dc;
+}
+
+.pet-name,
+.pet-weight,
+.section-title,
+.modal-title {
+  color: #3f352f;
+}
+
+.pet-name {
+  font-size: 25rpx;
+}
+
+.pet-weight {
+  font-size: 38rpx;
+}
+
+.pet-unit,
+.section-badge,
+.legend-text,
+.record-date,
+.record-unit,
+.person-badge,
+.placeholder-text,
+.input-suffix,
+.picker-arrow {
+  color: #8c7b6d;
+}
+
+.section-card {
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+}
+
+.section-header {
+  min-height: 84rpx;
+  padding: 0 24rpx;
+  border-bottom-color: #efe4d7;
+}
+
+.section-icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  background: #f3e9dc;
+}
+
+.section-title {
+  font-size: 29rpx;
+}
+
+.section-badge,
+.person-badge {
+  background: #f3e9dc;
+}
+
+.filter-tabs {
+  gap: 10rpx;
+  padding: 18rpx 20rpx 16rpx;
+}
+
+.filter-tab {
+  min-height: 60rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6a5c50;
+  background: #faf3e9;
+  border-color: #e6d8c8;
+  border-radius: 14rpx;
+}
+
+.filter-tab-active {
+  color: #fffdf8;
+  background: #9f4f3d;
+  border-color: #9f4f3d;
+  box-shadow: none;
+}
+
+.chart-wrapper {
+  padding: 0 20rpx 12rpx;
+}
+
+.chart-container {
+  height: 330rpx;
+  background: #fffaf2;
+  border: 1rpx solid #efe4d7;
+  border-radius: 16rpx;
+}
+
+.placeholder-icon,
+.empty-icon {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f3e9dc;
+}
+
+.records-container {
+  padding: 20rpx;
+}
+
+.person-header {
+  min-height: 56rpx;
+  margin-bottom: 10rpx;
+}
+
+.record-grid {
+  gap: 10rpx;
+}
+
+.record-card {
+  min-height: 90rpx;
+  justify-content: center;
+  padding: 14rpx 8rpx;
+  background: #faf3e9;
+  border-color: #efe4d7;
+}
+
+.record-card:active {
+  background: #f3e9dc;
+  border-color: #e6d8c8;
+}
+
+.empty-state {
+  padding: 48rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-title {
+  margin-top: 18rpx;
+  font-size: 29rpx;
+  font-weight: 650;
+  color: #3f352f;
+}
+
+.empty-text {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #8c7b6d;
+  text-align: center;
+}
+
+.empty-action {
+  min-width: 220rpx;
+  min-height: 80rpx;
+  margin-top: 24rpx;
+  color: #9f4f3d;
+  background: #f6e4dc;
+  border: 1rpx solid #dfb9aa;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  line-height: 80rpx;
+}
+
+.empty-action::after {
+  border: 0;
+}
+
+.fab-btn {
+  width: 96rpx;
+  height: 96rpx;
+  background: #e8c0b3;
+  border: 1rpx solid #d69a87;
+  box-shadow: 0 10rpx 24rpx rgba(159, 79, 61, 0.2);
+}
+
+.modal-overlay {
+  background: rgba(63, 53, 47, 0.46);
+}
+
+.modal-content {
+  background: #fffdf8;
+  border-radius: 26rpx 26rpx 0 0;
+}
+
+.modal-header {
+  min-height: 88rpx;
+  padding: 0 32rpx;
+  border-bottom-color: #e6d8c8;
+}
+
+.modal-title,
+.form-label-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.modal-close {
+  width: 64rpx;
+  height: 64rpx;
+  color: #6a5c50;
+  background: #f3e9dc;
+}
+
+.form-label {
+  color: #6a5c50;
+}
+
+.weight-input,
+.date-picker {
+  min-height: 84rpx;
+  color: #3f352f;
+  background: #faf3e9;
+  border: 1rpx solid #e6d8c8;
+  border-radius: 14rpx;
+}
+
+.weight-input:focus {
+  background: #fffdf8;
+  border-color: #c96f55;
+}
+
+.person-option {
+  min-height: 92rpx;
+  background: #faf3e9;
+  border: 1rpx solid #e6d8c8;
+}
+
+.person-option-active {
+  background: #f6e4dc;
+  border-color: #c98d7a;
+}
+
+.option-name,
+.person-option-active .option-name {
+  color: #3f352f;
+}
+
+.btn {
+  min-height: 84rpx;
+  padding: 0 20rpx;
+  border: 0;
+  border-radius: 14rpx;
+}
+
+.btn-secondary {
+  color: #6a5c50;
+  background: #f3e9dc;
+}
+
+.btn-primary {
+  color: #fffdf8;
+  background: #9f4f3d;
+  box-shadow: none;
+}

@@ -1,0 +1,398 @@
+<!--
+  THESIS: 把退休储蓄写成一本两个人每月共同落笔的家庭账簿，而不是冷冰冰的金融仪表盘。
+  OWN-WORLD: 暖纸、细横线、印章与陶土色墨迹；金额层级清楚，控件沿用小程序原生触感。
+  STORY: 先看家庭离目标还有多远，再确认本月快照、维护各自账户，最后阅读长期趋势。
+  FIRST VIEWPORT: 净资产占据账簿扉页，目标刻度紧随其后，本月两人确认状态是首个明确行动。
+  FORM: 既有计划页的原生纵向账簿延伸；信息按月度记录的真实频率组织。
+-->
+<view class="retirement-savings">
+  <view class="state-panel" wx:if="{{loading}}">
+    <view class="loading-dots">
+      <view></view><view></view><view></view>
+    </view>
+    <text>正在翻开家庭存钱簿</text>
+  </view>
+
+  <view class="state-panel error-panel" wx:elif="{{error}}">
+    <app-icon name="alert" size="52" label="加载失败" />
+    <text class="state-title">这页暂时没能打开</text>
+    <text class="state-copy">{{error}}</text>
+    <button class="paper-button compact-button" bindtap="retryLoad">重新加载</button>
+  </view>
+
+  <block wx:else>
+    <view class="savings-heading">
+      <view>
+        <text class="savings-title">我们的退休存钱簿</text>
+        <text class="savings-subtitle">每月各自确认一次，让共同目标慢慢有迹可循</text>
+      </view>
+      <app-icon name="piggy-bank" size="54" label="退休存钱罐" />
+    </view>
+
+    <view class="ledger">
+      <view class="ledger-hole hole-one"></view>
+      <view class="ledger-hole hole-two"></view>
+
+      <view class="balance-head">
+        <view>
+          <text class="balance-label">家庭净资产</text>
+          <text class="balance-value {{dashboardView.netAssetsNegative ? 'amount-negative' : ''}}">
+            {{dashboardView.netAssetsText}}
+          </text>
+          <text class="snapshot-time">更新于 {{dashboardView.latestSnapshotText}}</text>
+        </view>
+        <view class="provisional-stamp" wx:if="{{dashboardView.isProvisional}}">暂计</view>
+        <view class="final-stamp" wx:else>已合账</view>
+      </view>
+
+      <view class="owner-balances">
+        <view class="owner-balance">
+          <text class="owner-mark">🐷 猪猪</text>
+          <text>{{dashboardView.pigAssetsText}}</text>
+        </view>
+        <view class="owner-divider"></view>
+        <view class="owner-balance">
+          <text class="owner-mark">🫏 毛驴</text>
+          <text>{{dashboardView.donkeyAssetsText}}</text>
+        </view>
+      </view>
+
+      <view class="goal-sheet">
+        <view class="goal-heading">
+          <view>
+            <text class="minor-label">共同目标 {{dashboardView.targetText}}</text>
+            <text class="goal-progress">{{dashboardView.progressText}}</text>
+          </view>
+          <button
+            class="icon-action"
+            wx:if="{{canEditShared}}"
+            bindtap="openGoalModal"
+            aria-label="设置共同目标"
+          >
+            <app-icon name="edit" size="27" label="编辑" />
+          </button>
+        </view>
+        <view class="goal-track" wx:if="{{dashboardView.hasGoal}}">
+          <view class="goal-fill" style="width: {{dashboardView.progressWidth}}%;"></view>
+          <view class="goal-pin" style="left: {{dashboardView.progressWidth}}%;"></view>
+        </view>
+        <text class="goal-note {{dashboardView.goalReached ? 'goal-reached' : ''}}">
+          {{dashboardView.remainingText}}
+        </text>
+      </view>
+
+      <view class="quick-facts">
+        <view class="quick-fact">
+          <app-icon name="wallet" size="30" label="总资产" />
+          <text class="fact-label">总资产</text>
+          <text class="fact-value">{{dashboardView.grossAssetsText}}</text>
+        </view>
+        <view class="quick-fact">
+          <app-icon name="trend" size="30" label="本月变化" />
+          <text class="fact-label">本月变化</text>
+          <text class="fact-value change-{{dashboardView.monthChangeTone}}">{{dashboardView.monthChangeText}}</text>
+        </view>
+        <view class="quick-fact">
+          <app-icon name="mortgage" size="30" label="房贷余额" />
+          <text class="fact-label">房贷余额</text>
+          <text class="fact-value">{{dashboardView.mortgageText}}</text>
+          <text class="fact-note">{{dashboardView.mortgagePaidText}}</text>
+          <button
+            class="text-action"
+            wx:if="{{canEditShared}}"
+            bindtap="openMortgageModal"
+          >设置</button>
+        </view>
+      </view>
+
+      <view class="month-check">
+        <view class="month-title-row">
+          <view>
+            <text class="month-title">{{dashboardView.month}} 月度快照</text>
+            <text class="month-note" wx:if="{{dashboardView.isProvisional && dashboardView.missingText}}">
+              等{{dashboardView.missingText}}确认后转为正式数据
+            </text>
+            <text class="month-note" wx:elif="{{dashboardView.isProvisional}}">房贷余额待本月确认</text>
+            <text class="month-note" wx:else>两个人都确认了，本月已合账</text>
+          </view>
+          <button
+            class="paper-button compact-button"
+            wx:if="{{canEditShared}}"
+            bindtap="toggleMonthly"
+          >
+            {{showMonthly ? '收起' : (dashboardView.ownerConfirmed ? '查看并更新' : '填写本月')}}
+          </button>
+        </view>
+        <view class="confirmation-row">
+          <view class="confirmation {{dashboardView.pigConfirmed ? 'confirmed' : ''}}">
+            <text>🐷</text>
+            <view>
+              <text class="confirmation-name">猪猪</text>
+              <text class="confirmation-status">{{dashboardView.pigConfirmed ? '已确认' : '待确认'}}</text>
+            </view>
+            <app-icon wx:if="{{dashboardView.pigConfirmed}}" name="check" size="24" label="已确认" />
+          </view>
+          <view class="confirmation {{dashboardView.donkeyConfirmed ? 'confirmed' : ''}}">
+            <text>🫏</text>
+            <view>
+              <text class="confirmation-name">毛驴</text>
+              <text class="confirmation-status">{{dashboardView.donkeyConfirmed ? '已确认' : '待确认'}}</text>
+            </view>
+            <app-icon wx:if="{{dashboardView.donkeyConfirmed}}" name="check" size="24" label="已确认" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="monthly-sheet" wx:if="{{showMonthly}}">
+      <view class="section-heading">
+        <view>
+          <text class="section-title">{{dashboardView.month}} · {{currentOwner === 'Pig' ? '猪猪' : '毛驴'}}的月度确认</text>
+          <text class="section-copy">金额已按最新记录预填；不改动的账户会原样保存。</text>
+        </view>
+        <app-icon name="calendar" size="36" label="月度确认" />
+      </view>
+
+      <view class="inline-loading" wx:if="{{monthlyLoading}}">正在取回本月记录…</view>
+      <view class="inline-error" wx:elif="{{monthlyError}}" bindtap="loadMonthlyEntry">
+        {{monthlyError}} 点此重试
+      </view>
+      <block wx:elif="{{monthlyEntry}}">
+        <view class="monthly-category" wx:for="{{monthlyGroups}}" wx:key="value" wx:for-item="group">
+          <view class="category-heading">
+            <app-icon name="{{group.icon}}" size="30" label="{{group.label}}" />
+            <text>{{group.label}}</text>
+          </view>
+          <view class="entry-row" wx:for="{{group.accounts}}" wx:key="id" wx:for-item="account">
+            <view class="entry-copy">
+              <text class="entry-name">{{account.name}}</text>
+              <text class="entry-previous">上月 {{account.previousText}}</text>
+            </view>
+            <view class="amount-input-wrap">
+              <text>¥</text>
+              <input
+                class="amount-input"
+                type="digit"
+                value="{{account.amountInput}}"
+                data-id="{{account.id}}"
+                bindinput="onMonthlyAmountInput"
+                placeholder="0"
+                aria-label="{{account.name}}当前金额"
+              />
+            </view>
+          </view>
+        </view>
+
+        <view class="entry-row mortgage-entry">
+          <view class="entry-copy">
+            <text class="entry-name">共同房贷余额</text>
+            <text class="entry-previous">负债会从家庭总资产中扣除</text>
+          </view>
+          <view class="amount-input-wrap">
+            <text>¥</text>
+            <input
+              class="amount-input"
+              type="digit"
+              value="{{monthlyMortgageInput}}"
+              bindinput="onMonthlyMortgageInput"
+              placeholder="0"
+              aria-label="共同房贷余额"
+            />
+          </view>
+        </view>
+
+        <view class="monthly-empty" wx:if="{{!monthlyAccounts.length}}">
+          你还没有账户，也可以只确认共同房贷余额。
+        </view>
+        <button
+          class="primary-button"
+          disabled="{{monthlySubmitting}}"
+          bindtap="submitMonthlyEntry"
+        >
+          {{monthlySubmitting ? '正在保存…' : (dashboardView.ownerConfirmed ? '更新我的本月记录' : '确认我的本月记录')}}
+        </button>
+      </block>
+    </view>
+
+    <view class="accounts-section">
+      <view class="section-heading">
+        <view>
+          <text class="section-title">两个人的账户</text>
+          <text class="section-copy">各自维护自己的账户，金额共同可见。</text>
+        </view>
+        <button
+          class="paper-button compact-button"
+          wx:if="{{canEditShared}}"
+          bindtap="openAddAccount"
+        >
+          <app-icon name="plus" size="23" label="添加" />
+          <text>添加账户</text>
+        </button>
+      </view>
+
+      <view class="accounts-empty" wx:if="{{!accounts.length}}">
+        <app-icon name="wallet" size="48" label="暂无账户" />
+        <text class="state-title">还没有写下任何账户</text>
+        <text class="state-copy">从银行卡、股票或公积金开始。</text>
+      </view>
+
+      <view class="owner-account-sheet" wx:for="{{accountGroups}}" wx:key="owner" wx:for-item="ownerGroup">
+        <view class="owner-sheet-heading">
+          <text class="owner-sheet-name">{{ownerGroup.emoji}} {{ownerGroup.ownerLabel}}的账户</text>
+          <text class="owner-sheet-total">{{ownerGroup.totalText}}</text>
+        </view>
+        <view class="owner-no-account" wx:if="{{!ownerGroup.categories.length}}">
+          {{ownerGroup.owner === currentOwner ? '你还没有账户，添加一个开始记录。' : '对方还没有添加账户。'}}
+        </view>
+        <view class="account-category" wx:for="{{ownerGroup.categories}}" wx:key="value" wx:for-item="group">
+          <view class="category-heading">
+            <app-icon name="{{group.icon}}" size="28" label="{{group.label}}" />
+            <text>{{group.label}}</text>
+          </view>
+          <view class="account-row" wx:for="{{group.accounts}}" wx:key="id" wx:for-item="account">
+            <text class="account-name">{{account.name}}</text>
+            <text class="account-amount">{{account.amountText}}</text>
+            <view class="account-actions" wx:if="{{account.isMine}}">
+              <button class="row-action" data-id="{{account.id}}" bindtap="openEditAccount" aria-label="编辑{{account.name}}">
+                <app-icon name="edit" size="25" label="编辑" />
+              </button>
+              <button class="row-action danger-action" data-id="{{account.id}}" bindtap="deleteAccount" aria-label="删除{{account.name}}">
+                <app-icon name="trash" size="25" label="删除" />
+              </button>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="trend-section">
+      <view class="section-heading">
+        <view>
+          <text class="section-title">慢慢长大的数字</text>
+          <text class="section-copy">{{trendDescription}}</text>
+        </view>
+        <app-icon name="trend" size="37" label="资产趋势" />
+      </view>
+
+      <view class="filter-label">看谁</view>
+      <view class="filter-row">
+        <button
+          class="filter-chip {{trendOwner === item.value ? 'filter-chip-active' : ''}}"
+          wx:for="{{trendOwnerOptions}}"
+          wx:key="value"
+          data-group="trendOwner"
+          data-value="{{item.value}}"
+          bindtap="onTrendFilter"
+        >{{item.label}}</button>
+      </view>
+      <view class="filter-label">看什么</view>
+      <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="filter-row filter-row-wide">
+          <button
+            class="filter-chip {{trendCategory === item.value ? 'filter-chip-active' : ''}}"
+            wx:for="{{trendCategoryOptions}}"
+            wx:key="value"
+            data-group="trendCategory"
+            data-value="{{item.value}}"
+            bindtap="onTrendFilter"
+          >{{item.label}}</button>
+        </view>
+      </scroll-view>
+      <view class="range-row">
+        <button
+          class="range-option {{trendRange === item.value ? 'range-option-active' : ''}}"
+          wx:for="{{trendRangeOptions}}"
+          wx:key="value"
+          data-group="trendRange"
+          data-value="{{item.value}}"
+          bindtap="onTrendFilter"
+        >{{item.label}}</button>
+      </view>
+
+      <view class="chart-paper">
+        <canvas type="2d" id="retirement-trend-canvas" class="trend-canvas"></canvas>
+        <view class="chart-wash" wx:if="{{trendLoading}}">正在重画趋势…</view>
+        <view class="chart-wash chart-error" wx:elif="{{trendError}}" bindtap="retryTrends">{{trendError}}</view>
+      </view>
+      <view class="chart-legend">
+        <view><text class="legend-dot solid-dot"></text><text>正式快照</text></view>
+        <view><text class="legend-dot hollow-dot"></text><text>暂计：还有一人未确认，虚线段会随确认结果更新</text></view>
+      </view>
+    </view>
+  </block>
+
+  <view class="modal-overlay" wx:if="{{accountModalOpen}}" catchtap="closeAccountModal">
+    <view class="bottom-sheet" catchtap="stopPropagation">
+      <view class="sheet-handle"></view>
+      <view class="sheet-title-row">
+        <text class="sheet-title">{{accountForm.id ? '编辑账户' : '添加我的账户'}}</text>
+        <button class="sheet-close" bindtap="closeAccountModal">取消</button>
+      </view>
+      <text class="field-label">账户名称</text>
+      <input class="form-input" value="{{accountForm.name}}" bindinput="onAccountNameInput" maxlength="30" placeholder="例如：工资卡" />
+      <text class="field-label">账户类型</text>
+      <picker mode="selector" range="{{categoryLabels}}" value="{{accountForm.categoryIndex}}" bindchange="onAccountCategoryChange">
+        <view class="picker-field">
+          <text>{{categoryLabels[accountForm.categoryIndex]}}</text>
+          <app-icon name="chevron-right" size="25" label="选择" />
+        </view>
+      </picker>
+      <text class="field-label">当前金额</text>
+      <view class="form-money" wx:if="{{!accountForm.id}}">
+        <text>¥</text>
+        <input type="digit" value="{{accountForm.currentAmount}}" bindinput="onAccountAmountInput" placeholder="0" />
+      </view>
+      <view class="account-balance-help" wx:else>
+        余额请在“本月快照”中更新，避免绕过月度趋势记录。
+      </view>
+      <button class="primary-button" disabled="{{accountSaving}}" bindtap="saveAccount">
+        {{accountSaving ? '正在保存…' : '保存账户'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{goalModalOpen}}" catchtap="closeGoalModal">
+    <view class="bottom-sheet" catchtap="stopPropagation">
+      <view class="sheet-handle"></view>
+      <view class="sheet-title-row">
+        <text class="sheet-title">共同退休目标</text>
+        <button class="sheet-close" bindtap="closeGoalModal">取消</button>
+      </view>
+      <text class="sheet-help">猪和驴都可以修改。新目标会立即用于家庭进度计算。</text>
+      <text class="field-label">目标金额</text>
+      <view class="form-money">
+        <text>¥</text>
+        <input type="digit" value="{{goalInput}}" bindinput="onGoalInput" placeholder="例如：3000000" />
+      </view>
+      <button class="primary-button" disabled="{{goalSaving}}" bindtap="saveGoal">
+        {{goalSaving ? '正在保存…' : '保存共同目标'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="modal-overlay" wx:if="{{mortgageModalOpen}}" catchtap="closeMortgageModal">
+    <view class="bottom-sheet" catchtap="stopPropagation">
+      <view class="sheet-handle"></view>
+      <view class="sheet-title-row">
+        <text class="sheet-title">共同房贷</text>
+        <button class="sheet-close" bindtap="closeMortgageModal">取消</button>
+      </view>
+      <text class="sheet-help">房贷余额作为家庭负债，从总资产中扣除。</text>
+      <text class="field-label">房贷名称</text>
+      <input class="form-input" value="{{mortgageForm.name}}" bindinput="onMortgageNameInput" maxlength="30" placeholder="例如：家的房贷" />
+      <text class="field-label">原始本金</text>
+      <view class="form-money">
+        <text>¥</text>
+        <input type="digit" value="{{mortgageForm.originalPrincipal}}" bindinput="onMortgageOriginalInput" placeholder="0" />
+      </view>
+      <text class="field-label">当前剩余本金</text>
+      <view class="form-money">
+        <text>¥</text>
+        <input type="digit" value="{{mortgageForm.currentRemainingPrincipal}}" bindinput="onMortgageRemainingInput" placeholder="0" />
+      </view>
+      <button class="primary-button" disabled="{{mortgageSaving}}" bindtap="saveMortgage">
+        {{mortgageSaving ? '正在保存…' : '保存房贷设置'}}
+      </button>
+    </view>
+  </view>
+</view>

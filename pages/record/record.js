@@ -8,17 +8,17 @@ const constants = require('../../utils/constants');
 
 // 宠物配置
 const PERSON_CONFIG = {
-  '豌豆黄': { color: '#F4D03F', emoji: '🟡', lineColor: '#F4D03F' },
-  '小立夏': { color: '#27AE60', emoji: '🌱', lineColor: '#27AE60' }
+  '豌豆黄': { color: '#B98232', emoji: '🟡', lineColor: '#B98232' },
+  '小立夏': { color: '#6F8A65', emoji: '🌱', lineColor: '#6F8A65' }
 };
 
 const PERSON_LIST = ['豌豆黄', '小立夏'];
 
 // 陪玩者配置（身份由后端按 openid 识别，前端只负责展示）
 const PLAYER_CONFIG = {
-  'Pig': { emoji: '🐷', name: '猪猪', color: '#F59E0B' },
-  'Donkey': { emoji: '🫏', name: '毛驴', color: '#6366F1' },
-  'Other': { emoji: '👤', name: '其他', color: '#9CA3AF' }
+  'Pig': { emoji: '🐷', name: '猪猪', color: '#C96F55' },
+  'Donkey': { emoji: '🫏', name: '毛驴', color: '#6F8A65' },
+  'Other': { emoji: '👤', name: '其他', color: '#8C7B6D' }
 };
 
 // 单次陪玩超过该时长时，结束前提示是否误操作（秒）
@@ -32,8 +32,17 @@ Page({
     
     // Tab切换
     currentTab: 'weight',
+    recordTabs: [
+      { value: 'weight', label: '猫猫', icon: 'cat' },
+      { value: 'period', label: '姨妈', icon: 'flower' },
+      { value: 'checkup', label: '体检', icon: 'health' }
+    ],
     // 猫猫记录内部子切换：weight(体重) | play(陪玩)
     catSubTab: 'weight',
+    catTabs: [
+      { value: 'weight', label: '体重', icon: 'trend' },
+      { value: 'play', label: '陪玩', icon: 'timer' }
+    ],
 
     // ==================== 体重相关 ====================
     weightRecords: [],
@@ -182,7 +191,9 @@ Page({
 
   // Tab切换
   switchTab(e) {
-    const tab = e.currentTarget.dataset.tab;
+    const tab = e.detail && e.detail.value
+      ? e.detail.value
+      : e.currentTarget.dataset.tab;
     this.setData({ currentTab: tab });
 
     // 离开猫猫记录时停止陪玩计时器
@@ -206,7 +217,9 @@ Page({
 
   // 猫猫记录子切换：体重 / 陪玩
   switchCatSubTab(e) {
-    const sub = e.currentTarget.dataset.sub;
+    const sub = e.detail && e.detail.value
+      ? e.detail.value
+      : e.currentTarget.dataset.sub;
     if (sub === this.data.catSubTab) return;
     this.setData({ catSubTab: sub });
 
@@ -312,7 +325,7 @@ Page({
     const { groupedRecords, timeRange } = this.data;
     
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#f9fafb';
+    ctx.fillStyle = '#fffaf2';
     ctx.fillRect(0, 0, width, height);
     
     const padding = { left: 35, right: 10, top: 15, bottom: 45 };
@@ -381,7 +394,7 @@ Page({
     maxWeight = Math.ceil(maxWeight + yRange * 0.1);
     
     // 网格线
-    ctx.strokeStyle = '#e5e7eb';
+    ctx.strokeStyle = '#e6d8c8';
     ctx.lineWidth = 1;
     const ySteps = 5;
     for (let i = 0; i <= ySteps; i++) {
@@ -393,7 +406,7 @@ Page({
     }
     
     // Y轴标签
-    ctx.fillStyle = '#6b7280';
+    ctx.fillStyle = '#6a5c50';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'right';
     for (let i = 0; i <= ySteps; i++) {
