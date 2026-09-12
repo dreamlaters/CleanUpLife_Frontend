@@ -4,6 +4,33 @@
  */
 
 const BASE_URL = 'https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsites.net';
+const NETWORK_RETRY_DELAYS = [600, 1500];
+let lastNetworkErrorToastAt = 0;
+let reloginPromise = null;
+
+const showNetworkErrorOnce = () => {
+  const now = Date.now();
+  if (now - lastNetworkErrorToastAt < 3000) return;
+  lastNetworkErrorToastAt = now;
+  wx.showToast({ title: '网络不稳定，请稍后重试', icon: 'none' });
+};
+
+const refreshLogin = (app) => {
+  if (reloginPromise) return reloginPromise;
+
+  app._loginPromise = null;
+  reloginPromise = app.login().then(
+    result => {
+      reloginPromise = null;
+      return result;
+    },
+    error => {
+      reloginPromise = null;
+      throw error;
+    }
+  );
+  return reloginPromise;
+};
 
 /**
  * 发起 HTTP 请求
@@ -12,6 +39,7 @@ const BASE_URL = 'https://cleanuplife-eudgakdhcwcpfjb0.japanwest-01.azurewebsite
  * @param {string} options.method 请求方法 GET/POST/PUT/DELETE
  * @param {Object} options.data 请求数据
  * @param {boolean} options.showLoading 是否显示 loading，默认 true
+ * @param {boolean} options.showErrorToast 是否显示请求错误提示，默认 true
  * @param {string} options.loadingText loading 文本，默认 '加载中...'
  * @returns {Promise} 返回 Promise
  */
@@ -30,6 +58,7 @@ const request = (options) => {
         method = 'GET',
         data = {},
         showLoading = true,
+        showErrorToast = true,
         loadingText = '加载中...'
       } = options;
 
@@ -47,16 +76,24 @@ const request = (options) => {
         },
         success: (res) => {
           if (res.statusCode === 401) {
-            // token 过期或无效，重新登录后重试（最多重试3次）
+            // token 过期或无效。并发请求共用一次重新登录。
             const retryCount = options._retryCount || 0;
             if (retryCount >= 3) {
               reject(new Error('认证失败，请重新打开小程序'));
               return;
             }
             console.warn('Token 无效，正在重新登录...');
-            app._loginPromise = null;
-            app.login().then(() => {
-              request({ ...options, _retryCount: retryCount + 1 }).then(resolve).catch(reject);
+            refreshLogin(app).then(() => {
+              if (method !== 'GET') {
+                wx.showToast({ title: '登录已刷新，请重新操作', icon: 'none' });
+                reject(new Error('登录状态已刷新，请重新操作'));
+                return;
+              }
+              request({
+                ...options,
+                showLoading: false,
+                _retryCount: retryCount + 1
+              }).then(resolve).catch(reject);
             }).catch((err) => {
               reject(err);
             });
@@ -76,12 +113,39 @@ const request = (options) => {
             reject(error);
           } else {
             const errorMsg = res.data?.message || '请求失败';
-            wx.showToast({ title: errorMsg, icon: 'error' });
-            reject(new Error(errorMsg));
+            if (showErrorToast) {
+              wx.showToast({ title: errorMsg, icon: 'error' });
+            }
+            const error = new Error(errorMsg);
+            error.statusCode = res.statusCode;
+            error.data = res.data;
+            reject(error);
           }
         },
         fail: (err) => {
-          wx.showToast({ title: '网络错误', icon: 'error' });
+          const retryCount = options._networkRetryCount || 0;
+          const canRetry = method === 'GET' && retryCount < NETWORK_RETRY_DELAYS.length;
+          console.warn('API 网络请求失败', {
+            url,
+            method,
+            retryCount,
+            error: err && err.errMsg
+          });
+
+          if (canRetry) {
+            setTimeout(() => {
+              request({
+                ...options,
+                showLoading: false,
+                _networkRetryCount: retryCount + 1
+              }).then(resolve).catch(reject);
+            }, NETWORK_RETRY_DELAYS[retryCount]);
+            return;
+          }
+
+          if (showErrorToast) {
+            showNetworkErrorOnce();
+          }
           reject(err);
         },
         complete: () => {
@@ -123,6 +187,21 @@ const del = (url, options = {}) => {
 };
 
 // ==================== 业务 API ====================
+
+/**
+ * 获取首页摘要；sections 省略时加载全部模块，传数组时只重试指定模块。
+ * 非认证 HTTP 失败响应仍会 reject，并保留 statusCode 和 data，供首页呈现部分失败。
+ */
+const getHomeDashboard = (year, sections = null, options = {}) => {
+  const selector = sections && sections.length
+    ? `&sections=${encodeURIComponent(sections.join(','))}`
+    : '';
+  return get(`/Home/dashboard?year=${encodeURIComponent(year)}${selector}`, {
+    showLoading: false,
+    showErrorToast: false,
+    ...options
+  });
+};
 
 /**
  * 获取物品列表
@@ -320,6 +399,7 @@ module.exports = {
   post,
   put,
   del,
+  getHomeDashboard,
   getProductList,
   getProductsSummary,
   getWeightLatest,

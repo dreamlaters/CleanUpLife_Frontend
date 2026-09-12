@@ -7,6 +7,7 @@ const constants = require('./utils/constants');
 
 // 缓存系统信息，避免多次同步调用
 let cachedSystemInfo = null;
+const LOGIN_RETRY_DELAYS = [800, 1800];
 
 App({
   onLaunch() {
@@ -25,7 +26,7 @@ App({
   login() {
     if (this._loginPromise) return this._loginPromise;
 
-    this._loginPromise = new Promise((resolve, reject) => {
+    const attemptLogin = (retryCount = 0) => new Promise((resolve, reject) => {
       wx.login({
         success: (res) => {
           if (!res.code) {
@@ -56,6 +57,10 @@ App({
                 this.globalData.player = resp.data.player || null;
                 console.log('登录成功，token 已获取');
                 resolve(resp.data);
+              } else if (resp.statusCode >= 500 && retryCount < LOGIN_RETRY_DELAYS.length) {
+                setTimeout(() => {
+                  attemptLogin(retryCount + 1).then(resolve).catch(reject);
+                }, LOGIN_RETRY_DELAYS[retryCount]);
               } else {
                 console.error('登录接口异常', resp);
                 reject(new Error('登录失败'));
@@ -63,16 +68,32 @@ App({
             },
             fail: (err) => {
               console.error('登录请求失败', err);
+              if (retryCount < LOGIN_RETRY_DELAYS.length) {
+                setTimeout(() => {
+                  attemptLogin(retryCount + 1).then(resolve).catch(reject);
+                }, LOGIN_RETRY_DELAYS[retryCount]);
+                return;
+              }
+              wx.showToast({ title: '网络不稳定，请稍后重试', icon: 'none' });
               reject(err);
             }
           });
         },
         fail: (err) => {
           console.error('wx.login 失败', err);
+          if (retryCount < LOGIN_RETRY_DELAYS.length) {
+            setTimeout(() => {
+              attemptLogin(retryCount + 1).then(resolve).catch(reject);
+            }, LOGIN_RETRY_DELAYS[retryCount]);
+            return;
+          }
+          wx.showToast({ title: '微信登录失败，请稍后重试', icon: 'none' });
           reject(err);
         }
       });
     });
+
+    this._loginPromise = attemptLogin();
 
     // 登录失败后允许重试
     this._loginPromise.catch(() => {
@@ -107,4 +128,3 @@ App({
     blockedInfo: null
   }
 });
-

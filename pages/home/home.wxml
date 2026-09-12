@@ -12,15 +12,45 @@
 
   <loading-state loading="{{loading}}" />
 
+  <view class="dashboard-refresh" wx:if="{{refreshing}}">
+    <text>正在更新首页，已加载内容仍可查看…</text>
+  </view>
+  <view class="dashboard-error" wx:if="{{!loading && failedSections.length}}">
+    <view class="section-error-copy">
+      <text class="section-error-title">{{dashboardError || (failedSections.length === 7 ? '首页各模块暂时无法加载' : '部分内容暂时无法加载')}}</text>
+      <text class="section-error-message">未加载不代表没有记录，可单独重试；其余内容仍可查看。</text>
+    </view>
+    <button class="section-retry" size="mini" bindtap="retryFailedSections" disabled="{{refreshing}}">重试失败项</button>
+  </view>
+
   <view class="today-section" wx:if="{{!loading}}">
     <view class="section-heading">
       <view class="section-heading-copy">
         <text class="section-kicker">TODAY</text>
         <view class="section-title-row">
           <text class="section-title">今天要留意</text>
-          <text class="section-count" wx:if="{{attentionCount}}">{{attentionCount}} 件</text>
+          <text class="section-count" wx:if="{{attentionCount}}">{{attentionComplete ? '' : '已知 '}}{{attentionCount}} 件</text>
         </view>
       </view>
+    </view>
+
+    <view class="attention-incomplete" wx:if="{{!attentionComplete}}">
+      <text class="section-error-title">提醒尚未确认完整</text>
+      <text class="section-error-message">{{attentionPendingNames}}尚未确认，提醒数量可能不完整。</text>
+    </view>
+    <view class="section-error" wx:if="{{sectionStates.products.status === 'error'}}">
+      <view class="section-error-copy">
+        <text class="section-error-title">物品到期提醒暂不可用</text>
+        <text class="section-error-message">{{sectionStates.products.loading ? '正在重试…' : sectionStates.products.error}}</text>
+      </view>
+      <button class="section-retry" size="mini" data-section="products" bindtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
+    </view>
+    <view class="section-error" wx:if="{{sectionStates.play.status === 'error'}}">
+      <view class="section-error-copy">
+        <text class="section-error-title">猫猫陪玩状态暂不可用</text>
+        <text class="section-error-message">{{sectionStates.play.loading ? '正在重试…' : sectionStates.play.error}}</text>
+      </view>
+      <button class="section-retry" size="mini" data-section="play" bindtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
     </view>
 
     <view class="attention-card" wx:if="{{attentionCount}}">
@@ -79,7 +109,7 @@
       </view>
     </view>
 
-    <view class="all-clear-card" wx:else>
+    <view class="all-clear-card" wx:if="{{allClear}}">
       <view class="all-clear-icon"><app-icon name="check" size="38" /></view>
       <view class="all-clear-copy">
         <text class="all-clear-title">今天没有待处理提醒</text>
@@ -92,7 +122,7 @@
     <view class="quick-item" bindtap="goToPlay">
       <view class="quick-icon quick-icon-cat"><app-icon name="cat" size="34" /></view>
       <text class="quick-action-title">陪猫玩</text>
-      <text class="quick-label">开始计时</text>
+      <text class="quick-label">{{sectionStates.play.status === 'ok' ? '开始计时' : '陪玩状态未加载'}}</text>
     </view>
     <view class="quick-item" bindtap="goToSavings">
       <view class="quick-icon quick-icon-savings"><app-icon name="piggy-bank" size="34" /></view>
@@ -102,7 +132,9 @@
     <view class="quick-item" bindtap="goToAddToBuy">
       <view class="quick-icon quick-icon-cart"><app-icon name="cart" size="34" /></view>
       <text class="quick-action-title">添加待买</text>
-      <text class="quick-label">{{toBuyCount}} 件待完成</text>
+      <text class="quick-label" wx:if="{{sectionStates.toBuy.status === 'ok'}}">{{toBuyCount}} 件待完成</text>
+      <text class="quick-label section-unavailable" wx:else>待买数量未加载</text>
+      <button class="section-retry quick-retry" size="mini" wx:if="{{sectionStates.toBuy.status === 'error'}}" data-section="toBuy" catchtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
     </view>
   </view>
 
@@ -114,7 +146,7 @@
       </view>
     </view>
 
-    <view class="savings-note" bindtap="goToSavings" wx:if="{{savingsSummary}}">
+    <view class="savings-note" bindtap="goToSavings" wx:if="{{sectionStates.savings.status === 'ok'}}">
       <view class="savings-note-header">
         <view class="savings-title-wrap">
           <view class="life-card-icon savings-icon"><app-icon name="piggy-bank" size="40" /></view>
@@ -138,13 +170,21 @@
         <text>{{savingsSummary.checkInText}}</text>
       </view>
     </view>
+    <view class="section-error life-error" wx:elif="{{sectionStates.savings.status === 'error'}}">
+      <view class="section-error-copy">
+        <text class="section-error-title">退休存钱罐暂不可用</text>
+        <text class="section-error-message">{{sectionStates.savings.loading ? '正在重试…' : sectionStates.savings.error}}</text>
+      </view>
+      <button class="section-retry" size="mini" data-section="savings" bindtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
+    </view>
 
-    <view class="life-card period-card" bindtap="goToPeriod" wx:if="{{periodStats}}">
+    <view class="life-card period-card" bindtap="goToPeriod" wx:if="{{sectionStates.period.status === 'ok'}}">
       <view class="life-card-icon period-icon"><app-icon name="flower" size="38" /></view>
       <view class="life-card-copy">
         <text class="life-card-label">周期记录</text>
         <text class="life-card-title" wx:if="{{periodStats.status === 'none'}}">还没有开始记录</text>
         <text class="life-card-title" wx:elif="{{periodStats.status === 'in-period'}}">经期中，记得照顾好自己</text>
+        <text class="life-card-title" wx:elif="{{periodStats.daysUntilNextPeriod === null}}">暂无预测日期</text>
         <text class="life-card-title" wx:elif="{{periodStats.daysUntilNextPeriod > 0}}">距下次预计还有 {{periodStats.daysUntilNextPeriod}} 天</text>
         <text class="life-card-title" wx:elif="{{periodStats.daysUntilNextPeriod === 0}}">预计今天开始</text>
         <text class="life-card-title" wx:else>已超出预计 {{-periodStats.daysUntilNextPeriod}} 天</text>
@@ -152,43 +192,65 @@
       </view>
       <app-icon name="chevron-right" size="30" />
     </view>
+    <view class="section-error life-error" wx:elif="{{sectionStates.period.status === 'error'}}">
+      <view class="section-error-copy">
+        <text class="section-error-title">周期记录暂不可用</text>
+        <text class="section-error-message">{{sectionStates.period.loading ? '正在重试…' : sectionStates.period.error}}</text>
+      </view>
+      <button class="section-retry" size="mini" data-section="period" bindtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
+    </view>
 
-    <view class="life-card cat-card" bindtap="goToWeight" wx:if="{{catWeights.length}}">
+    <view class="life-card cat-card" bindtap="goToWeight" wx:if="{{sectionStates.weights.status === 'ok'}}">
       <view class="life-card-icon cat-icon"><app-icon name="cat" size="40" /></view>
       <view class="life-card-copy">
         <text class="life-card-label">猫猫体重</text>
-        <view class="cat-summary">
+        <view class="cat-summary" wx:if="{{catWeights.length}}">
           <view class="cat-summary-item" wx:for="{{catWeights}}" wx:key="personName">
             <text class="cat-name">{{item.personName}}</text>
             <text class="cat-weight">{{item.weight}} 斤</text>
             <text class="cat-date">{{item.dateText}}</text>
           </view>
         </view>
+        <text class="life-card-title" wx:else>还没有记录猫猫体重</text>
       </view>
       <app-icon name="chevron-right" size="30" />
     </view>
+    <view class="section-error life-error" wx:elif="{{sectionStates.weights.status === 'error'}}">
+      <view class="section-error-copy">
+        <text class="section-error-title">猫猫体重暂不可用</text>
+        <text class="section-error-message">{{sectionStates.weights.loading ? '正在重试…' : sectionStates.weights.error}}</text>
+      </view>
+      <button class="section-retry" size="mini" data-section="weights" bindtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
+    </view>
 
-    <view class="goals-note" bindtap="goToGoals" wx:if="{{goalsPig.length || goalsDonkey.length}}">
+    <view class="goals-note" bindtap="goToGoals" wx:if="{{sectionStates.goals.status === 'ok'}}">
       <view class="goals-note-header">
         <view class="goals-note-title">
           <view class="life-card-icon goal-icon"><app-icon name="target" size="38" /></view>
           <view>
             <text class="life-card-label">年度目标</text>
-            <text class="life-card-title">一起靠近想要的生活</text>
+            <text class="life-card-title">{{pigTotal || donkeyTotal ? '一起靠近想要的生活' : '今年还没有年度目标'}}</text>
           </view>
         </view>
         <app-icon name="chevron-right" size="30" />
       </view>
-      <view class="goal-progress-row" wx:if="{{goalsPig.length}}">
+      <view class="goal-progress-row" wx:if="{{pigTotal}}">
         <text class="goal-owner">🐷 猪猪</text>
         <view class="goal-progress-track"><view class="goal-progress-fill pig" style="width: {{pigProgress}}%"></view></view>
-        <text class="goal-progress-text">{{pigCompleted}}/{{goalsPig.length}}</text>
+        <text class="goal-progress-text">{{pigCompleted}}/{{pigTotal}}</text>
       </view>
-      <view class="goal-progress-row" wx:if="{{goalsDonkey.length}}">
+      <view class="goal-progress-row" wx:if="{{donkeyTotal}}">
         <text class="goal-owner">🫏 毛驴</text>
         <view class="goal-progress-track"><view class="goal-progress-fill donkey" style="width: {{donkeyProgress}}%"></view></view>
-        <text class="goal-progress-text">{{donkeyCompleted}}/{{goalsDonkey.length}}</text>
+        <text class="goal-progress-text">{{donkeyCompleted}}/{{donkeyTotal}}</text>
       </view>
+    </view>
+    <view class="section-error life-error" wx:elif="{{sectionStates.goals.status === 'error'}}">
+      <view class="section-error-copy">
+        <text class="section-error-title">年度目标暂不可用</text>
+        <text class="section-error-message">{{sectionStates.goals.loading ? '正在重试…' : sectionStates.goals.error}}</text>
+      </view>
+      <button class="section-retry" size="mini" data-section="goals" bindtap="retryFailedSections" disabled="{{refreshing}}">重试</button>
     </view>
   </view>
 

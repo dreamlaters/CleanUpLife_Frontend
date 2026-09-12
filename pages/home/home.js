@@ -4,6 +4,69 @@
  */
 const api = require('../../utils/api');
 
+const HOME_SECTIONS = ['products', 'toBuy', 'goals', 'weights', 'period', 'play', 'savings'];
+const ATTENTION_SECTIONS = ['products', 'play', 'savings'];
+const SECTION_LABELS = {
+  products: '物品到期提醒',
+  play: '猫猫陪玩状态',
+  savings: '退休存钱盘点'
+};
+const SECTION_ERROR_MESSAGES = {
+  timeout: '模块加载超时，请重试',
+  dependency_unavailable: '模块暂不可用，请重试'
+};
+const EMPTY_SECTION_DATA = {
+  products: { expiredItems: [], expiringSoonItems: [] },
+  toBuy: { toBuyCount: null },
+  goals: {
+    pigTotal: null,
+    donkeyTotal: null,
+    pigCompleted: null,
+    pigProgress: null,
+    donkeyCompleted: null,
+    donkeyProgress: null
+  },
+  weights: { catWeights: [] },
+  period: { periodStats: null },
+  play: { playStatus: null },
+  savings: { savingsSummary: null }
+};
+
+const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const isCount = value => Number.isInteger(value) && value >= 0;
+const isDate = value => typeof value === 'string' && Number.isFinite(new Date(value).getTime());
+const isNullableNumber = value => value === null || Number.isFinite(value);
+const isGoalCount = value => isObject(value) && isCount(value.total) &&
+  isCount(value.completed) && value.completed <= value.total;
+const isProduct = value => isObject(value) && typeof value.id === 'string' &&
+  typeof value.name === 'string' && typeof value.category === 'string' && isDate(value.bestBy);
+
+// 不把缺失、格式错误的响应当作空列表或零值，否则会误报“没有提醒”。
+const SECTION_VALIDATORS = {
+  products: value => isObject(value) && Array.isArray(value.expiredItems) &&
+    value.expiredItems.every(isProduct) && Array.isArray(value.expiringSoonItems) &&
+    value.expiringSoonItems.every(isProduct),
+  toBuy: value => isObject(value) && isCount(value.count),
+  goals: value => isObject(value) && isGoalCount(value.pig) && isGoalCount(value.donkey),
+  weights: value => Array.isArray(value) && value.every(record => isObject(record) &&
+    typeof record.personName === 'string' && Number.isFinite(record.weight) && isDate(record.recordDate)),
+  period: value => isObject(value) && ['none', 'in-period', 'waiting'].includes(value.status) &&
+    isNullableNumber(value.averageCycleDays) &&
+    (value.daysUntilNextPeriod === null || Number.isInteger(value.daysUntilNextPeriod)),
+  play: value => isObject(value) && typeof value.ongoing === 'boolean',
+  savings: value => isObject(value) && typeof value.hasSetup === 'boolean' &&
+    Number.isFinite(value.netAssets) && Number.isFinite(value.targetAmount) &&
+    Number.isFinite(value.progressPercent) && Number.isFinite(value.remainingToGoal) &&
+    isObject(value.currentMonthStatus) && typeof value.currentMonthStatus.month === 'string' &&
+    ['pigConfirmed', 'donkeyConfirmed', 'mortgageConfirmed', 'isProvisional']
+      .every(key => typeof value.currentMonthStatus[key] === 'boolean') &&
+    Array.isArray(value.currentMonthStatus.missingOwners) &&
+    value.currentMonthStatus.missingOwners.every(owner => typeof owner === 'string')
+};
+
+const isDashboardEnvelope = value => isObject(value) && typeof value.requestId === 'string' &&
+  typeof value.partial === 'boolean' && isObject(value.sections);
+
 Page({
   data: {
     // 导航栏高度
@@ -15,36 +78,28 @@ Page({
     dateText: '',
     reminderPending: true,
 
-    // 过期物品
-    expiredItems: [],
-    expiringSoonItems: [],
-
-    // 统计数据
-    totalItems: '--',
-    toBuyCount: '--',
-    travelCount: '--',
-
-    // 姨妈记录
-    periodStats: null,
-
-    // 猫猫体重
-    catWeights: [],
-    playStatus: null,
+    ...EMPTY_SECTION_DATA.products,
+    ...EMPTY_SECTION_DATA.toBuy,
+    ...EMPTY_SECTION_DATA.goals,
+    ...EMPTY_SECTION_DATA.weights,
+    ...EMPTY_SECTION_DATA.period,
+    ...EMPTY_SECTION_DATA.play,
+    ...EMPTY_SECTION_DATA.savings,
     attentionCount: 0,
-
-    // 年度目标
-    goalsPig: [],
-    goalsDonkey: [],
-    pigCompleted: 0,
-    pigProgress: 0,
-    donkeyCompleted: 0,
-    donkeyProgress: 0,
-
-    // 退休存钱罐
-    savingsSummary: null,
+    attentionComplete: false,
+    attentionPendingNames: '',
+    allClear: false,
+    sectionStates: HOME_SECTIONS.reduce((states, section) => {
+      states[section] = { status: 'idle', loading: false, error: '' };
+      return states;
+    }, {}),
+    failedSections: [],
+    dashboardError: '',
+    requestId: '',
 
     // 加载状态
-    loading: false
+    loading: true,
+    refreshing: false
   },
 
   onLoad() {
@@ -54,7 +109,12 @@ Page({
 
   onShow() {
     this.setData({ reminderPending: !wx.getStorageSync('reminders:authorized') });
-    this.fetchData();
+    return this.fetchData();
+  },
+
+  onUnload() {
+    this._unloaded = true;
+    this._queuedRefresh = null;
   },
 
   // 初始化导航栏高度
@@ -85,201 +145,212 @@ Page({
     this.setData({ greeting, dateText });
   },
 
-  // 获取所有数据
-  async fetchData() {
-    this.setData({ loading: true });
-
-    try {
-      const currentYear = new Date().getFullYear();
-      const [summaryResult, toBuyResult, travelResult, periodStats, catWeights, playStatus, goalsResult, savingsSummary] = await Promise.all([
-        this._fetchSummary(),
-        this._fetchToBuyData(),
-        this._fetchTravelData(),
-        this._fetchPeriodData(),
-        this._fetchCatWeights(),
-        this._fetchPlayStatus(),
-        this._fetchGoals(currentYear),
-        this._fetchSavingsData()
-      ]);
-
-      this.setData({
-        loading: false,
-        ...summaryResult,
-        ...toBuyResult,
-        ...travelResult,
-        periodStats,
-        catWeights,
-        playStatus,
-        ...goalsResult,
-        savingsSummary,
-        attentionCount:
-          summaryResult.expiredItems.length +
-          summaryResult.expiringSoonItems.length +
-          (playStatus && playStatus.ongoing ? 1 : 0) +
-          (savingsSummary && savingsSummary.hasSetup && savingsSummary.isProvisional ? 1 : 0)
-      });
-    } catch (err) {
-      console.error('获取数据失败', err);
-      this.setData({ loading: false });
-    }
+  fetchData() {
+    if (this._unloaded) return Promise.resolve();
+    this._refreshVersion = (this._refreshVersion || 0) + 1;
+    this._queuedRefresh = { sections: null, version: this._refreshVersion };
+    return this._startDashboardRefresh();
   },
 
-  // 获取物品摘要
-  async _fetchSummary() {
-    try {
-      const summary = await api.getProductsSummary();
-      const now = new Date();
-
-      const expiredItems = (summary.expiredItems || []).map(item => {
-        const diffDays = Math.abs(Math.ceil((new Date(item.bestBy) - now) / (1000 * 60 * 60 * 24)));
-        return { ...item, emoji: this.getCategoryEmoji(item.category), daysText: diffDays + '天' };
-      });
-
-      const expiringSoonItems = (summary.expiringSoonItems || []).map(item => {
-        const diffDays = Math.ceil((new Date(item.bestBy) - now) / (1000 * 60 * 60 * 24));
-        return { ...item, emoji: this.getCategoryEmoji(item.category), daysText: diffDays === 0 ? '今天' : diffDays + '天' };
-      });
-
-      return { totalItems: summary.total, expiredItems, expiringSoonItems };
-    } catch (err) {
-      console.error('获取物品摘要失败', err);
-      return { totalItems: 0, expiredItems: [], expiringSoonItems: [] };
-    }
+  retryFailedSections(event) {
+    if (this._unloaded || this._refreshPromise) return this._refreshPromise || Promise.resolve();
+    const selected = event?.currentTarget?.dataset?.section;
+    const sections = HOME_SECTIONS.filter(section =>
+      this.data.sectionStates[section].status === 'error' && (!selected || section === selected));
+    if (!sections.length) return Promise.resolve();
+    this._refreshVersion = (this._refreshVersion || 0) + 1;
+    this._queuedRefresh = { sections, version: this._refreshVersion };
+    return this._startDashboardRefresh();
   },
 
-  // 获取待购数据
-  async _fetchToBuyData() {
-    try {
-      const res = await api.getToBuyList();
-      const list = res.data || [];
-      return { toBuyCount: list.filter(item => !item.completed).length };
-    } catch (err) {
-      console.error('获取待购列表失败', err);
-      return { toBuyCount: 0 };
-    }
-  },
-
-  // 获取出行数据
-  async _fetchTravelData() {
-    try {
-      const res = await api.getPendingTravelList();
-      return { travelCount: (res.data || []).length };
-    } catch (err) {
-      console.error('获取出行列表失败', err);
-      return { travelCount: 0 };
-    }
-  },
-
-  // 获取姨妈统计
-  async _fetchPeriodData() {
-    try {
-      const stats = await api.getPeriodStats();
-      if (stats && stats.averageCycleDays) {
-        stats.averageCycleDays = Math.round(stats.averageCycleDays);
+  _startDashboardRefresh() {
+    if (this._refreshPromise) return this._refreshPromise;
+    this._refreshPromise = this._drainDashboardRefreshes().finally(() => {
+      this._refreshPromise = null;
+      if (this._queuedRefresh && !this._unloaded) {
+        return this._startDashboardRefresh();
       }
-      return stats;
-    } catch (err) {
-      console.error('获取姨妈统计失败', err);
-      return null;
+    });
+    return this._refreshPromise;
+  },
+
+  async _drainDashboardRefreshes() {
+    try {
+      while (this._queuedRefresh && !this._unloaded) {
+        const refresh = this._queuedRefresh;
+        this._queuedRefresh = null;
+        const requested = refresh.sections || HOME_SECTIONS;
+        const sectionStates = { ...this.data.sectionStates };
+        requested.forEach(section => {
+          sectionStates[section] = { ...sectionStates[section], loading: true };
+        });
+        this._updateDashboardState({
+          loading: !this._hasLoaded,
+          refreshing: Boolean(this._hasLoaded)
+        }, sectionStates);
+
+        let response;
+        let failure;
+        try {
+          response = await api.getHomeDashboard(new Date().getFullYear(), refresh.sections);
+        } catch (error) {
+          failure = error;
+        }
+
+        if (this._unloaded) break;
+        // 返回写入页面后触发的刷新不能被吞掉；串行补发最新刷新，不渲染旧请求的结果。
+        if (refresh.version !== this._refreshVersion) continue;
+
+        if (failure) {
+          if (failure.statusCode === 503 && isDashboardEnvelope(failure.data) &&
+              requested.every(section => failure.data.sections[section]?.status === 'error')) {
+            this._applyDashboardEnvelope(failure.data, requested);
+          } else {
+            const message = failure.errMsg
+              ? '网络连接失败，请检查网络后重试'
+              : '首页加载失败，请稍后重试';
+            this._applyDashboardFailure(message, requested);
+          }
+        } else if (isDashboardEnvelope(response)) {
+          this._applyDashboardEnvelope(response, requested);
+        } else {
+          this._applyDashboardFailure('首页返回的数据不完整，请重试', requested);
+        }
+        this._hasLoaded = true;
+      }
+    } finally {
+      if (!this._unloaded) {
+        this.setData({ loading: false, refreshing: false });
+      }
     }
   },
 
-  // 获取猫猫最新体重
-  async _fetchCatWeights() {
-    try {
-      const records = await api.getWeightLatest();
-      const now = new Date();
-      return (records || []).map(r => {
-        const recordDate = new Date(r.recordDate);
-        const diffDays = Math.floor((now - recordDate) / (1000 * 60 * 60 * 24));
-        let dateText = '今天';
-        if (diffDays === 1) dateText = '昨天';
-        else if (diffDays > 1) dateText = diffDays + '天前';
-        return {
-          personName: r.personName,
-          weight: r.weight,
-          dateText
+  _applyDashboardEnvelope(envelope, requested) {
+    const sectionStates = { ...this.data.sectionStates };
+    const patch = { dashboardError: '', requestId: envelope.requestId };
+    requested.forEach(section => {
+      const result = envelope.sections[section];
+      if (result?.status === 'ok' && result.error === null && SECTION_VALIDATORS[section](result.data)) {
+        sectionStates[section] = { status: 'ok', loading: false, error: '' };
+        Object.assign(patch, this._formatSection(section, result.data));
+      } else {
+        const expectedFailure = result?.status === 'error' && result.data === null &&
+          isObject(result.error) && ['timeout', 'dependency_unavailable'].includes(result.error.code) &&
+          typeof result.error.message === 'string' && result.error.message.length > 0 &&
+          result.error.retryable === true;
+        sectionStates[section] = {
+          status: 'error',
+          loading: false,
+          error: expectedFailure ? SECTION_ERROR_MESSAGES[result.error.code] : '返回数据不完整，请重试'
         };
-      });
-    } catch (err) {
-      console.error('获取猫猫体重失败', err);
-      return [];
-    }
-  },
-
-  async _fetchPlayStatus() {
-    try {
-      return await api.getPlayStatus();
-    } catch (err) {
-      console.error('获取陪玩状态失败', err);
-      return null;
-    }
-  },
-
-  // 获取年度目标
-  async _fetchGoals(year) {
-    try {
-      const goals = await api.get(`/YearlyGoal?year=${year}`, { showLoading: false });
-      const allGoals = (goals || []).map(g => ({
-        ...g,
-        subGoals: g.subGoals || [],
-        completedSubGoalsCount: g.completedSubGoalsCount || 0,
-        totalSubGoalsCount: g.totalSubGoalsCount || 0
-      }));
-
-      const goalsPig = allGoals.filter(g => g.owner === 'Pig');
-      const goalsDonkey = allGoals.filter(g => g.owner === 'Donkey');
-      const pigCompleted = goalsPig.filter(g => g.completed).length;
-      const donkeyCompleted = goalsDonkey.filter(g => g.completed).length;
-
-      return {
-        goalsPig,
-        goalsDonkey,
-        pigCompleted,
-        pigProgress: goalsPig.length ? Math.round(pigCompleted / goalsPig.length * 100) : 0,
-        donkeyCompleted,
-        donkeyProgress: goalsDonkey.length ? Math.round(donkeyCompleted / goalsDonkey.length * 100) : 0
-      };
-    } catch (err) {
-      console.error('获取年度目标失败', err);
-      return { goalsPig: [], goalsDonkey: [], pigCompleted: 0, pigProgress: 0, donkeyCompleted: 0, donkeyProgress: 0 };
-    }
-  },
-
-  async _fetchSavingsData() {
-    try {
-      const dashboard = await api.get('/RetirementSavings/dashboard', { showLoading: false });
-      const status = dashboard.currentMonthStatus || {};
-      const progress = Math.max(0, Number(dashboard.progressPercent) || 0);
-      let checkInText = '本月还未盘点';
-      if (status.pigConfirmed && status.donkeyConfirmed) {
-        checkInText = '本月双人盘点已完成';
-      } else if (status.pigConfirmed) {
-        checkInText = '猪猪已更新，等待毛驴';
-      } else if (status.donkeyConfirmed) {
-        checkInText = '毛驴已更新，等待猪猪';
+        Object.assign(patch, EMPTY_SECTION_DATA[section]);
       }
+    });
+    this._updateDashboardState(patch, sectionStates);
+  },
 
-      return {
-        hasSetup: Boolean(
-          (dashboard.goal && dashboard.goal.targetAmount > 0) ||
-          (Array.isArray(dashboard.accounts) && dashboard.accounts.length) ||
-          dashboard.mortgage
-        ),
-        netAssets: dashboard.netAssets || 0,
-        netAssetsText: this.formatCompactCurrency(dashboard.netAssets || 0),
-        targetAmount: dashboard.goal ? dashboard.goal.targetAmount : 0,
-        targetText: this.formatCompactCurrency(dashboard.goal ? dashboard.goal.targetAmount : 0),
-        progress: Math.round(progress * 10) / 10,
-        progressWidth: Math.min(100, progress),
-        remainingText: this.formatCompactCurrency(Math.max(0, Number(dashboard.remainingToGoal) || 0)),
-        checkInText,
-        isProvisional: Boolean(status.isProvisional)
-      };
-    } catch (err) {
-      console.error('获取退休存钱罐摘要失败', err);
-      return null;
+  _applyDashboardFailure(message, requested) {
+    const sectionStates = { ...this.data.sectionStates };
+    const patch = { dashboardError: message, requestId: '' };
+    requested.forEach(section => {
+      sectionStates[section] = { status: 'error', loading: false, error: message };
+      Object.assign(patch, EMPTY_SECTION_DATA[section]);
+    });
+    this._updateDashboardState(patch, sectionStates);
+  },
+
+  _updateDashboardState(patch, sectionStates) {
+    const next = { ...this.data, ...patch };
+    const available = section => sectionStates[section].status === 'ok';
+    const attentionCount =
+      (available('products') ? next.expiredItems.length + next.expiringSoonItems.length : 0) +
+      (available('play') && next.playStatus.ongoing ? 1 : 0) +
+      (available('savings') && next.savingsSummary.hasSetup && next.savingsSummary.isProvisional ? 1 : 0);
+    const pending = ATTENTION_SECTIONS.filter(section => !available(section) || sectionStates[section].loading);
+    this.setData({
+      ...patch,
+      sectionStates,
+      failedSections: HOME_SECTIONS.filter(section => sectionStates[section].status === 'error'),
+      attentionCount,
+      attentionComplete: pending.length === 0,
+      attentionPendingNames: pending.map(section => SECTION_LABELS[section]).join('、'),
+      allClear: pending.length === 0 && attentionCount === 0
+    });
+  },
+
+  _formatSection(section, value) {
+    const now = new Date();
+    switch (section) {
+      case 'products':
+        return {
+          expiredItems: value.expiredItems.map(item => {
+            const diffDays = Math.abs(Math.ceil((new Date(item.bestBy) - now) / (1000 * 60 * 60 * 24)));
+            return { ...item, emoji: this.getCategoryEmoji(item.category), daysText: diffDays + '天' };
+          }),
+          expiringSoonItems: value.expiringSoonItems.map(item => {
+            const diffDays = Math.ceil((new Date(item.bestBy) - now) / (1000 * 60 * 60 * 24));
+            return { ...item, emoji: this.getCategoryEmoji(item.category), daysText: diffDays === 0 ? '今天' : diffDays + '天' };
+          })
+        };
+      case 'toBuy':
+        return { toBuyCount: value.count };
+      case 'goals':
+        return {
+          pigTotal: value.pig.total,
+          donkeyTotal: value.donkey.total,
+          pigCompleted: value.pig.completed,
+          donkeyCompleted: value.donkey.completed,
+          pigProgress: value.pig.total ? Math.round(value.pig.completed / value.pig.total * 100) : 0,
+          donkeyProgress: value.donkey.total ? Math.round(value.donkey.completed / value.donkey.total * 100) : 0
+        };
+      case 'weights':
+        return {
+          catWeights: value.map(record => {
+            const diffDays = Math.floor((now - new Date(record.recordDate)) / (1000 * 60 * 60 * 24));
+            let dateText = '今天';
+            if (diffDays === 1) dateText = '昨天';
+            else if (diffDays > 1) dateText = diffDays + '天前';
+            return { personName: record.personName, weight: record.weight, dateText };
+          })
+        };
+      case 'period':
+        return {
+          periodStats: {
+            ...value,
+            averageCycleDays: value.averageCycleDays ? Math.round(value.averageCycleDays) : value.averageCycleDays
+          }
+        };
+      case 'play':
+        return { playStatus: value };
+      case 'savings':
+        return { savingsSummary: this._formatSavings(value) };
     }
+  },
+
+  _formatSavings(dashboard) {
+    const status = dashboard.currentMonthStatus;
+    const progress = Math.max(0, dashboard.progressPercent);
+    let checkInText = '本月还未盘点';
+    if (status.pigConfirmed && status.donkeyConfirmed) {
+      checkInText = '本月双人盘点已完成';
+    } else if (status.pigConfirmed) {
+      checkInText = '猪猪已更新，等待毛驴';
+    } else if (status.donkeyConfirmed) {
+      checkInText = '毛驴已更新，等待猪猪';
+    }
+
+    return {
+      hasSetup: dashboard.hasSetup,
+      netAssets: dashboard.netAssets,
+      netAssetsText: this.formatCompactCurrency(dashboard.netAssets),
+      targetAmount: dashboard.targetAmount,
+      targetText: this.formatCompactCurrency(dashboard.targetAmount),
+      progress: Math.round(progress * 10) / 10,
+      progressWidth: Math.min(100, progress),
+      remainingText: this.formatCompactCurrency(Math.max(0, dashboard.remainingToGoal)),
+      checkInText,
+      isProvisional: status.isProvisional
+    };
   },
 
   formatCompactCurrency(value) {

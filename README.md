@@ -68,3 +68,30 @@ behaviors/
 1. Import the project in [WeChat DevTools](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
 2. Set AppID: `wx1815cbe400c07c23`
 3. Enable ES6, PostCSS, and minification in project settings
+
+### Home dashboard contract and rollout
+
+Deploy the compatible backend **before releasing this frontend**. Home now makes one authenticated business request to `GET /Home/dashboard?year=YYYY`, covering `products`, `toBuy`, `goals`, `weights`, `period`, `play`, and `savings`. It no longer downloads the unused travel list or full goal/account documents. There is deliberately no fallback fan-out to legacy endpoints, including when the new endpoint returns 404.
+
+- Each requested section has an explicit `ok` or `error` result. Successful empty records are different from unavailable data; malformed or missing section data is also shown as unavailable.
+- Healthy sections remain visible during section retries. Retry buttons send only failed section names through the optional comma-separated `sections` query parameter.
+- An HTTP 503 section envelope is still an error response, but its section details remain available for display. Global and network failures have visible retry states rather than zero counts.
+- Timeout and dependency failures use fixed Chinese messages selected by error code. Home does not display backend exception text.
+- The reminder all-clear requires successful product, play, and savings sources. Incomplete reminder totals are labeled as known reminders, not exact totals.
+- Full refreshes are serialized and coalesced. Returning to home while a previous request is pending schedules a fresh full refresh and prevents the superseded result from being rendered.
+
+`api.getHomeDashboard(year, sections = null, options = {})` disables generic loading/error toasts by default because home renders these states inline. Other API calls retain their default behavior. Non-auth HTTP errors expose `error.statusCode` and `error.data`; the existing GET network retries, single-flight 401 refresh, 403 redirect, and **no automatic write replay** behavior remain unchanged. Transport/auth retries can therefore make more than one HTTP attempt for one logical home refresh.
+
+The backend's configurable per-section wait budget (default 5 seconds) is not an end-to-end response-time guarantee. This client does not extend timeouts or introduce caching. The existing request wrapper does not expose cancellation; an unloaded home page ignores pending replies and does not start queued refreshes.
+
+### Targeted tests
+
+With Node.js 18 or later, run from this repository directory:
+
+```powershell
+node --test .\tests\api.test.js .\tests\home-dashboard.test.js
+```
+
+These dependency-free `node:test` suites run the real API and home code in VM contexts with mocked `wx`, `getApp`, and `Page`. They cover request paths/counts, display formatting, complete reminders, empty/error states, targeted retries, all-failed 503s, malformed/global/network failures, refresh ordering, and the existing authentication/write-replay protections.
+
+The tests check state and WXML visibility guards, not native layout or live-service performance. Before releasing, verify partial failures/retry buttons and navigation in WeChat DevTools/on-device, then measure authenticated loading against the deployed compatible backend.
