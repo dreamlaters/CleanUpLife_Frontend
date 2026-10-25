@@ -4,6 +4,7 @@
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
+const { createDateAxis } = require('../../utils/dateAxis');
 
 // 宠物配置
 const PERSON_CONFIG = {
@@ -250,17 +251,11 @@ Page({
     
     // X轴标签
     ctx.textAlign = 'center';
-    const xStep = chartWidth / Math.max(sortedDates.length - 1, 1);
-    const maxLabels = Math.floor(chartWidth / 40);
-    const labelStep = Math.max(1, Math.ceil(sortedDates.length / maxLabels));
-    
-    sortedDates.forEach((dateStr, index) => {
-      if (index % labelStep === 0 || index === sortedDates.length - 1) {
-        const x = padding.left + xStep * index;
-        const date = new Date(dateStr);
-        const label = `${date.getMonth() + 1}/${date.getDate()}`;
-        ctx.fillText(label, x, height - padding.bottom + 18);
-      }
+    const dateAxis = createDateAxis(
+      sortedDates, padding.left, chartWidth, text => ctx.measureText(text).width
+    );
+    dateAxis.labels.forEach(label => {
+      ctx.fillText(label.text, label.x, height - padding.bottom + 18);
     });
     
     // 折线
@@ -269,7 +264,7 @@ Page({
       sortedDates.forEach((date, index) => {
         const val = seriesData[person][date];
         if (val !== undefined) {
-          const x = padding.left + xStep * index;
+          const x = dateAxis.positions[index];
           const y = padding.top + chartHeight - ((val - minWeight) / (maxWeight - minWeight)) * chartHeight;
           points.push({ x, y, val });
         }

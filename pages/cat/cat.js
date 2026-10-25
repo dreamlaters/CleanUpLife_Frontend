@@ -1,5 +1,6 @@
 const api = require('../../utils/api');
 const util = require('../../utils/util');
+const { createDateAxis } = require('../../utils/dateAxis');
 
 const PERSON_CONFIG = {
   '豌豆黄': { color: '#B98232', emoji: '🟡', lineColor: '#B98232' },
@@ -308,15 +309,11 @@ Page({
     }
 
     ctx.textAlign = 'center';
-    const xStep = chartWidth / Math.max(sortedDates.length - 1, 1);
-    const maxLabels = Math.floor(chartWidth / 40);
-    const labelStep = Math.max(1, Math.ceil(sortedDates.length / maxLabels));
-    sortedDates.forEach((dateStr, index) => {
-      if (index % labelStep === 0 || index === sortedDates.length - 1) {
-        const x = padding.left + xStep * index;
-        const date = new Date(dateStr);
-        ctx.fillText(`${date.getMonth() + 1}/${date.getDate()}`, x, height - padding.bottom + 18);
-      }
+    const dateAxis = createDateAxis(
+      sortedDates, padding.left, chartWidth, text => ctx.measureText(text).width
+    );
+    dateAxis.labels.forEach(label => {
+      ctx.fillText(label.text, label.x, height - padding.bottom + 18);
     });
 
     PERSON_LIST.forEach(person => {
@@ -325,7 +322,7 @@ Page({
         const value = seriesData[person][date];
         if (value !== undefined) {
           points.push({
-            x: padding.left + xStep * index,
+            x: dateAxis.positions[index],
             y: padding.top + chartHeight - ((value - minWeight) / (maxWeight - minWeight)) * chartHeight
           });
         }

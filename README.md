@@ -14,7 +14,7 @@ WeChat Mini Program for personal life management — track products, shopping li
 - **Product Management** — Track pantry items, cat food, and medicine with expiry date alerts
 - **To-Buy List** — Shopping checklist with priority levels
 - **Travel Plans** — Domestic/international destination wishlist with visited tracking
-- **Cat Care Tracking** — Monitor weight trends and shared play sessions for two cats (豌豆黄 & 小立夏)
+- **Cat Care Tracking** — Monitor weight trends on a proportional calendar-date axis and shared play sessions for two cats (豌豆黄 & 小立夏). Weight charts span the first to last recorded day within the selected range; crowded date labels are omitted without hiding measurements, and a single recorded day is centered.
 - **Period Tracking** — Menstrual cycle calendar, predictions, and statistics
 - **Health Checkups** — Medical record tracking with standardized checkup items and normal ranges
 - **Yearly Goals** — Goal management with sub-goals and progress tracking for two people (🐷 & 🫏)
@@ -48,6 +48,7 @@ components/
 utils/
   api.js          # REST API client with auto-retry on token expiration
   constants.js    # Categories, locations, countries, checkup definitions
+  dateAxis.js     # Shared proportional date-axis positions and non-overlapping labels
   util.js         # Date formatting, modals, debounce utilities
   filters.wxs     # WXS filters for template-side data processing
 
@@ -90,8 +91,11 @@ With Node.js 18 or later, run from this repository directory:
 
 ```powershell
 node --test .\tests\api.test.js .\tests\home-dashboard.test.js
+node --test .\tests\weight-chart.test.js
 ```
 
 These dependency-free `node:test` suites run the real API and home code in VM contexts with mocked `wx`, `getApp`, and `Page`. They cover request paths/counts, display formatting, complete reminders, empty/error states, targeted retries, all-failed 503s, malformed/global/network failures, refresh ordering, and the existing authentication/write-replay protections.
+
+The weight-chart suite runs both the cat and legacy pet page renderers with a mocked canvas. It checks actual point coordinates, shared date alignment, calendar boundaries, label spacing, range changes, and single-day/empty data.
 
 The tests check state and WXML visibility guards, not native layout or live-service performance. Before releasing, verify partial failures/retry buttons and navigation in WeChat DevTools/on-device, then measure authenticated loading against the deployed compatible backend.
