@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const { findChartPoint, drawChartTooltip } = require('../../utils/chartTooltip')
 
 const CATEGORIES = [
   { value: 'BankCard', label: '银行卡', icon: 'bank-card' },
@@ -585,6 +586,7 @@ Component({
     loadTrends() {
       const { trendRange, trendOwner, trendCategory } = this.data
       this.setData({ trendLoading: true, trendError: '' })
+      this._drawChart()
       const url = `/RetirementSavings/trends?range=${encodeURIComponent(trendRange)}&owner=${encodeURIComponent(trendOwner)}&category=${encodeURIComponent(trendCategory)}`
 
       return api.get(url, { showLoading: false }).then(response => {
@@ -648,6 +650,7 @@ Component({
     },
 
     _drawChart() {
+      this._trendChartPoints = []
       if (!this.ctx) return
       const ctx = this.ctx
       const width = this.canvasWidth
@@ -707,6 +710,9 @@ Component({
         x: padding.left + (points.length === 1 ? chartWidth / 2 : xStep * index),
         y: padding.top + chartHeight - ((point.amount - min) / (max - min)) * chartHeight
       }))
+      if (!this.data.trendLoading && !this.data.trendError) {
+        this._trendChartPoints = plotted
+      }
 
       for (let index = 1; index < plotted.length; index += 1) {
         const previous = plotted[index - 1]
@@ -740,6 +746,18 @@ Component({
           ctx.fillText(this._formatMonthLabel(point.month), point.x, height - 14)
         }
       })
+    },
+
+    onTrendChartLongPress(e) {
+      if (this.data.trendLoading || this.data.trendError) return
+      const point = findChartPoint(this._trendChartPoints || [], e)
+      this._drawChart()
+      if (!point || !this.ctx) return
+      const lines = [
+        `${point.month}${point.isProvisional ? ' · 暂计' : ''}`,
+        `¥ ${this._withThousands(point.amount.toFixed(2))}`
+      ]
+      drawChartTooltip(this.ctx, point, lines, this.canvasWidth, this.canvasHeight)
     },
 
     _currentMonth() {

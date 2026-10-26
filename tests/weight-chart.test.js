@@ -37,6 +37,9 @@ function createChart(pageName, records = [], width = 345) {
       segments.length = 0;
     },
     fillRect() {},
+    strokeRect() {},
+    save() {},
+    restore() {},
     beginPath() {},
     moveTo() {},
     lineTo(x, y) { segments.push({ x, y }); },
@@ -81,6 +84,71 @@ function closeTo(actual, expected) {
 }
 
 for (const pageName of ['cat', 'pet']) {
+  test(`${pageName}: weight filters offer month, three months and all, defaulting to all`, () => {
+    const filename = path.join(__dirname, '..', 'pages', pageName, `${pageName}.wxml`);
+    const template = fs.readFileSync(filename, 'utf8');
+    const ranges = Array.from(
+      template.matchAll(/bindtap="onTimeRangeChange"\s+data-range="([^"]+)"/g),
+      match => match[1]
+    );
+    assert.deepEqual(ranges, ['month', '3month', 'all']);
+    assert.equal(createChart(pageName).page.data.timeRange, 'all');
+  });
+
+  test(`${pageName}: native canvas long-tap shows both cats' exact weights for that date`, () => {
+    const h = createChart(pageName, [['2026-10-20'], ['2026-10-20']]);
+    const [first, second] = h.page.data.personList;
+    h.page.data.groupedRecords[first][0].weight = 8.125;
+    h.page.drawChart();
+    const point = h.points()[0];
+    const template = fs.readFileSync(path.join(__dirname, '..', 'pages', pageName, `${pageName}.wxml`), 'utf8');
+    const canvas = template.match(/<canvas\b[^>]*id="weight-canvas"[^>]*>/)[0];
+    const handler = canvas.match(/bindlongtap="([^"]+)"/)[1];
+    h.page[handler]({ touches: [{ x: point.x + 8, y: point.y + 8 }] });
+    const texts = h.texts.map(item => item.text);
+    assert.ok(texts.includes('2026-10-20'));
+    assert.ok(texts.includes(`${first}\uff1a8.125 \u65a4`));
+    assert.ok(texts.includes(`${second}\uff1a9 \u65a4`));
+    assert.equal(h.points().length, 1);
+    assert.equal(h.points(1).length, 1);
+    assert.doesNotMatch(canvas, /(?:catchtouchmove|disable-scroll|bindtouchend)=/);
+
+    for (const event of ['touchstart', 'touchcancel']) {
+      h.page[handler]({ touches: [point] });
+      const clear = canvas.match(new RegExp(`bind${event}="([^"]+)"`))[1];
+      h.page[clear]();
+      assert.ok(!h.texts.some(item => item.text === '2026-10-20'));
+    }
+  });
+
+  test(`${pageName}: a tooltip does not invent a missing cat's weight`, () => {
+    const h = createChart(pageName, [['2026-10-01'], ['2026-10-20']]);
+    h.page.drawChart();
+    h.page.onWeightChartLongPress({ touches: [h.points()[0]] });
+    assert.ok(h.texts.some(item => item.text === '2026-10-01'));
+    assert.ok(!h.texts.some(item => item.text.startsWith(h.page.data.personList[1])));
+  });
+
+  test(`${pageName}: blank presses and range changes clear tooltips and stale hit targets`, () => {
+    const h = createChart(pageName, [['2026-06-01', '2026-10-20']]);
+    h.page.drawChart();
+    h.page.onWeightChartLongPress({ touches: [h.points()[0]] });
+    assert.ok(h.texts.some(item => item.text === '2026-06-01'));
+    h.page.onWeightChartLongPress({ touches: [{ x: 0, y: 240 }] });
+    assert.ok(!h.texts.some(item => item.text === '2026-06-01'));
+    h.page.onTimeRangeChange({ currentTarget: { dataset: { range: 'month' } } });
+    assert.equal(h.page._weightChartPoints.length, 1);
+    assert.equal(h.page._weightChartPoints[0].date, '2026-10-20');
+    h.page.onWeightChartLongPress({ touches: [h.points()[0]] });
+    assert.ok(h.texts.some(item => item.text === '2026-10-20'));
+    h.page.data.groupedRecords = {};
+    h.page.drawChart();
+    h.page.onWeightChartLongPress({ touches: [{ x: LEFT, y: 20 }] });
+    assert.equal(h.page._weightChartPoints.length, 0);
+    assert.equal(h.texts.length, 1);
+    assert.equal(h.texts[0].text, '\u6682\u65e0\u6570\u636e');
+  });
+
   test(`${pageName}: irregular dates use elapsed days, not record indexes`, () => {
     const h = createChart(pageName, [['2026-10-01', '2026-10-02', '2026-10-20']]);
     h.page.drawChart();
@@ -167,7 +235,7 @@ for (const pageName of ['cat', 'pet']) {
   test(`${pageName}: range changes filter records before rescaling the time axis`, () => {
     const dates = ['2026-06-01', '2026-08-01', '2026-10-10', '2026-10-20', '2026-10-24'];
     const h = createChart(pageName, [dates]);
-    for (const [range, startIndex] of [['week', 3], ['month', 2], ['3month', 1], ['all', 0]]) {
+    for (const [range, startIndex] of [['month', 2], ['3month', 1], ['all', 0]]) {
       h.page.onTimeRangeChange({ currentTarget: { dataset: { range } } });
       const points = h.points();
       const included = dates.slice(startIndex);
@@ -184,10 +252,17 @@ for (const pageName of ['cat', 'pet']) {
   test(`${pageName}: empty records and an empty time range keep the no-data state`, () => {
     for (const records of [[], [['2020-01-01']]]) {
       const h = createChart(pageName, records);
-      h.page.onTimeRangeChange({ currentTarget: { dataset: { range: 'week' } } });
+      h.page.onTimeRangeChange({ currentTarget: { dataset: { range: 'month' } } });
       assert.equal(h.arcs.length, 0);
       assert.equal(h.texts.length, 1);
       assert.equal(h.texts[0].text, '\u6682\u65e0\u6570\u636e');
     }
   });
 }
+
+test('cat: play statistics retain the weekly filter', () => {
+  const filename = path.join(__dirname, '..', 'pages', 'cat', 'cat.wxml');
+  const template = fs.readFileSync(filename, 'utf8');
+  assert.match(template, /bindtap="onPlayStatsRangeChange"\s+data-range="week"/);
+  assert.equal(createChart('cat').page.data.playStatsRange, 'week');
+});

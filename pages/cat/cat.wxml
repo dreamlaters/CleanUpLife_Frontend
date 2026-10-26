@@ -40,7 +40,6 @@
         </view>
 
         <view class="filter-tabs">
-          <view class="filter-tab {{timeRange === 'week' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="week">近7天</view>
           <view class="filter-tab {{timeRange === 'month' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="month">近30天</view>
           <view class="filter-tab {{timeRange === '3month' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="3month">近3月</view>
           <view class="filter-tab {{timeRange === 'all' ? 'filter-tab-active' : ''}}" bindtap="onTimeRangeChange" data-range="all">全部</view>
@@ -48,7 +47,8 @@
 
         <view class="chart-wrapper">
           <view class="chart-container" wx:if="{{!showWeightForm}}">
-            <canvas type="2d" id="weight-canvas" class="weight-canvas"></canvas>
+            <canvas type="2d" id="weight-canvas" class="weight-canvas"
+              bindlongtap="onWeightChartLongPress" bindtouchstart="drawChart" bindtouchcancel="drawChart"></canvas>
           </view>
           <view class="chart-container chart-placeholder" wx:else>
             <view class="placeholder-icon"><app-icon name="trend" size="52" label="图表" /></view>

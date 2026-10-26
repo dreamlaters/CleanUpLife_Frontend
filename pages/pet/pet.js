@@ -5,6 +5,7 @@
 const api = require('../../utils/api');
 const util = require('../../utils/util');
 const { createDateAxis } = require('../../utils/dateAxis');
+const { findChartPoint, drawChartTooltip } = require('../../utils/chartTooltip');
 
 // 宠物配置
 const PERSON_CONFIG = {
@@ -151,6 +152,7 @@ Page({
   },
 
   drawChart() {
+    this._weightChartPoints = [];
     if (!this.ctx) return;
     
     const ctx = this.ctx;
@@ -186,9 +188,6 @@ Page({
       let startDate;
       
       switch(timeRange) {
-        case 'week':
-          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          break;
         case 'month':
           startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
           break;
@@ -266,11 +265,12 @@ Page({
         if (val !== undefined) {
           const x = dateAxis.positions[index];
           const y = padding.top + chartHeight - ((val - minWeight) / (maxWeight - minWeight)) * chartHeight;
-          points.push({ x, y, val });
+          points.push({ x, y, value: val, date, person, color: PERSON_CONFIG[person].lineColor });
         }
       });
       
       if (points.length > 0) {
+        this._weightChartPoints.push(...points);
         const config = PERSON_CONFIG[person];
         
         ctx.strokeStyle = config.lineColor;
@@ -301,6 +301,18 @@ Page({
         });
       }
     });
+  },
+
+  onWeightChartLongPress(e) {
+    const point = findChartPoint(this._weightChartPoints || [], e);
+    this.drawChart();
+    if (!point || !this.ctx) return;
+    const lines = [
+      point.date,
+      ...this._weightChartPoints.filter(item => item.date === point.date)
+        .map(item => `${item.person}：${item.value} 斤`)
+    ];
+    drawChartTooltip(this.ctx, point, lines, this.canvasWidth, this.canvasHeight);
   },
 
   onTimeRangeChange(e) {

@@ -310,7 +310,8 @@
       </view>
 
       <view class="chart-paper">
-        <canvas type="2d" id="retirement-trend-canvas" class="trend-canvas"></canvas>
+        <canvas type="2d" id="retirement-trend-canvas" class="trend-canvas"
+          bindlongtap="onTrendChartLongPress" bindtouchstart="_drawChart" bindtouchcancel="_drawChart"></canvas>
         <view class="chart-wash" wx:if="{{trendLoading}}">正在重画趋势…</view>
         <view class="chart-wash chart-error" wx:elif="{{trendError}}" bindtap="retryTrends">{{trendError}}</view>
       </view>

@@ -14,11 +14,11 @@ WeChat Mini Program for personal life management — track products, shopping li
 - **Product Management** — Track pantry items, cat food, and medicine with expiry date alerts
 - **To-Buy List** — Shopping checklist with priority levels
 - **Travel Plans** — Domestic/international destination wishlist with visited tracking
-- **Cat Care Tracking** — Monitor weight trends on a proportional calendar-date axis and shared play sessions for two cats (豌豆黄 & 小立夏). Weight charts span the first to last recorded day within the selected range; crowded date labels are omitted without hiding measurements, and a single recorded day is centered.
+- **Cat Care Tracking** — Monitor weight trends on a proportional calendar-date axis and shared play sessions for two cats (豌豆黄 & 小立夏). Weight ranges are 30 days, 3 months, and all records (default). Weight charts span the first to last recorded day within the selected range; crowded date labels are omitted without hiding measurements, and a single recorded day is centered. Long-press a point to see the date and each cat's recorded weight for that day in jin.
 - **Period Tracking** — Menstrual cycle calendar, predictions, and statistics
 - **Health Checkups** — Medical record tracking with standardized checkup items and normal ranges
 - **Yearly Goals** — Goal management with sub-goals and progress tracking for two people (🐷 & 🫏)
-- **Retirement Savings** — Shared net-worth goal with personal accounts, mortgage tracking, monthly check-ins, and trends
+- **Retirement Savings** — Shared net-worth goal with personal accounts, mortgage tracking, monthly check-ins, and trends. Long-press a trend point to see its month, exact yuan amount, and provisional status when applicable. Chart tooltips remain visible after release and clear on the next chart touch, cancellation, or redraw.
 
 ## Project Structure
 
@@ -49,6 +49,7 @@ utils/
   api.js          # REST API client with auto-retry on token expiration
   constants.js    # Categories, locations, countries, checkup definitions
   dateAxis.js     # Shared proportional date-axis positions and non-overlapping labels
+  chartTooltip.js # Shared canvas point hit-testing and bounded value callouts
   util.js         # Date formatting, modals, debounce utilities
   filters.wxs     # WXS filters for template-side data processing
 
@@ -91,11 +92,11 @@ With Node.js 18 or later, run from this repository directory:
 
 ```powershell
 node --test .\tests\api.test.js .\tests\home-dashboard.test.js
-node --test .\tests\weight-chart.test.js
+node --test .\tests\weight-chart.test.js .\tests\chart-tooltip.test.js
 ```
 
 These dependency-free `node:test` suites run the real API and home code in VM contexts with mocked `wx`, `getApp`, and `Page`. They cover request paths/counts, display formatting, complete reminders, empty/error states, targeted retries, all-failed 503s, malformed/global/network failures, refresh ordering, and the existing authentication/write-replay protections.
 
-The weight-chart suite runs both the cat and legacy pet page renderers with a mocked canvas. It checks actual point coordinates, shared date alignment, calendar boundaries, label spacing, range changes, and single-day/empty data.
+The chart suites run the cat, legacy pet, and retirement-savings renderers with mocked canvases. They check actual point coordinates, shared date alignment, calendar boundaries, label spacing, available ranges, and single-day/empty data. Long-press coverage includes touch bindings, point hit-testing, exact values and units, missing cat measurements, provisional savings, tooltip bounds, and clearing stale selections after range/data changes.
 
 The tests check state and WXML visibility guards, not native layout or live-service performance. Before releasing, verify partial failures/retry buttons and navigation in WeChat DevTools/on-device, then measure authenticated loading against the deployed compatible backend.
