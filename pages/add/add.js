@@ -16,9 +16,9 @@ Page({
   submitForm() {
     if (!this._validateForm()) return;
 
-    const { productData, categoryKey } = this._buildProductData(false);
+    const { productData, endpoint } = this._buildProductData(false);
 
-    api.post(`/${categoryKey}`, productData, { loadingText: '提交中...' })
+    api.post(`/${endpoint}`, productData, { loadingText: '提交中...' })
       .then(() => {
         util.showSuccess('添加成功');
         setTimeout(() => wx.navigateBack(), 1500);

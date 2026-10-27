@@ -271,7 +271,7 @@ Page({
       showToBuyForm: true,
       editingToBuyId: id,
       toBuyFormName: item.name || '',
-      toBuyFormPriority: item.priority || 5,
+      toBuyFormPriority: item.priority ?? 5,
       toBuyFormDesc: item.description || ''
     });
   },
@@ -302,14 +302,13 @@ Page({
     }
 
     const data = {
-      Name: toBuyFormName.trim(),
-      Priority: toBuyFormPriority,
-      Description: toBuyFormDesc || ''
+      name: toBuyFormName.trim(),
+      priority: toBuyFormPriority,
+      description: toBuyFormDesc || ''
     };
 
     if (editingToBuyId) {
-      data.id = editingToBuyId;
-      api.put(`/ToBuy/${editingToBuyId}`, data, { loadingText: '更新中...' })
+      return api.put(`/ToBuy/${editingToBuyId}`, data, { loadingText: '更新中...' })
         .then(() => {
           util.showSuccess('更新成功');
           this.hideToBuyForm();
@@ -317,7 +316,7 @@ Page({
         })
         .catch(() => util.showError('更新失败'));
     } else {
-      api.post('/ToBuy', data, { loadingText: '添加中...' })
+      return api.post('/ToBuy', data, { loadingText: '添加中...' })
         .then(() => {
           util.showSuccess('添加成功');
           this.hideToBuyForm();
@@ -359,7 +358,7 @@ Page({
             showToBuyForm: true,
             editingToBuyId: actionSheetId,
             toBuyFormName: item.name || '',
-            toBuyFormPriority: item.priority || 5,
+            toBuyFormPriority: item.priority ?? 5,
             toBuyFormDesc: item.description || ''
           });
         }

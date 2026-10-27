@@ -89,39 +89,50 @@ Component({
 
   lifetimes: {
     attached() {
-      this.refresh()
+      this._destroyed = false
+      this._pageHidden = false
+      return this.refresh()
     },
     detached() {
       this._destroyed = true
+      this._overviewRequestId = (this._overviewRequestId || 0) + 1
+      this._trendRequestId = (this._trendRequestId || 0) + 1
       this.canvas = null
       this.ctx = null
     }
   },
 
+  pageLifetimes: {
+    show() {
+      if (this._pageHidden && !this._destroyed) {
+        this._pageHidden = false
+        return this.refresh()
+      }
+    },
+    hide() {
+      this._pageHidden = true
+    }
+  },
+
   methods: {
     refresh() {
-      this._destroyed = false
-      this.setData({ loading: true, error: '' })
+      if (this._destroyed) return Promise.resolve()
+      const requestId = this._overviewRequestId = (this._overviewRequestId || 0) + 1
+      const trendRequestId = this._trendRequestId = (this._trendRequestId || 0) + 1
+      this.setData({ loading: true, error: '', trendLoading: true, trendError: '' })
+      this._drawChart()
 
-      const dashboardRequest = api.get('/RetirementSavings/dashboard', { showLoading: false })
-      const accountsRequest = api.get('/RetirementSavings/accounts', { showLoading: false })
-      const trendRequest = this.loadTrends()
-
-      return Promise.all([dashboardRequest, accountsRequest])
-        .then(([dashboardResponse, accountsResponse]) => {
-          if (this._destroyed) return
-          const dashboard = dashboardResponse && dashboardResponse.dashboard
-            ? dashboardResponse.dashboard
-            : (dashboardResponse || {})
-          const accountPayload = accountsResponse && accountsResponse.accounts
-            ? accountsResponse.accounts
-            : accountsResponse
-          const accounts = Array.isArray(accountPayload)
-            ? accountPayload
-            : (Array.isArray(dashboard.accounts) ? dashboard.accounts : [])
+      return api.get(this._savingsReadUrl('overview'), { showLoading: false })
+        .then(response => {
+          if (this._destroyed || requestId !== this._overviewRequestId) return
+          if (!response || !response.dashboard || !Array.isArray(response.dashboard.accounts)
+            || !response.trends || !Array.isArray(response.trends.points)) {
+            throw new Error('存钱簿返回的数据不完整，请重试。')
+          }
+          const dashboard = response.dashboard
+          const accounts = dashboard.accounts
           const currentOwner = this._getCurrentOwner()
-
-          this.setData({
+          const updates = {
             loading: false,
             dashboard,
             currentOwner,
@@ -129,20 +140,34 @@ Component({
             dashboardView: this._decorateDashboard(dashboard),
             accounts,
             accountGroups: this._groupAccounts(accounts, currentOwner)
-          }, () => {
+          }
+          // A filter request may already own the chart while this overview still owns the dashboard.
+          if (trendRequestId === this._trendRequestId) {
+            Object.assign(updates, this._trendData(response.trends))
+          }
+          this.setData(updates, () => {
+            if (this._destroyed || requestId !== this._overviewRequestId) return
             this.triggerEvent('dashboardchange', { dashboard })
             this._initCanvas()
           })
         })
-        .catch(() => {
-          if (!this._destroyed) {
-            this.setData({
-              loading: false,
-              error: '存钱簿暂时没有打开，请检查网络后重试。'
-            })
+        .catch(error => {
+          if (this._destroyed || requestId !== this._overviewRequestId) return
+          const updates = {
+            loading: false,
+            error: (error && error.message) || '存钱簿暂时没有打开，请检查网络后重试。'
           }
+          if (trendRequestId === this._trendRequestId) {
+            updates.trendLoading = false
+            updates.trendError = '趋势暂时加载失败，点此重试。'
+          }
+          this.setData(updates)
         })
-        .then(() => trendRequest)
+    },
+
+    _savingsReadUrl(endpoint) {
+      const { trendRange, trendOwner, trendCategory } = this.data
+      return `/RetirementSavings/${endpoint}?range=${encodeURIComponent(trendRange)}&owner=${encodeURIComponent(trendOwner)}&category=${encodeURIComponent(trendCategory)}`
     },
 
     retryLoad() {
@@ -584,33 +609,40 @@ Component({
     },
 
     loadTrends() {
-      const { trendRange, trendOwner, trendCategory } = this.data
+      if (this._destroyed) return Promise.resolve()
+      const requestId = this._trendRequestId = (this._trendRequestId || 0) + 1
       this.setData({ trendLoading: true, trendError: '' })
       this._drawChart()
-      const url = `/RetirementSavings/trends?range=${encodeURIComponent(trendRange)}&owner=${encodeURIComponent(trendOwner)}&category=${encodeURIComponent(trendCategory)}`
 
-      return api.get(url, { showLoading: false }).then(response => {
-        if (this._destroyed) return
+      return api.get(this._savingsReadUrl('trends'), { showLoading: false }).then(response => {
+        if (this._destroyed || requestId !== this._trendRequestId) return
         const source = response || {}
         const payload = source.points ? source : (source.trends || {})
-        const points = Array.isArray(payload.points) ? payload.points.map(point => ({
-          ...point,
-          amount: numberValue(point.amount),
-          isProvisional: !!point.isProvisional
-        })) : []
-        this.setData({
-          trendLoading: false,
-          trendPoints: points,
-          trendDescription: this._trendDescription()
-        }, () => this._initCanvas())
+        this.setData(this._trendData(payload), () => this._initCanvas())
       }).catch(() => {
-        if (!this._destroyed) {
+        if (!this._destroyed && requestId === this._trendRequestId) {
           this.setData({
             trendLoading: false,
             trendError: '趋势暂时加载失败，点此重试。'
           }, () => this._drawChart())
         }
       })
+    },
+
+    _trendData(payload) {
+      if (!payload || !Array.isArray(payload.points)) {
+        throw new Error('趋势数据不完整')
+      }
+      return {
+        trendLoading: false,
+        trendError: '',
+        trendPoints: payload.points.map(point => ({
+          ...point,
+          amount: numberValue(point.amount),
+          isProvisional: !!point.isProvisional
+        })),
+        trendDescription: this._trendDescription()
+      }
     },
 
     retryTrends() {
@@ -629,11 +661,13 @@ Component({
 
     _initCanvas() {
       if (this._destroyed) return
+      const requestId = this._trendRequestId
       const query = wx.createSelectorQuery().in(this)
       query.select('#retirement-trend-canvas')
         .fields({ node: true, size: true })
         .exec(result => {
-          if (!result[0] || !result[0].node || !result[0].width) return
+          if (this._destroyed || requestId !== this._trendRequestId
+            || !result[0] || !result[0].node || !result[0].width) return
           const canvas = result[0].node
           const ctx = canvas.getContext('2d')
           const systemInfo = wx.getSystemInfoSync()
@@ -784,7 +818,8 @@ Component({
     },
 
     _trimNumber(value, digits = 1) {
-      return Number(value).toFixed(digits).replace(/\.?0+$/, '')
+      const fixed = Number(value).toFixed(digits)
+      return fixed.includes('.') ? fixed.replace(/0+$/, '').replace(/\.$/, '') : fixed
     },
 
     _withThousands(value) {

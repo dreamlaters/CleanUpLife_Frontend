@@ -86,6 +86,32 @@ Deploy the compatible backend **before releasing this frontend**. Home now makes
 
 The backend's configurable per-section wait budget (default 5 seconds) is not an end-to-end response-time guarantee. This client does not extend timeouts or introduce caching. The existing request wrapper does not expose cancellation; an unloaded home page ignores pending replies and does not start queued refreshes.
 
+### Editing and feature-page reads
+
+Deploy the backend with both new overview endpoints **before releasing this
+frontend**. Existing feature endpoints remain available for older clients.
+
+- Other-category products retain `category: "Product"` but use `/Products`
+  for create, read and update.
+- Editing goal details does not clear sub-goals or completion state. Ordinary
+  shopping edits retain completion; explicit checkbox changes still work.
+  Editing a visited destination retains its status and original visit date.
+- Travel refreshes request Pending and Visited once each, then reuse those
+  results for the visible list and counts.
+- Savings initial/full refresh uses
+  `/RetirementSavings/overview?range=6m&owner=all&category=all`, returning
+  `{ dashboard, trends }`. Accounts come from dashboard; there is no separate
+  accounts request. Filter changes still request only `/RetirementSavings/trends`.
+  The backend shares account and historical snapshot reads within overview.
+- The health page uses `api.getPeriodOverview()` to obtain `{ records, stats }`
+  from one `/Period/overview` request and one backend history read. Existing
+  cycle values and prediction rules are unchanged.
+
+Overview failures remain visible errors, not zero/empty success or automatic
+fan-out to older endpoints. Existing authentication and network retry policies
+remain in effect, so one logical refresh can still make multiple HTTP attempts.
+No cross-request cache or live-service performance claim is introduced.
+
 ### Targeted tests
 
 With Node.js 18 or later, run from this repository directory:
@@ -93,6 +119,9 @@ With Node.js 18 or later, run from this repository directory:
 ```powershell
 node --test .\tests\api.test.js .\tests\home-dashboard.test.js
 node --test .\tests\weight-chart.test.js .\tests\chart-tooltip.test.js
+node --test .\tests\product-routes.test.js .\tests\period-overview.test.js
+# Run all regression suites, including editing and savings overview coverage:
+node --test
 ```
 
 These dependency-free `node:test` suites run the real API and home code in VM contexts with mocked `wx`, `getApp`, and `Page`. They cover request paths/counts, display formatting, complete reminders, empty/error states, targeted retries, all-failed 503s, malformed/global/network failures, refresh ordering, and the existing authentication/write-replay protections.

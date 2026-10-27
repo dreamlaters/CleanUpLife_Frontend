@@ -13,6 +13,13 @@ const CATEGORY_MAP = {
   '其他': 'Product'
 };
 
+const PRODUCT_ENDPOINTS = {
+  Food: 'Food',
+  CatFood: 'CatFood',
+  Medicine: 'Medicine',
+  Product: 'Products'
+};
+
 // 种类映射 (英文 -> 中文)
 const CATEGORY_MAP_REVERSE = {
   'Food': '食物',
@@ -106,6 +113,7 @@ const SUBSCRIPTION_TEMPLATE_IDS = {
 module.exports = {
   CATEGORIES,
   CATEGORY_MAP,
+  PRODUCT_ENDPOINTS,
   CATEGORY_MAP_REVERSE,
   CATEGORY_EMOJI,
   STORAGES,

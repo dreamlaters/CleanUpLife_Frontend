@@ -182,7 +182,7 @@ module.exports = Behavior({
       // 添加特有字段
       this._addCategorySpecificFields(productData, category);
 
-      return { productData, categoryKey };
+      return { productData, categoryKey, endpoint: constants.PRODUCT_ENDPOINTS[categoryKey] };
     },
 
     _addCategorySpecificFields(data, category) {

@@ -95,8 +95,6 @@ Page({
         this.fetchTravelList();
       } else if (targetTab === 'goals') {
         this.fetchYearlyGoals();
-      } else if (targetTab === 'savings') {
-        this.refreshSavings();
       }
       return;
     }
@@ -104,8 +102,6 @@ Page({
       this.fetchTravelList();
     } else if (this.data.currentTab === 'goals') {
       this.fetchYearlyGoals();
-    } else if (this.data.currentTab === 'savings') {
-      this.refreshSavings();
     }
   },
 
@@ -130,15 +126,6 @@ Page({
   },
 
   stopPropagation() {},
-
-  refreshSavings() {
-    wx.nextTick(() => {
-      const savings = this.selectComponent('#retirementSavings');
-      if (savings && typeof savings.refresh === 'function') {
-        savings.refresh();
-      }
-    });
-  },
 
   // 当前账号身份（Pig/Donkey/Other），用于"只能写自己的"
   _myPlayer() {
@@ -168,16 +155,12 @@ Page({
 
   fetchTravelList() {
     this.setData({ loadingTravel: true });
-    const status = this.data.travelTab === 'pending' 
-      ? constants.TRAVEL_STATUS.PENDING 
-      : constants.TRAVEL_STATUS.VISITED;
-    
-    // 同时获取两个Tab的数量
-    Promise.all([
-      api.get(`/Travel/status/${status}`, { showLoading: false }),
+    // 列表和两个 Tab 的数量共用这两份结果，保留服务端排序。
+    return Promise.all([
       api.get(`/Travel/status/${constants.TRAVEL_STATUS.PENDING}`, { showLoading: false }),
       api.get(`/Travel/status/${constants.TRAVEL_STATUS.VISITED}`, { showLoading: false })
-    ]).then(([list, pendingList, visitedList]) => {
+    ]).then(([pendingList, visitedList]) => {
+      const list = this.data.travelTab === 'pending' ? pendingList : visitedList;
       const travelList = (list || []).map(item => ({
         ...item,
         displayName: this.formatTravelDisplayName(item),
@@ -264,8 +247,7 @@ Page({
     const destination = {
       name: travelFormName,
       type: travelFormTypeIndex === 0 ? 'Domestic' : 'International',
-      priority: travelFormPriority,
-      status: 'Pending'
+      priority: travelFormPriority
     };
 
     if (travelFormTypeIndex === 0) {
@@ -278,8 +260,7 @@ Page({
     }
 
     if (editingTravelId) {
-      destination.id = editingTravelId;
-      api.put(`/Travel/${editingTravelId}`, destination, { loadingText: '更新中...' })
+      return api.put(`/Travel/${editingTravelId}`, destination, { loadingText: '更新中...' })
         .then(() => {
           util.showSuccess('更新成功');
           this.setData({ showTravelForm: false, editingTravelId: null });
@@ -287,7 +268,8 @@ Page({
         })
         .catch(() => util.showError('更新失败'));
     } else {
-      api.post('/Travel', destination, { loadingText: '添加中...' })
+      destination.status = 'Pending';
+      return api.post('/Travel', destination, { loadingText: '添加中...' })
         .then(() => {
           util.showSuccess('添加成功');
           this.setData({ showTravelForm: false });
@@ -447,14 +429,11 @@ Page({
     
     const goal = {
       title: goalFormTitle.trim(),
-      owner: goalFormOwner,
-      year: goalFormYear,
-      priority: 10
+      year: goalFormYear
     };
     
     if (editingGoalId) {
-      goal.id = editingGoalId;
-      api.put(`/YearlyGoal/${editingGoalId}`, goal, { loadingText: '更新中...' })
+      return api.put(`/YearlyGoal/${editingGoalId}`, goal, { loadingText: '更新中...' })
         .then(() => {
           util.showSuccess('更新成功');
           this.setData({ showGoalForm: false, editingGoalId: null });
@@ -468,7 +447,9 @@ Page({
         })
         .catch(() => util.showError('更新失败'));
     } else {
-      api.post('/YearlyGoal', goal, { loadingText: '添加中...' })
+      goal.owner = goalFormOwner;
+      goal.priority = 10;
+      return api.post('/YearlyGoal', goal, { loadingText: '添加中...' })
         .then(() => {
           util.showSuccess('添加成功');
           this.setData({ showGoalForm: false, goalFormTitle: '' });
@@ -565,7 +546,7 @@ Page({
       editingTravelId: item.id,
       travelFormTypeIndex: isDomestic ? 0 : 1,
       travelFormName: item.name || '',
-      travelFormPriority: item.priority || 1,
+      travelFormPriority: item.priority ?? 1,
       travelRegion: region,
       travelRegionDisplay: regionDisplay,
       travelCountryIndex: countryIndex

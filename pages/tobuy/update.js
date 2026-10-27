@@ -23,7 +23,7 @@ Page({
 
   // ==================== 数据获取 ====================
   _fetchToBuy(id) {
-    api.get(`/ToBuy/${id}`, { loadingText: '加载中...' })
+    return api.get(`/ToBuy/${id}`, { loadingText: '加载中...' })
       .then(item => {
         this.setData({
           formData: {
@@ -59,13 +59,12 @@ Page({
     }
 
     const data = {
-      id: this.data.id,
-      Name: this.data.formData.name,
-      Priority: this.data.formData.priority,
-      Description: this.data.formData.description || ''
+      name: this.data.formData.name,
+      priority: this.data.formData.priority,
+      description: this.data.formData.description || ''
     };
 
-    api.put(`/ToBuy/${this.data.id}`, data, { loadingText: '更新中...' })
+    return api.put(`/ToBuy/${this.data.id}`, data, { loadingText: '更新中...' })
       .then(() => {
         util.showSuccess('更新成功');
         setTimeout(() => wx.navigateBack(), 1000);

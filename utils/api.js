@@ -247,6 +247,10 @@ const getWeightLatest = (options = {}) => {
 
 // ==================== 姨妈记录 API ====================
 
+const getPeriodOverview = (options = {}) => {
+  return get('/Period/overview', { showLoading: false, ...options });
+};
+
 /**
  * 获取姨妈记录列表
  */
@@ -407,6 +411,7 @@ module.exports = {
   getTravelList,
   getPendingTravelList,
   // 姨妈记录
+  getPeriodOverview,
   getPeriodList,
   getPeriodStats,
   getLatestPeriod,
