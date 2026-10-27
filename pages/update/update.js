@@ -3,6 +3,7 @@
  */
 const api = require('../../utils/api');
 const util = require('../../utils/util');
+const constants = require('../../utils/constants');
 const productFormBehavior = require('../../behaviors/productFormBehavior');
 
 Page({
@@ -25,7 +26,11 @@ Page({
 
   // ==================== 数据获取 ====================
   _fetchProduct(id, category) {
-    const endpoint = category === 'Product' ? 'Products' : category;
+    const endpoint = constants.PRODUCT_ENDPOINTS[category];
+    if (typeof endpoint !== 'string') {
+      util.showError('不支持的物品种类');
+      return;
+    }
     
     api.get(`/${endpoint}/${id}`, { loadingText: '加载中...' })
       .then(item => {
@@ -40,9 +45,9 @@ Page({
   updateForm() {
     if (!this._validateForm()) return;
 
-    const { productData, categoryKey } = this._buildProductData(true);
+    const { productData, endpoint } = this._buildProductData(true);
 
-    api.put(`/${categoryKey}/${this.data.id}`, productData, { loadingText: '更新中...' })
+    api.put(`/${endpoint}/${this.data.id}`, productData, { loadingText: '更新中...' })
       .then(() => {
         util.showSuccess('更新成功');
         setTimeout(() => wx.navigateBack(), 1500);

@@ -173,3 +173,31 @@ test('savings filters clear the old tooltip and use freshly loaded amounts', asy
   h.component.onTrendChartLongPress({ touches: [h.component._trendChartPoints[0]] });
   assert.equal(h.texts.at(-1).text, '\u00a5 123,456.78');
 });
+
+test('savings overview refresh clears old tooltips before loading replacement points', async () => {
+  let resolve;
+  const h = createSavingsChart(
+    [{ month: '2026-09', amount: 1543273.31 }],
+    () => new Promise(done => { resolve = done; })
+  );
+  h.component._getCurrentOwner = () => 'Pig';
+  h.component.triggerEvent = () => {};
+  h.component._drawChart();
+  h.component.onTrendChartLongPress({ touches: [h.component._trendChartPoints[0]] });
+  assert.equal(h.boxes.length, 1);
+
+  const loading = h.component.refresh();
+  assert.equal(h.component.data.trendLoading, true);
+  assert.equal(h.component._trendChartPoints.length, 0);
+  assert.equal(h.boxes.length, 0);
+  resolve({
+    dashboard: { accounts: [] },
+    trends: { points: [{ month: '2026-10', amount: 1200 }] }
+  });
+  await loading;
+
+  assert.equal(h.component.data.error, '');
+  assert.equal(h.component.data.trendLoading, false);
+  h.component.onTrendChartLongPress({ touches: [h.component._trendChartPoints[0]] });
+  assert.equal(h.texts.at(-1).text, '\u00a5 1,200.00');
+});

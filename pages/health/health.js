@@ -103,12 +103,16 @@ Page({
     this.setData({ loadingPeriod: true });
 
     try {
-      const [recordsRes, stats] = await Promise.all([
-        api.getPeriodList(),
-        api.getPeriodStats()
-      ]);
+      const overview = await api.getPeriodOverview({ showErrorToast: false });
+      const stats = overview && overview.stats;
+      if (!overview || !Array.isArray(overview.records) || !stats ||
+          !['none', 'in-period', 'waiting'].includes(stats.status) ||
+          !Number.isFinite(stats.averageCycleDays) || !Number.isFinite(stats.averagePeriodDays) ||
+          !Array.isArray(stats.predictedPeriods)) {
+        throw new Error('经期数据不完整');
+      }
 
-      const records = (recordsRes.data || []).map(record => ({
+      const records = overview.records.map(record => ({
         ...record,
         startDateDisplay: record.startDate ? record.startDate.substring(0, 10) : '',
         endDateDisplay: record.endDate ? record.endDate.substring(0, 10) : ''
@@ -143,6 +147,7 @@ Page({
     } catch (err) {
       console.error('获取姨妈数据失败', err);
       this.setData({ loadingPeriod: false });
+      util.showError('经期数据加载失败');
     }
   },
 
